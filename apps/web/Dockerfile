@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:24-alpine AS build
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -25,7 +25,7 @@ RUN pnpm --filter @permit-portal/web deploy --prod --legacy /prod/web
 RUN cp -a apps/web/.next /prod/web/.next
 RUN cp -a apps/web/public /prod/web/public
 
-FROM node:22-alpine AS runtime
+FROM node:24-alpine AS runtime
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
