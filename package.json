@@ -8,6 +8,8 @@
     "dev:operator": "pnpm --filter @permit-portal/operator dev",
     "dev:web": "pnpm --filter @permit-portal/web dev",
     "start:web": "pnpm --filter @permit-portal/web start",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
     "build": "pnpm build:operator && pnpm build:web",
     "build:operator": "pnpm --filter @permit-portal/operator build",
     "build:web": "pnpm --filter @permit-portal/web build",
