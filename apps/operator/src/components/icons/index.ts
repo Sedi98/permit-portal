@@ -1,0 +1,5 @@
+export { TickCircleIcon } from "./tick-circle"
+export { DocumentTextIcon } from "./document-text"
+export { VisaIcon } from "./visa"
+export { Edit2Icon } from "./edit-2"
+export { EyeIcon } from "./eye"
