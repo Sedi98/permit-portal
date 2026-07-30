@@ -19,6 +19,12 @@ export interface LoginResponse {
   };
 }
 
+export interface LoginWithMyGovResponse {
+  status: string;
+  data: {
+    url: string;
+  };
+}
 export interface UserResponse {
   status: string;
   data: User;

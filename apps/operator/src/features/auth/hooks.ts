@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { getToken, setToken, removeToken } from "@/lib/cookies";
-import { loginUser, getMe, logoutUser } from "./api";
+import { loginUser, getMe, logoutUser, loginWithMyGov } from "./api";
 
 export function useMe() {
   const token = getToken();
@@ -23,9 +23,18 @@ export function useLogin() {
     mutationFn: loginUser,
     onSuccess: (data) => {
       setToken(data.data.token);
-      queryClient.setQueryData(["auth", "me"], { status: "success", data: data.data.user });
+      queryClient.setQueryData(["auth", "me"], {
+        status: "success",
+        data: data.data.user,
+      });
       navigate("/", { replace: true });
     },
+  });
+}
+
+export function useLoginWithMyGov() {
+  return useMutation({
+    mutationFn: loginWithMyGov,
   });
 }
 

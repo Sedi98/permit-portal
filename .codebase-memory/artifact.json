@@ -1,0 +1,11 @@
+{
+    "schema_version": 2,
+    "commit": "b16c16197e329cb2faee1a35933710618ce9b3ec",
+    "indexed_at": "2026-07-30T09:06:33Z",
+    "project": "permit-portal",
+    "nodes": 961,
+    "edges": 1975,
+    "original_size": 2883584,
+    "compressed_size": 469774,
+    "compression_level": 9
+}
