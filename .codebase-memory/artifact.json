@@ -1,11 +1,11 @@
 {
     "schema_version": 2,
-    "commit": "b16c16197e329cb2faee1a35933710618ce9b3ec",
-    "indexed_at": "2026-07-30T09:06:33Z",
-    "project": "permit-portal",
-    "nodes": 961,
-    "edges": 1975,
-    "original_size": 2883584,
-    "compressed_size": 469774,
-    "compression_level": 9
+    "commit": "3527610d21f65fca11886c43c0ea9155bcf4a63b",
+    "indexed_at": "2026-08-02T19:59:24Z",
+    "project": "home-sadi-programming-secop-permit-portal",
+    "nodes": 1269,
+    "edges": 2666,
+    "original_size": 5373952,
+    "compressed_size": 693336,
+    "compression_level": 3
 }

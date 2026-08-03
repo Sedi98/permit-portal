@@ -70,3 +70,56 @@ export const PostApi = async <T = unknown, T2 = unknown>(
     throw error;
   }
 };
+
+export const PatchApi = async <T = unknown, T2 = unknown>(
+  endpoint: string,
+  data: T2,
+  config?: AxiosRequestConfig,
+): Promise<T> => {
+  try {
+    const res = await Http.patch<T>(endpoint, data, config);
+    return res.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.error("PATCH error:", error.message);
+    } else if (error instanceof Error) {
+      console.error("PATCH error:", error.message);
+    }
+    throw error;
+  }
+};
+
+export const PutApi = async <T = unknown, T2 = unknown>(
+  endpoint: string,
+  data: T2,
+  config?: AxiosRequestConfig,
+): Promise<T> => {
+  try {
+    const res = await Http.put<T>(endpoint, data, config);
+    return res.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.error("PUT error:", error.message);
+    } else if (error instanceof Error) {
+      console.error("PUT error:", error.message);
+    }
+    throw error;
+  }
+};
+
+export const DeleteApi = async <T = unknown>(
+  endpoint: string,
+  config?: AxiosRequestConfig,
+): Promise<T> => {
+  try {
+    const res = await Http.delete<T>(endpoint, config);
+    return res.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.error("DELETE error:", error.message);
+    } else if (error instanceof Error) {
+      console.error("DELETE error:", error.message);
+    }
+    throw error;
+  }
+};

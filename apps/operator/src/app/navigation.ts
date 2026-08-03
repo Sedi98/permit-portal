@@ -1,113 +1,168 @@
 import type { LucideIcon } from "lucide-react";
 import {
   ChartLine,
-  CircleHelp,
-  CircleX,
-  ClipboardCheck,
-  ClipboardX,
+  CreditCard,
   FileText,
   Home,
-  Inbox,
-  Medal,
-  MessageSquare,
-  MessagesSquare,
-  PencilLine,
-  RefreshCcw,
-  Settings2,
-  Star,
-  WalletCards,
+  SignatureIcon,
+  Users,
 } from "lucide-react";
+
+export type Role =
+  | "super_admin"
+  | "executor"
+  | "deputy_minister"
+  | "department_head";
 
 export type SidebarSubItem = {
   label: string;
   path: string;
+  roles?: Role[];
+  endpoint?: string;
 };
 
 export type SidebarItem = {
   label: string;
   path: string;
   icon: LucideIcon;
-  badgeCount?: number;
+  roles?: Role[];
+  endpoint?: string;
   subItems?: SidebarSubItem[];
 };
 
+const allRoles: Role[] = [
+  "super_admin",
+  "executor",
+  "deputy_minister",
+  "department_head",
+];
+
 export const sidebarItems: SidebarItem[] = [
-  { label: "Əsas səhifə", path: "/", icon: Home },
-  { label: "Lövhə", path: "/board", icon: ChartLine },
+  // Roles: all roles
+  // Endpoint: GET /api/admin/permit-applications (role-scoped by backend)
+  { label: "Əsas səhifə", path: "/", icon: Home, roles: allRoles },
+
+  // Roles: all roles
+  // Endpoint: GET /api/admin/statistics (role-scoped by backend)
+  { label: "Lövhə", path: "/board", icon: ChartLine, roles: allRoles },
+
+  // Roles: super_admin
+  // Endpoint: user-management endpoints (documented separately)
+  { label: "İstifadəçilər", path: "/users", icon: Users, roles: ["super_admin"] },
+
   {
+    // Roles: all roles
+    // Endpoint: GET /api/admin/permit-applications (status-specific below)
     label: "Müraciətlər",
     path: "/applications",
     icon: FileText,
-    badgeCount: 3,
+    roles: allRoles,
     subItems: [
-      { label: "Yeni daxil olanlar", path: "/applications/new" },
-      { label: "Yönləndirilmişlər", path: "/applications/assigned" },
-      { label: "İcra edilmişlər", path: "/applications/completed" },
-    ],
-  },
-  {
-    label: "Rəy üçün sorğular",
-    path: "/feedback-requests",
-    icon: MessageSquare,
-    badgeCount: 3,
-    subItems: [
-      { label: "Viza üçün", path: "/feedback-requests/viza-uchun" },
-      { label: "İmza üçün", path: "/feedback-requests/imza-uchun" },
-      { label: "Göndərilənlər", path: "/feedback-requests/gonderilenler" },
-      { label: "Daxil olanlar", path: "/feedback-requests/daxil-olanlar" },
-      { label: "Geri qaytarılanlar", path: "/feedback-requests/geri-qaytarilanlar" },
+      // Roles: super_admin, executor
+      // Endpoint: GET /api/admin/permit-applications?status=assigned
       {
-        label: "Müddət uzatma sorğuları",
-        path: "/feedback-requests/muddet-uzatma-sorgulari",
+        label: "Yeni daxil olanlar",
+        path: "/applications/assigned",
+        roles: ["super_admin", "executor"],
+        endpoint: "GET /api/admin/permit-applications?status=assigned",
       },
-      { label: "Vizaladıqlarım", path: "/feedback-requests/vizaladiglarim" },
-      { label: "İmzaladıqlarım", path: "/feedback-requests/imzaladiglarim" },
-    ],
-  },
-  {
-    label: "Sənədin təsdiqi üçün sorğular",
-    path: "/document-approval-requests",
-    icon: ClipboardCheck,
-  },
-  {
-    label: "Çatışmazlıq barədə bildirişlər",
-    path: "/noncompliance-notices",
-    icon: ClipboardX,
-    badgeCount: 3,
-    subItems: [
-      { label: "Viza üçün", path: "/noncompliance-notices/viza-uchun" },
-      { label: "İmza üçün", path: "/noncompliance-notices/imza-uchun" },
-      { label: "Göndərilənlər", path: "/noncompliance-notices/gonderilenler" },
-      { label: "Geri qaytarılanlar", path: "/noncompliance-notices/geri-qaytarilanlar" },
-      { label: "Vizaladıqlarım", path: "/noncompliance-notices/vizaladiglarim" },
-      { label: "İmzaladıqlarım", path: "/noncompliance-notices/imzaladiglarim" },
+      // Roles: super_admin, executor
+      // Endpoint: GET /api/admin/permit-applications?status=under_review
       {
-        label: "Ümumi vizaladıqlarım",
-        path: "/noncompliance-notices/umumi-vizaladiglarim",
+        label: "İcrada olanlar",
+        path: "/applications/under_review",
+        roles: ["super_admin", "executor"],
+        endpoint: "GET /api/admin/permit-applications?status=under_review",
+      },
+      // Roles: super_admin, executor
+      // Endpoint: GET /api/admin/permit-applications?status=in_document_flow
+      {
+        label: "Göndərilmişlər",
+        path: "/applications/in_document_flow",
+        roles: ["super_admin", "executor"],
+        endpoint: "GET /api/admin/permit-applications?status=in_document_flow",
+      },
+      // Roles: super_admin, deputy_minister
+      // Endpoint: GET /api/admin/permit-applications?status=registered
+      {
+        label: "Yeni (yönləndirmə gözləyir)",
+        path: "/applications/registered",
+        roles: ["super_admin", "deputy_minister"],
+        endpoint: "GET /api/admin/permit-applications?status=registered",
+      },
+      // Roles: super_admin, deputy_minister, department_head
+      // Endpoint: GET /api/admin/permit-applications?status=forwarded
+      {
+        label: "Yönləndirilmişlər",
+        path: "/applications/forwarded",
+        roles: ["super_admin", "deputy_minister", "department_head"],
+        endpoint: "GET /api/admin/permit-applications?status=forwarded",
+      },
+      // Roles: super_admin, department_head
+      // Endpoint: GET /api/admin/permit-applications?status=assigned,under_review,in_document_flow
+      {
+        label: "İcrada olanlar",
+        path: "/applications/on_assigned",
+        roles: ["super_admin", "department_head"],
+        endpoint: "GET /api/admin/permit-applications?status=assigned,under_review,in_document_flow",
+      },
+      // Roles: all roles
+      // Endpoint: GET /api/admin/permit-applications?status=completed
+      {
+        label: "İcra edilmişlər",
+        path: "/applications/completed",
+        roles: allRoles,
+        endpoint: "GET /api/admin/permit-applications?status=completed",
       },
     ],
   },
-  { label: "Ödənişlər", path: "/payments", icon: WalletCards },
-  { label: "Xidməti məruzələr", path: "/service-reports", icon: PencilLine },
-  { label: "Sərəncamların rəsmiləşməsi", path: "/orders-registration", icon: MessagesSquare },
-  { label: "İmtinalar", path: "/rejections", icon: CircleX },
-  { label: "Hesabatlar", path: "/reports", icon: FileText },
+
+  // Roles: super_admin, department_head
+  // Endpoint: GET /api/admin/visa-queue
   {
-    label: "Dayandırma, Bərpa, Ləğv etmə",
-    path: "/suspension-restoration-cancellation",
-    icon: RefreshCcw,
+    label: "Viza gözləyən sənədlər",
+    path: "/visa-queue",
+    icon: SignatureIcon,
+    roles: ["super_admin", "department_head"],
+    endpoint: "GET /api/admin/visa-queue",
   },
-  { label: "İcazələrin rəsmiləşdirilməsi", path: "/permits-registration", icon: Medal },
-  { label: "Mesajlar", path: "/messages", icon: Inbox },
-  { label: "Qiymətləndirmə", path: "/evaluation", icon: Star },
+
+  // Roles: super_admin, deputy_minister
+  // Endpoint: GET /api/admin/sign-queue
   {
-    label: "Təklif, Şikayət, Sorğular",
-    path: "/suggestions-complaints-requests",
-    icon: MessagesSquare,
+    label: "İmza gözləyən sənədlər",
+    path: "/sign-queue",
+    icon: SignatureIcon,
+    roles: ["super_admin", "deputy_minister"],
+    endpoint: "GET /api/admin/sign-queue",
   },
-  { label: "Sual-Cavab bazası", path: "/faq", icon: CircleHelp },
-  { label: "İdarəetmə modulu", path: "/administration", icon: Settings2 },
+
+  // Roles: super_admin, deputy_minister
+  // Endpoint: GET /api/admin/permit-applications?status=awaiting_payment
+  {
+    label: "Ödəniş təsdiqi gözləyənlər",
+    path: "/awaiting_payment",
+    icon: CreditCard,
+    roles: ["executor"],
+    endpoint: "GET /api/admin/permit-applications?status=awaiting_payment",
+  },
 ];
+
+export function getVisibleSidebarItems(userRole: Role | undefined) {
+  return sidebarItems
+    .map((item) => {
+      if (item.roles && (!userRole || !item.roles.includes(userRole))) return null;
+
+      const subItems = item.subItems?.filter(
+        (subItem) => !subItem.roles || (!!userRole && subItem.roles.includes(userRole)),
+      );
+
+      if (item.subItems && !subItems?.length) return null;
+
+      return item.subItems ? { ...item, subItems } : item;
+    })
+    .filter((item): item is SidebarItem => item !== null);
+}
 
 export function getSidebarBreadcrumbs(pathname: string) {
   const normalizedPath = pathname === "/" ? "/" : pathname.replace(/\/+$/, "");

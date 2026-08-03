@@ -2,7 +2,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: "super_admin" | "manager" | "executor";
+  role: "super_admin" | "executor" | "deputy_minister" | "department_head";
 }
 
 export interface LoginPayload {

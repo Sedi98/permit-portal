@@ -2,8 +2,12 @@ import type { User } from "@/features/auth/types";
 
 export type ApplicationStatus =
   | "registered"
+  | "forwarded"
   | "assigned"
   | "under_review"
+  | "in_document_flow"
+  | "awaiting_payment"
+  | "awaiting_revision"
   | "sent_for_approval"
   | "completed"
   | "rejected"
@@ -12,10 +16,12 @@ export type ApplicationStatus =
 export type ApplicantType = "physical" | "legal";
 
 export interface ApplicationsQueryParams {
-  status?: ApplicationStatus;
+  status?: ApplicationStatus | string;
   permit_service_id?: number;
   search?: string;
   applicant_type?: ApplicantType;
+  date_from?: string;
+  date_to?: string;
   per_page?: number;
   page?: number;
 }
@@ -24,8 +30,25 @@ export interface AssignPayload {
   assigned_to: number;
 }
 
+export type AssignmentRole = "main" | "joint" | "observer";
+
+export interface ApplicationAssigneePayload {
+  user_id: number;
+  assignment_role: AssignmentRole;
+}
+
+export interface AssignApplicationPayload {
+  assignees: ApplicationAssigneePayload[];
+  note?: string;
+}
+
+export interface ForwardApplicationPayload {
+  department_id: number;
+  note?: string;
+}
+
 export interface StatusChangePayload {
-  status: Exclude<ApplicationStatus, "registered" | "assigned">;
+  status: ApplicationStatus;
   rejection_reason?: string;
 }
 
@@ -45,6 +68,19 @@ export interface Executor {
   id: number;
   name: string;
   email: string;
+  fin?: string;
+  department_id?: number;
+}
+
+export interface Department {
+  id: number;
+  name: string;
+  code: string;
+}
+
+export interface DepartmentsResponse {
+  status: string;
+  data: Department[];
 }
 
 export interface AppPhone {
@@ -66,19 +102,48 @@ export interface AppFile {
   size: number;
   created_at: string;
   updated_at: string;
+  review_status?: "accepted" | "rejected" | null;
+  review_note?: string | null;
 }
 
 export interface AppDocument {
   id: number;
-  document_number: string;
-  url: string;
-  created_at: string;
+  type?: string;
+  status?: string;
+  body?: string;
+  document_number?: string;
+  url?: string;
+  signed_at?: string;
+  created_at?: string;
+  visas?: DocumentVisa[];
+}
+
+export interface DocumentVisa {
+  id?: number;
+  status?: string;
+  note?: string | null;
+  acted_at?: string | null;
+  department: Department;
+}
+
+export interface FileReviewPayload {
+  review_status: "accepted" | "rejected";
+  review_note?: string;
+}
+
+export interface PrepareDocumentPayload {
+  type: "deficiency" | "permit" | string;
+  body: string;
 }
 
 export interface StatusHistory {
-  from_status: string;
-  to_status: string;
-  changed_by_user: User;
+  old_status?: string | null;
+  new_status?: string;
+  from_status?: string | null;
+  to_status?: string;
+  note?: string | null;
+  changed_by?: Pick<User, "id" | "name"> | null;
+  changed_by_user?: User | null;
   created_at: string;
 }
 
@@ -151,6 +216,7 @@ export interface ApplicationDetail {
   files: AppFile[];
   documents: AppDocument[];
   status_histories: StatusHistory[];
+  assignees: ApplicationAssignee[];
   assigned_user: User | null;
   user: User | null;
 }
@@ -180,6 +246,19 @@ export interface StatusChangeResponse {
   status: string;
   message: string;
   data?: {
+    id?: number;
+    status?: string;
+    review_status?: string;
+    review_note?: string | null;
+    department?: Department;
+    assignees?: ApplicationAssignee[];
     documents?: AppDocument[];
+    visas?: DocumentVisa[];
   };
+}
+
+export interface ApplicationAssignee {
+  user_id: number;
+  assignment_role: AssignmentRole;
+  user?: Pick<User, "id" | "name">;
 }

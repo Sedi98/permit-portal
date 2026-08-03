@@ -1,45 +1,25 @@
-import { Routes, Route } from "react-router";
+import { Route, Routes } from "react-router";
 
-import DashLayout from '@/app/layouts/DashLayout';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import LoginPage from '@/pages/login/index';
-import HomePage from '@/pages/(dashboard)/home';
+import DashLayout from "@/app/layouts/DashLayout";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import LoginPage from "@/pages/login/index";
+import HomePage from "@/pages/(dashboard)/home";
 import BoardPage from "@/pages/(dashboard)/board";
-import ApplicationsPage from "@/pages/(dashboard)/applications";
-import NewApplicationsPage from "@/pages/(dashboard)/applications/new";
+import UsersPage from "@/pages/(dashboard)/users";
 import AssignedApplicationsPage from "@/pages/(dashboard)/applications/assigned";
+import UnderReviewApplicationsPage from "@/pages/(dashboard)/applications/under_review";
+import InDocumentFlowApplicationsPage from "@/pages/(dashboard)/applications/in_document_flow";
+import RegisteredApplicationsPage from "@/pages/(dashboard)/applications/registered";
+import ForwardedApplicationsPage from "@/pages/(dashboard)/applications/forwarded";
+import DepartmentApplicationsPage from "@/pages/(dashboard)/applications/on_assigned";
 import CompletedApplicationsPage from "@/pages/(dashboard)/applications/completed";
-import FeedbackRequestsPage from "@/pages/(dashboard)/feedback-requests";
-import FeedbackRequestsVizaUchunPage from "@/pages/(dashboard)/feedback-requests/viza-uchun";
-import FeedbackRequestsImzaUchunPage from "@/pages/(dashboard)/feedback-requests/imza-uchun";
-import FeedbackRequestsGonderilenlerPage from "@/pages/(dashboard)/feedback-requests/gonderilenler";
-import FeedbackRequestsDaxilOlanlarPage from "@/pages/(dashboard)/feedback-requests/daxil-olanlar";
-import FeedbackRequestsGeriQaytarilanlarPage from "@/pages/(dashboard)/feedback-requests/geri-qaytarilanlar";
-import FeedbackRequestsMuddetUzatmaSorgulariPage from "@/pages/(dashboard)/feedback-requests/muddet-uzatma-sorgulari";
-import FeedbackRequestsVizaladiglarimPage from "@/pages/(dashboard)/feedback-requests/vizaladiglarim";
-import FeedbackRequestsImzaladiglarimPage from "@/pages/(dashboard)/feedback-requests/imzaladiglarim";
-import DocumentApprovalRequestsPage from "@/pages/(dashboard)/document-approval-requests";
-import NoncomplianceNoticesPage from "@/pages/(dashboard)/noncompliance-notices";
-import NoncomplianceNoticesVizaUchunPage from "@/pages/(dashboard)/noncompliance-notices/viza-uchun";
-import NoncomplianceNoticesImzaUchunPage from "@/pages/(dashboard)/noncompliance-notices/imza-uchun";
-import NoncomplianceNoticesGonderilenlerPage from "@/pages/(dashboard)/noncompliance-notices/gonderilenler";
-import NoncomplianceNoticesGeriQaytarilanlarPage from "@/pages/(dashboard)/noncompliance-notices/geri-qaytarilanlar";
-import NoncomplianceNoticesVizaladiglarimPage from "@/pages/(dashboard)/noncompliance-notices/vizaladiglarim";
-import NoncomplianceNoticesImzaladiglarimPage from "@/pages/(dashboard)/noncompliance-notices/imzaladiglarim";
-import NoncomplianceNoticesUmumiVizaladiglarimPage from "@/pages/(dashboard)/noncompliance-notices/umumi-vizaladiglarim";
-import PaymentsPage from "@/pages/(dashboard)/payments";
-import ServiceReportsPage from "@/pages/(dashboard)/service-reports";
-import OrdersRegistrationPage from "@/pages/(dashboard)/orders-registration";
-import RejectionsPage from "@/pages/(dashboard)/rejections";
-import ReportsPage from "@/pages/(dashboard)/reports";
-import SuspensionRestorationCancellationPage from "@/pages/(dashboard)/suspension-restoration-cancellation";
-import PermitsRegistrationPage from "@/pages/(dashboard)/permits-registration";
-import MessagesPage from "@/pages/(dashboard)/messages";
-import EvaluationPage from "@/pages/(dashboard)/evaluation";
-import SuggestionsComplaintsRequestsPage from "@/pages/(dashboard)/suggestions-complaints-requests";
-import FaqPage from "@/pages/(dashboard)/faq";
-import AdministrationPage from "@/pages/(dashboard)/administration";
-
+import VisaQueuePage from "@/pages/(dashboard)/visa-queue";
+import SignQueuePage from "@/pages/(dashboard)/sign-queue";
+import AwaitingPaymentPage from "@/pages/(dashboard)/awaiting_payment";
+import ApplicationManagePage from "@/pages/(dashboard)/applications/manage";
+import VisaQueueManagePage from "@/pages/(dashboard)/visa-queue/manage";
+import SignQueueManagePage from "@/pages/(dashboard)/sign-queue/manage";
+import UserManagePage from "@/pages/(dashboard)/users/manage";
 
 export default function AppRouter() {
   return (
@@ -49,47 +29,30 @@ export default function AppRouter() {
         <Route element={<DashLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/board" element={<BoardPage />} />
-          <Route path="/applications" element={<ApplicationsPage />} />
-          <Route path="/applications/new" element={<NewApplicationsPage />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/users/manage/:id" element={<UserManagePage />} />
+
           <Route path="/applications/assigned" element={<AssignedApplicationsPage />} />
+          <Route path="/applications/assigned/manage/:id" element={<ApplicationManagePage />} />
+          <Route path="/applications/under_review" element={<UnderReviewApplicationsPage />} />
+          <Route path="/applications/under_review/manage/:id" element={<ApplicationManagePage />} />
+          <Route path="/applications/in_document_flow" element={<InDocumentFlowApplicationsPage />} />
+          <Route path="/applications/in_document_flow/manage/:id" element={<ApplicationManagePage />} />
+          <Route path="/applications/registered" element={<RegisteredApplicationsPage />} />
+          <Route path="/applications/registered/manage/:id" element={<ApplicationManagePage />} />
+          <Route path="/applications/forwarded" element={<ForwardedApplicationsPage />} />
+          <Route path="/applications/forwarded/manage/:id" element={<ApplicationManagePage />} />
+          <Route path="/applications/on_assigned" element={<DepartmentApplicationsPage />} />
+          <Route path="/applications/on_assigned/manage/:id" element={<ApplicationManagePage />} />
           <Route path="/applications/completed" element={<CompletedApplicationsPage />} />
-          <Route path="/feedback-requests" element={<FeedbackRequestsPage />} />
-          <Route path="/feedback-requests/viza-uchun" element={<FeedbackRequestsVizaUchunPage />} />
-          <Route path="/feedback-requests/imza-uchun" element={<FeedbackRequestsImzaUchunPage />} />
-          <Route path="/feedback-requests/gonderilenler" element={<FeedbackRequestsGonderilenlerPage />} />
-          <Route path="/feedback-requests/daxil-olanlar" element={<FeedbackRequestsDaxilOlanlarPage />} />
-          <Route path="/feedback-requests/geri-qaytarilanlar" element={<FeedbackRequestsGeriQaytarilanlarPage />} />
-          <Route path="/feedback-requests/muddet-uzatma-sorgulari" element={<FeedbackRequestsMuddetUzatmaSorgulariPage />} />
-          <Route path="/feedback-requests/vizaladiglarim" element={<FeedbackRequestsVizaladiglarimPage />} />
-          <Route path="/feedback-requests/imzaladiglarim" element={<FeedbackRequestsImzaladiglarimPage />} />
-          <Route path="/document-approval-requests" element={<DocumentApprovalRequestsPage />} />
-          <Route path="/noncompliance-notices" element={<NoncomplianceNoticesPage />} />
-          <Route path="/noncompliance-notices/viza-uchun" element={<NoncomplianceNoticesVizaUchunPage />} />
-          <Route path="/noncompliance-notices/imza-uchun" element={<NoncomplianceNoticesImzaUchunPage />} />
-          <Route path="/noncompliance-notices/gonderilenler/:id" element={<NoncomplianceNoticesGonderilenlerPage />} />
-          <Route path="/noncompliance-notices/gonderilenler" element={<NoncomplianceNoticesGonderilenlerPage />} />
-          <Route path="/noncompliance-notices/geri-qaytarilanlar" element={<NoncomplianceNoticesGeriQaytarilanlarPage />} />
-          <Route path="/noncompliance-notices/vizaladiglarim" element={<NoncomplianceNoticesVizaladiglarimPage />} />
-          <Route path="/noncompliance-notices/imzaladiglarim" element={<NoncomplianceNoticesImzaladiglarimPage />} />
-          <Route path="/noncompliance-notices/umumi-vizaladiglarim" element={<NoncomplianceNoticesUmumiVizaladiglarimPage />} />
-          <Route path="/payments" element={<PaymentsPage />} />
-          <Route path="/service-reports" element={<ServiceReportsPage />} />
-          <Route path="/orders-registration" element={<OrdersRegistrationPage />} />
-          <Route path="/rejections" element={<RejectionsPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route
-            path="/suspension-restoration-cancellation"
-            element={<SuspensionRestorationCancellationPage />}
-          />
-          <Route path="/permits-registration" element={<PermitsRegistrationPage />} />
-          <Route path="/messages" element={<MessagesPage />} />
-          <Route path="/evaluation" element={<EvaluationPage />} />
-          <Route
-            path="/suggestions-complaints-requests"
-            element={<SuggestionsComplaintsRequestsPage />}
-          />
-          <Route path="/faq" element={<FaqPage />} />
-          <Route path="/administration" element={<AdministrationPage />} />
+          <Route path="/applications/completed/manage/:id" element={<ApplicationManagePage />} />
+
+          <Route path="/visa-queue" element={<VisaQueuePage />} />
+          <Route path="/visa-queue/manage/:id" element={<VisaQueueManagePage />} />
+          <Route path="/sign-queue" element={<SignQueuePage />} />
+          <Route path="/sign-queue/manage/:id" element={<SignQueueManagePage />} />
+          <Route path="/awaiting_payment" element={<AwaitingPaymentPage />} />
+          <Route path="/awaiting_payment/manage/:id" element={<ApplicationManagePage />} />
         </Route>
       </Route>
     </Routes>

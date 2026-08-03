@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { addDays, format } from "date-fns"
+import { format, subMonths } from "date-fns"
 import { CalendarIcon, ChevronDown } from "lucide-react"
 import { type DateRange } from "react-day-picker"
 
@@ -26,10 +26,10 @@ export function DatePickerWithRange({
   placeholder = "Tarix seç",
   className,
 }: DatePickerWithRangeProps) {
-  const [internalDate, setInternalDate] = React.useState<DateRange | undefined>({
-    from: new Date(new Date().getFullYear(), 0, 20),
-    to: addDays(new Date(new Date().getFullYear(), 0, 20), 20),
-  })
+  const [internalDate, setInternalDate] = React.useState<DateRange | undefined>(() => ({
+    from: subMonths(new Date(), 1),
+    to: new Date(),
+  }))
 
   const date = controlledValue ?? internalDate
 
@@ -54,7 +54,7 @@ export function DatePickerWithRange({
       <PopoverTrigger asChild>
         <div
           className={cn(
-            "flex items-center gap-3 bg-[#f5f5f5] rounded-lg px-4 py-3 w-[280px] cursor-pointer",
+            "flex items-center gap-3 bg-[#f5f5f5] rounded-lg px-4 py-3 w-auto cursor-pointer",
             "text-base font-normal leading-6",
             date?.from ? "text-[#1F1F1F]" : "text-[#797979]",
             className

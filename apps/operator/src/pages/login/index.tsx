@@ -17,10 +17,8 @@ const myGovErrorMessages: Record<string, string> = {
   user_not_registered:
     "Bu hesab sistemdə qeydə alınmayıb. Administratora müraciət edin.",
   not_admin: "Bu hesabın admin panelə girişi yoxdur.",
-  account_inactive:
-    "Hesabınız deaktiv edilib. Administratora müraciət edin.",
-  mygov_auth_failed:
-    "Giriş zamanı xəta baş verdi, yenidən cəhd edin.",
+  account_inactive: "Hesabınız deaktiv edilib. Administratora müraciət edin.",
+  mygov_auth_failed: "Giriş zamanı xəta baş verdi, yenidən cəhd edin.",
 };
 
 export default function LoginPage() {
@@ -76,9 +74,7 @@ export default function LoginPage() {
         window.location.assign(data.data.url);
       },
       onError: () => {
-        toast.error(
-          "Giriş zamanı xəta baş verdi, yenidən cəhd edin.",
-        );
+        toast.error("Giriş zamanı xəta baş verdi, yenidən cəhd edin.");
       },
     });
   };
@@ -89,16 +85,13 @@ export default function LoginPage() {
         <CardContent className="flex flex-col items-center gap-6 pt-10 pb-8">
           <img src={logoUrl} alt="Logo" className="h-12" />
 
-          <h1 className="text-xl font-semibold text-[#1f1f1f]">
-            Login
-          </h1>
+          <h1 className="text-xl font-semibold text-[#1f1f1f]">Login</h1>
 
-          <p className="-mt-4 text-sm text-[#797979]">
-            Hesabınıza daxil olun
-          </p>
+          <p className="-mt-4 text-sm text-[#797979]">Hesabınıza daxil olun</p>
 
           <Button
             type="button"
+            variant={"link"}
             className="w-full"
             onClick={handleMyGovLogin}
             disabled={myGovLogin.isPending}

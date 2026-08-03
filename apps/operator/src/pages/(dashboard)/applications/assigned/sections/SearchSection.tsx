@@ -10,13 +10,9 @@ import {
 import type { ApplicationStatus, ApplicantType } from "@/features/applications/types"
 
 const statusOptions: { value: ApplicationStatus | "all"; label: string }[] = [
-  { value: "all", label: "Hamısı" },
-  { value: "registered", label: "Gözləmədə" },
   { value: "assigned", label: "Yönləndirilmiş" },
   { value: "under_review", label: "İcrada" },
-  { value: "sent_for_approval", label: "Təsdiq gözləyir" },
-  { value: "completed", label: "Tamamlanmış" },
-  { value: "rejected", label: "Geri qaytarılmış" },
+  { value: "in_document_flow", label: "Sənəd dövriyyəsində" },
 ]
 
 const applicantTypeOptions: { value: ApplicantType | "all"; label: string }[] = [
@@ -32,6 +28,7 @@ interface SearchSectionProps {
   onStatusChange: (value: string) => void
   applicantType: string
   onApplicantTypeChange: (value: string) => void
+  showStatus?: boolean
 }
 
 export default function SearchSection({
@@ -41,6 +38,7 @@ export default function SearchSection({
   onStatusChange,
   applicantType,
   onApplicantTypeChange,
+  showStatus = false,
 }: SearchSectionProps) {
   return (
     <div className="flex gap-4">
@@ -69,20 +67,22 @@ export default function SearchSection({
         </Select>
       </div>
 
-      <div className="w-[200px]">
-        <Select value={status} onValueChange={onStatusChange}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {statusOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {showStatus ? (
+        <div className="w-[200px]">
+          <Select value={status} onValueChange={onStatusChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
     </div>
   )
 }

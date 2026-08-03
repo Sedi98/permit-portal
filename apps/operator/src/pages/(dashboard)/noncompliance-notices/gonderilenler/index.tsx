@@ -27,7 +27,7 @@ export default function NoncomplianceNoticesGonderilenlerPage() {
   const { data: executorsData, isFetched: executorsFetched } = useExecutors();
   const me = useMe();
   const role = me.data?.data?.role;
-  const canAssign = role === "super_admin" || role === "manager";
+  const canAssign = role === "super_admin" || role === "department_head";
   const isExecutor = role === "executor";
   const detail = applicationDetail?.data;
   const hasAssignedUser = !!detail?.assigned_user;

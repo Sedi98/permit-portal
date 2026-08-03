@@ -1,14 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import {
+  assignApplication,
   getApplications,
   getApplicationById,
+  getDepartments,
   getExecutors,
   assignExecutor,
   changeStatus,
+  forwardApplication,
   getFileBlob,
+  prepareApplicationDocument,
+  reviewApplicationFile,
 } from "./api";
-import type { ApplicationsQueryParams, AssignPayload, StatusChangePayload } from "./types";
+import type {
+  ApplicationsQueryParams,
+  AssignApplicationPayload,
+  AssignPayload,
+  FileReviewPayload,
+  ForwardApplicationPayload,
+  PrepareDocumentPayload,
+  StatusChangePayload,
+} from "./types";
 
 export function useApplications(params?: ApplicationsQueryParams) {
   return useQuery({
@@ -33,6 +46,38 @@ export function useExecutors() {
     queryFn: getExecutors,
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: true,
+  });
+}
+
+export function useDepartments() {
+  return useQuery({
+    queryKey: ["applications", "departments"],
+    queryFn: getDepartments,
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
+export function useForwardApplication(applicationId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: ForwardApplicationPayload) => forwardApplication(applicationId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["applications", "detail", applicationId] });
+      queryClient.invalidateQueries({ queryKey: ["applications", "list"] });
+    },
+  });
+}
+
+export function useAssignApplication(applicationId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: AssignApplicationPayload) => assignApplication(applicationId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["applications", "detail", applicationId] });
+      queryClient.invalidateQueries({ queryKey: ["applications", "list"] });
+    },
   });
 }
 
@@ -61,6 +106,29 @@ export function useChangeStatus(applicationId: number) {
 
   return useMutation({
     mutationFn: (payload: StatusChangePayload) => changeStatus(applicationId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["applications", "detail", applicationId] });
+      queryClient.invalidateQueries({ queryKey: ["applications", "list"] });
+    },
+  });
+}
+
+export function useReviewApplicationFile(applicationId: number, fileId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: FileReviewPayload) => reviewApplicationFile(applicationId, fileId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["applications", "detail", applicationId] });
+    },
+  });
+}
+
+export function usePrepareApplicationDocument(applicationId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: PrepareDocumentPayload) => prepareApplicationDocument(applicationId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["applications", "detail", applicationId] });
       queryClient.invalidateQueries({ queryKey: ["applications", "list"] });

@@ -5,7 +5,8 @@ import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
 
 import { cn } from "@/lib/utils";
-import { sidebarItems } from "@/app/navigation";
+import { getVisibleSidebarItems, type SidebarItem } from "@/app/navigation";
+import { useMe } from "@/features/auth/hooks";
 
 function SidebarItem({
   item,
@@ -13,7 +14,7 @@ function SidebarItem({
   onToggle,
   isActiveRoute,
 }: {
-  item: (typeof sidebarItems)[number];
+  item: SidebarItem;
   isOpen: boolean;
   onToggle: () => void;
   isActiveRoute: boolean;
@@ -129,7 +130,9 @@ function SidebarItem({
 
 export default function Sidebar() {
   const location = useLocation();
+  const { data: me } = useMe();
   const [manualOpenPath, setManualOpenPath] = useState<string | null>(null);
+  const sidebarItems = getVisibleSidebarItems(me?.data?.role);
 
   return (
     <aside className="flex w-[300px] flex-col bg-white px-6 pt-6 pb-8 text-[#1f1f1f] border-r border-[#dfdfdf] h-dvh overflow-scroll">
