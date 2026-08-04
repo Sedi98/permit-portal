@@ -2,6 +2,8 @@
 
 Fiziki şəxsin, mygov ID ilə giriş etdikdən sonra, müraciət yaradana qədər keçdiyi bütün yol.
 
+
+<!-- burda  ana sehifede icazelerin gosterilmesi endpointi nezerde tutulur addim 0 icazeni getirmek -->
 ---
 ## ADDIM 0 — 15 İcazəni gətirmək
 
