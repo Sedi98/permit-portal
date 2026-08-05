@@ -4,6 +4,7 @@ import { Bell, BookOpen, ChevronDown, FileText, LogOut, Menu, PhoneCall, X } fro
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const links = [
   { label: "İcazələr", href: "#icazələr" },
@@ -56,21 +57,23 @@ export function Navbar() {
             <span>974</span>
           </a>
           {authenticated ? (
-            <div className="relative">
+            <Popover open={profileOpen} onOpenChange={setProfileOpen}>
               <div className="flex items-center gap-2 rounded-lg border border-[#dfdfdf] bg-white p-1.5 pl-3">
                 <span className="text-base font-semibold leading-6 text-[#286aa6]">İstifadəçi</span>
-                <button
-                  type="button"
-                  aria-label="Profil menyusunu aç"
-                  aria-expanded={profileOpen}
-                  onClick={() => setProfileOpen((open) => !open)}
-                  className="flex size-9 items-center justify-center rounded-lg text-[#286aa6] hover:bg-[#eaf3fa]"
-                >
-                  <ChevronDown className={`size-5 transition-transform ${profileOpen ? "rotate-180" : ""}`} aria-hidden="true" />
-                </button>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Profil menyusunu aç"
+                    className="flex size-9 items-center justify-center rounded-lg text-[#286aa6] hover:bg-[#eaf3fa]"
+                  >
+                    <ChevronDown className={`size-5 transition-transform ${profileOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+                  </button>
+                </PopoverTrigger>
               </div>
-              {profileOpen ? <ProfileMenu onLogout={() => void handleLogout()} /> : null}
-            </div>
+              <PopoverContent align="end" sideOffset={8} className="w-60 rounded-xl border-0 bg-white p-2 shadow-lg">
+                <ProfileMenu onLogout={() => void handleLogout()} />
+              </PopoverContent>
+            </Popover>
           ) : (
             <a href="/login" className="rounded-lg bg-[#286aa6] px-4 py-3 text-base font-semibold leading-6 text-white transition-colors hover:bg-[#1f5688]">
               Portala giriş
@@ -144,7 +147,7 @@ export function Navbar() {
 
 function ProfileMenu({ onLogout, mobile = false }: { onLogout: () => void; mobile?: boolean }) {
   return (
-    <div className={`${mobile ? "mt-2" : "absolute right-0 top-[calc(100%+8px)] z-50 w-60 shadow-lg"} flex flex-col gap-3 rounded-xl bg-white p-2`}>
+    <div className={`${mobile ? "mt-2" : ""} flex flex-col gap-3 rounded-xl bg-white p-0`}>
       <a href="/muracietlerim" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><FileText className="size-6" aria-hidden="true" />Müraciətlərim</a>
       <a href="/qaralamalar" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><BookOpen className="size-6" aria-hidden="true" />Qaralamalar</a>
       <a href="/bildirisler" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><Bell className="size-6" aria-hidden="true" /><span className="flex-1">Bildirişlər</span><span className="rounded-full bg-[#286aa6] px-2 py-0.5 text-sm font-medium leading-5 text-white">2</span></a>
