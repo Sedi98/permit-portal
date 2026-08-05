@@ -19,10 +19,10 @@ export function PermissionCard({
   return (
     <Link
       href={href}
-      className="block w-full max-w-[305px] rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[#286aa6] focus-visible:ring-offset-2"
+      className="block w-full min-h-full rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[#286aa6] focus-visible:ring-offset-2"
       aria-label={`${title} icazəsinə keçid`}
     >
-      <article className="flex min-h-[221px] flex-col items-start justify-between rounded-xl border-[0.8px] border-[#dfdfdf] bg-white p-5 transition-shadow hover:shadow-md">
+      <article className="flex h-full flex-col items-start justify-between rounded-xl border-[0.8px] border-[#dfdfdf] bg-white p-5 transition-shadow hover:shadow-md">
         <div className="flex w-full flex-col items-start gap-4">
           <div className="flex size-12 items-center justify-center rounded-lg bg-[#f9fafc] p-3">
             <Image src={icon} alt={iconAlt} width={24} height={24} sizes="24px" />

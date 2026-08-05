@@ -1,9 +1,9 @@
 "use client";
 
-import { Menu, PhoneCall, X } from "lucide-react";
+import { Bell, BookOpen, ChevronDown, FileText, LogOut, Menu, PhoneCall, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const links = [
   { label: "İcazələr", href: "#icazələr" },
@@ -13,6 +13,22 @@ const links = [
 
 export function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => setAuthenticated(document.cookie.includes("permit_portal_authenticated=1"));
+    checkAuth();
+    window.addEventListener("portal-auth-change", checkAuth);
+    return () => window.removeEventListener("portal-auth-change", checkAuth);
+  }, []);
+
+  async function handleLogout() {
+    await fetch("/api/auth/session", { method: "DELETE" });
+    setAuthenticated(false);
+    setProfileOpen(false);
+    window.location.assign("/");
+  }
 
   return (
     <header className="relative z-50 h-20 w-full border-b border-slate-100 bg-white">
@@ -39,9 +55,27 @@ export function Navbar() {
             <PhoneCall aria-hidden="true" className="size-6" strokeWidth={1.7} />
             <span>974</span>
           </a>
-          <a href="/login" className="rounded-lg bg-[#286aa6] px-4 py-3 text-base font-semibold leading-6 text-white transition-colors hover:bg-[#1f5688]">
-            Portala giriş
-          </a>
+          {authenticated ? (
+            <div className="relative">
+              <div className="flex items-center gap-2 rounded-lg border border-[#dfdfdf] bg-white p-1.5 pl-3">
+                <span className="text-base font-semibold leading-6 text-[#286aa6]">İstifadəçi</span>
+                <button
+                  type="button"
+                  aria-label="Profil menyusunu aç"
+                  aria-expanded={profileOpen}
+                  onClick={() => setProfileOpen((open) => !open)}
+                  className="flex size-9 items-center justify-center rounded-lg text-[#286aa6] hover:bg-[#eaf3fa]"
+                >
+                  <ChevronDown className={`size-5 transition-transform ${profileOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+                </button>
+              </div>
+              {profileOpen ? <ProfileMenu onLogout={() => void handleLogout()} /> : null}
+            </div>
+          ) : (
+            <a href="/login" className="rounded-lg bg-[#286aa6] px-4 py-3 text-base font-semibold leading-6 text-white transition-colors hover:bg-[#1f5688]">
+              Portala giriş
+            </a>
+          )}
         </div>
 
         <button
@@ -90,13 +124,31 @@ export function Navbar() {
                 <PhoneCall aria-hidden="true" className="size-5" strokeWidth={1.7} />
                 974
               </a>
-              <a href="/login" className="mt-2 rounded-lg bg-[#286aa6] px-4 py-3 text-center text-base font-semibold leading-6 text-white hover:bg-[#1f5688]">
-                Portala giriş
-              </a>
+              {authenticated ? (
+                <>
+                  <span className="mt-4 px-3 text-base font-semibold leading-6 text-[#286aa6]">İstifadəçi</span>
+                  <ProfileMenu onLogout={() => void handleLogout()} mobile />
+                </>
+              ) : (
+                <a href="/login" className="mt-2 rounded-lg bg-[#286aa6] px-4 py-3 text-center text-base font-semibold leading-6 text-white hover:bg-[#1f5688]">
+                  Portala giriş
+                </a>
+              )}
             </nav>
           </aside>
         </>
       ) : null}
     </header>
+  );
+}
+
+function ProfileMenu({ onLogout, mobile = false }: { onLogout: () => void; mobile?: boolean }) {
+  return (
+    <div className={`${mobile ? "mt-2" : "absolute right-0 top-[calc(100%+8px)] z-50 w-60 shadow-lg"} flex flex-col gap-3 rounded-xl bg-white p-2`}>
+      <a href="/muracietlerim" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><FileText className="size-6" aria-hidden="true" />Müraciətlərim</a>
+      <a href="/qaralamalar" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><BookOpen className="size-6" aria-hidden="true" />Qaralamalar</a>
+      <a href="/bildirisler" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><Bell className="size-6" aria-hidden="true" /><span className="flex-1">Bildirişlər</span><span className="rounded-full bg-[#286aa6] px-2 py-0.5 text-sm font-medium leading-5 text-white">2</span></a>
+      <div className="border-t border-[#dfdfdf] pt-3"><button type="button" onClick={onLogout} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#fef1f1] px-4 py-3 text-base font-semibold leading-6 text-[#f32020] hover:bg-[#fde3e3]"><LogOut className="size-6" aria-hidden="true" />Çıxış et</button></div>
+    </div>
   );
 }
