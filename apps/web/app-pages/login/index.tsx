@@ -43,8 +43,6 @@ const LoginPage = () => {
 
     if (!token) return;
 
-    console.log("[permit-portal] Login token (copy for local testing):", token);
-
     window.history.replaceState({}, "", "/login");
 
     void fetch("/api/auth/session", {
