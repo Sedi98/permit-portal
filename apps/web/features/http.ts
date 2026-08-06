@@ -9,6 +9,13 @@ export const Http = axios.create({
   proxy: false,
 });
 
+const testMode = process.env.NEXT_APP_TEST_MODE === "true";
+const testToken = process.env.NEXT_APP_TEST_TOKEN?.trim();
+
+if (testMode && testToken) {
+  Http.defaults.headers.common.Authorization = `Bearer ${testToken}`;
+}
+
 export const GetApi = async <T = unknown>(
   endpoint: string,
   params?: Record<string, unknown>,
