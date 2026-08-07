@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { useMyGovLogin } from "@/features/auth/hooks";
+import { setAuthCookies } from "@/features/auth/cookies";
 
 const errorMessages: Record<string, string> = {
   invalid_state: "Giriş sessiyası etibarsızdır, yenidən cəhd edin.",
@@ -45,21 +46,12 @@ const LoginPage = () => {
 
     window.history.replaceState({}, "", "/login");
 
-    void fetch("/api/auth/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("session");
-        if (cancelled) return;
-        setSuccess("Giriş uğurla tamamlandı. 5 saniyə sonra ana səhifəyə yönləndiriləcəksiniz.");
-        window.dispatchEvent(new Event("portal-auth-change"));
-        redirectTimer = window.setTimeout(() => router.replace("/"), 5000);
-      })
-      .catch(() => {
-        if (!cancelled) setError("Giriş məlumatları yadda saxlanıla bilmədi, yenidən cəhd edin.");
-      });
+    setAuthCookies(token);
+    if (!cancelled) {
+      setSuccess("Giriş uğurla tamamlandı. 5 saniyə sonra ana səhifəyə yönləndiriləcəksiniz.");
+      window.dispatchEvent(new Event("portal-auth-change"));
+      redirectTimer = window.setTimeout(() => router.replace("/"), 5000);
+    }
 
     return () => {
       cancelled = true;

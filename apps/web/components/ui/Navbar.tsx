@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { clearAuthCookies, hasAuthCookie } from "@/features/auth/cookies";
 
 const links = [
   { label: "İcazələr", href: "#icazələr" },
@@ -18,14 +19,14 @@ export function Navbar() {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    const checkAuth = () => setAuthenticated(document.cookie.includes("permit_portal_authenticated=1"));
+    const checkAuth = () => setAuthenticated(hasAuthCookie());
     checkAuth();
     window.addEventListener("portal-auth-change", checkAuth);
     return () => window.removeEventListener("portal-auth-change", checkAuth);
   }, []);
 
-  async function handleLogout() {
-    await fetch("/api/auth/session", { method: "DELETE" });
+  function handleLogout() {
+    clearAuthCookies();
     setAuthenticated(false);
     setProfileOpen(false);
     window.location.assign("/");
