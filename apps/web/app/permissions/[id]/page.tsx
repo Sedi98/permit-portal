@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
-import PermissionDetailPage, { permissionDetail } from "@/app-pages/permission/detail";
+import PermissionDetailPage from "@/app-pages/permission/detail";
+import { getPermitService, getPermitServices } from "@/features/permit-services/api";
 
 export const metadata: Metadata = {
   title: "İxrac nəzarəti üçün icazə",
   description: "İxrac nəzarətinə düşən mallar üçün icazə tələbləri, sənədlər və müraciət məlumatları.",
 };
 
-export function generateStaticParams() {
-  return Array.from({ length: 15 }, (_, index) => ({ id: String(index + 1) }));
+export async function generateStaticParams() {
+  const response = await getPermitServices();
+
+  return response.data.map(({ id }) => ({ id: String(id) }));
 }
 
 export default async function PermissionPage({ params }: { params: Promise<{ id: string }> }) {
-  await params;
-  return <PermissionDetailPage permission={permissionDetail} />;
+  const { id } = await params;
+  const response = await getPermitService(id);
+
+  return <PermissionDetailPage permitService={response.data} />;
 }

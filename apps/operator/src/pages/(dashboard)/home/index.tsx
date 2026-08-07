@@ -19,12 +19,30 @@ import SearchSection from "./sections/SearchSection";
 
 const statusLabels: Record<ApplicationStatus, string> = {
   registered: "Gözləmədə",
+  forwarded: "Şöbəyə yönləndirildi",
   assigned: "Yönləndirilmiş",
   under_review: "İcrada",
+  in_document_flow: "Sənəd dövriyyəsində",
+  awaiting_payment: "Ödəniş gözlənilir",
+  awaiting_revision: "Düzəliş gözlənilir",
   sent_for_approval: "Təsdiq gözləyir",
   completed: "Tamamlanmış",
   rejected: "Geri qaytarılmış",
   suspended: "Dayandırılmış",
+};
+
+const statusBadgeVariants: Record<ApplicationStatus, React.ComponentProps<typeof StatusBadge>["variant"]> = {
+  registered: "registered",
+  forwarded: "registered",
+  assigned: "assigned",
+  under_review: "under_review",
+  in_document_flow: "under_review",
+  awaiting_payment: "sent_for_approval",
+  awaiting_revision: "registered",
+  sent_for_approval: "sent_for_approval",
+  completed: "completed",
+  rejected: "rejected",
+  suspended: "suspended",
 };
 
 function ActionCell({ id, status: itemStatus }: { id: number; status: ApplicationStatus }) {
@@ -108,7 +126,7 @@ const columns: ColumnDef<ApplicationListItem>[] = [
     accessorKey: "status",
     cell: ({ row }) => (
       <StatusBadge
-        variant={row.original.status}
+        variant={statusBadgeVariants[row.original.status]}
         label={statusLabels[row.original.status]}
       />
     ),

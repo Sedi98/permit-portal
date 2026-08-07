@@ -210,6 +210,7 @@ export interface ApplicationDetail {
   rejection_reason: string | null;
   created_at: string;
   updated_at: string;
+  applicant_full_name: string;
   permit_service: PermitService;
   phones: AppPhone[];
   trade_detail: Record<string, unknown> | null;

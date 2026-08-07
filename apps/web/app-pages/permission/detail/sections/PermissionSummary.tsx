@@ -1,8 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { PermissionDetailData } from "./types";
 
-type PermissionSummaryProps = Pick<PermissionDetailData, "type" | "reviewTime" | "fee" | "documentCount" | "requirements">;
+type PermissionSummaryProps = {
+  type: string;
+  reviewTime: string;
+  fee: string;
+  documentCount: string;
+  requirements: string[];
+};
 
 const summaryRows = [
   ["Növ", "type"],

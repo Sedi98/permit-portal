@@ -114,7 +114,7 @@ export default function ApplicationManagePage() {
     if (!mainExecutor || selectedExecutors.length === 0) return toast.error("Ən azı bir icraçı və əsas icraçı seçin");
     const assignees = selectedExecutors.map((userId) => ({
       user_id: Number(userId),
-      assignment_role: userId === mainExecutor ? "main" : (assignmentRoles[userId] ?? "joint"),
+      assignment_role: (userId === mainExecutor ? "main" : (assignmentRoles[userId] ?? "joint")) as AssignmentRole,
     }));
     assign.mutate(
       { assignees, ...(assignmentNote ? { note: assignmentNote } : {}) },

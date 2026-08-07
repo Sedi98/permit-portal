@@ -1,7 +1,10 @@
 import Image from "next/image";
-import type { PermissionDetailData } from "./types";
 
-type PermissionIdentityProps = Pick<PermissionDetailData, "category" | "title" | "icon">;
+type PermissionIdentityProps = {
+  category: string;
+  title: string;
+  icon: string;
+};
 
 export function PermissionIdentity({ category, title, icon }: PermissionIdentityProps) {
   return (
