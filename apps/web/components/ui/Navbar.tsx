@@ -150,8 +150,8 @@ function ProfileMenu({ onLogout, mobile = false }: { onLogout: () => void; mobil
   return (
     <div className={`${mobile ? "mt-2" : ""} flex flex-col gap-3 rounded-xl bg-white p-0`}>
       <a href="/muracietlerim" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><FileText className="size-6" aria-hidden="true" />Müraciətlərim</a>
-      <a href="/qaralamalar" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><BookOpen className="size-6" aria-hidden="true" />Qaralamalar</a>
-      <a href="/bildirisler" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><Bell className="size-6" aria-hidden="true" /><span className="flex-1">Bildirişlər</span><span className="rounded-full bg-[#286aa6] px-2 py-0.5 text-sm font-medium leading-5 text-white">2</span></a>
+      <a href="/drafts" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><BookOpen className="size-6" aria-hidden="true" />Qaralamalar</a>
+      <a href="/notifications" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><Bell className="size-6" aria-hidden="true" /><span className="flex-1">Bildirişlər</span><span className="rounded-full bg-[#286aa6] px-2 py-0.5 text-sm font-medium leading-5 text-white">2</span></a>
       <div className="border-t border-[#dfdfdf] pt-3"><button type="button" onClick={onLogout} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#fef1f1] px-4 py-3 text-base font-semibold leading-6 text-[#f32020] hover:bg-[#fde3e3]"><LogOut className="size-6" aria-hidden="true" />Çıxış et</button></div>
     </div>
   );
