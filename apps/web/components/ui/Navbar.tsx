@@ -1,11 +1,12 @@
 "use client";
 
-import { Bell, BookOpen, ChevronDown, FileText, LogOut, Menu, PhoneCall, X } from "lucide-react";
+import { Bell, BookOpen, ChevronDown, FileText, LoaderCircle, LogOut, Menu, PhoneCall, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { clearAuthCookies, hasAuthCookie } from "@/features/auth/cookies";
+import { useAuth } from "@/features/auth/context";
+import { clearAuthCookies } from "@/features/auth/cookies";
 
 const links = [
   { label: "İcazələr", href: "#icazələr" },
@@ -16,18 +17,13 @@ const links = [
 export function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = () => setAuthenticated(hasAuthCookie());
-    checkAuth();
-    window.addEventListener("portal-auth-change", checkAuth);
-    return () => window.removeEventListener("portal-auth-change", checkAuth);
-  }, []);
+  const { user, loading, clearUser } = useAuth();
+  const authenticated = user !== null;
+  const userName = user ? `${user.first_name} ${user.last_name}`.trim() : "";
 
   function handleLogout() {
     clearAuthCookies();
-    setAuthenticated(false);
+    clearUser();
     setProfileOpen(false);
     window.location.assign("/");
   }
@@ -57,10 +53,14 @@ export function Navbar() {
             <PhoneCall aria-hidden="true" className="size-6" strokeWidth={1.7} />
             <span>974</span>
           </a>
-          {authenticated ? (
+          {loading ? (
+            <div className="flex h-12 items-center gap-2 rounded-lg border border-[#dfdfdf] px-4 text-[#286aa6]" aria-label="İstifadəçi məlumatları yüklənir">
+              <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
+            </div>
+          ) : authenticated ? (
             <Popover open={profileOpen} onOpenChange={setProfileOpen}>
               <div className="flex items-center gap-2 rounded-lg border border-[#dfdfdf] bg-white p-1.5 pl-3">
-                <span className="text-base font-semibold leading-6 text-[#286aa6]">İstifadəçi</span>
+                <span className="text-base font-semibold leading-6 text-[#286aa6]">{userName}</span>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
@@ -128,9 +128,13 @@ export function Navbar() {
                 <PhoneCall aria-hidden="true" className="size-5" strokeWidth={1.7} />
                 974
               </a>
-              {authenticated ? (
+              {loading ? (
+                <div className="mt-4 flex items-center gap-2 px-3 text-[#286aa6]" aria-label="İstifadəçi məlumatları yüklənir">
+                  <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
+                </div>
+              ) : authenticated ? (
                 <>
-                  <span className="mt-4 px-3 text-base font-semibold leading-6 text-[#286aa6]">İstifadəçi</span>
+                  <span className="mt-4 px-3 text-base font-semibold leading-6 text-[#286aa6]">{userName}</span>
                   <ProfileMenu onLogout={() => void handleLogout()} mobile />
                 </>
               ) : (
@@ -149,7 +153,7 @@ export function Navbar() {
 function ProfileMenu({ onLogout, mobile = false }: { onLogout: () => void; mobile?: boolean }) {
   return (
     <div className={`${mobile ? "mt-2" : ""} flex flex-col gap-3 rounded-xl bg-white p-0`}>
-      <a href="/muracietlerim" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><FileText className="size-6" aria-hidden="true" />Müraciətlərim</a>
+      <a href="/applications" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><FileText className="size-6" aria-hidden="true" />Müraciətlərim</a>
       <a href="/drafts" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><BookOpen className="size-6" aria-hidden="true" />Qaralamalar</a>
       <a href="/notifications" className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold leading-6 text-[#286aa6] hover:bg-[#eaf3fa]"><Bell className="size-6" aria-hidden="true" /><span className="flex-1">Bildirişlər</span><span className="rounded-full bg-[#286aa6] px-2 py-0.5 text-sm font-medium leading-5 text-white">2</span></a>
       <div className="border-t border-[#dfdfdf] pt-3"><button type="button" onClick={onLogout} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#fef1f1] px-4 py-3 text-base font-semibold leading-6 text-[#f32020] hover:bg-[#fde3e3]"><LogOut className="size-6" aria-hidden="true" />Çıxış et</button></div>

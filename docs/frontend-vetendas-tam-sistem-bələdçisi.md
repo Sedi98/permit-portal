@@ -92,6 +92,7 @@ GET /api/permit-applications/{id}
 
 ---
 
+<!-- Müraciət kartı elementinin alt sağ tərəfi nəzərdə tutulur  -->
 ## 3. Status-a görə, ekranın altında nə var
 
 | Status | Ekranın altında | Bax |

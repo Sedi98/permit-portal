@@ -25,3 +25,14 @@ export function hasAuthCookie() {
     .split("; ")
     .some((cookie) => cookie === `${authStateCookie}=1`);
 }
+
+export function getAuthToken() {
+  const token = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith(`${tokenCookie}=`))
+    ?.split("=")
+    .slice(1)
+    .join("=");
+
+  return token ? decodeURIComponent(token) : null;
+}

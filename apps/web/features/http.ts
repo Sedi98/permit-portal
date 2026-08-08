@@ -9,12 +9,38 @@ export const Http = axios.create({
   proxy: false,
 });
 
+Http.interceptors.request.use((config) => {
+  if (typeof document === "undefined" || config.headers?.Authorization) {
+    return config;
+  }
+
+  const token = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith("permit_portal_token="))
+    ?.split("=")
+    .slice(1)
+    .join("=");
+
+  if (token) {
+    const authorization = `Bearer ${decodeURIComponent(token)}`;
+
+    if (typeof config.headers.set === "function") {
+      config.headers.set("Authorization", authorization);
+    } else {
+      config.headers.Authorization = authorization;
+    }
+  }
+
+  return config;
+});
+
 export const GetApi = async <T = unknown>(
   endpoint: string,
   params?: Record<string, unknown>,
+  config?: AxiosRequestConfig,
 ): Promise<T> => {
   try {
-    const res = await Http.get<T>(endpoint, { params });
+    const res = await Http.get<T>(endpoint, { ...config, params });
     return res.data;
   } catch (error: unknown) {
     if (isAxiosError(error)) {
