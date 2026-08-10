@@ -65,7 +65,7 @@ const queueColumns: ColumnDef<QueueRow>[] = [
   },
 ];
 
-export const visaQueueColumns: ColumnDef<QueueRow>[] = [
+const visaQueueColumns: ColumnDef<QueueRow>[] = [
   queueColumns[0],
   queueColumns[1],
   queueColumns[4],
@@ -74,6 +74,7 @@ export const visaQueueColumns: ColumnDef<QueueRow>[] = [
 export interface QueueListPageProps {
   title: string;
   columns?: ColumnDef<QueueRow>[];
+  compact?: boolean;
   items: QueueRow[];
   isLoading: boolean;
   search: string;
@@ -90,6 +91,7 @@ export interface QueueListPageProps {
 export default function QueueListPage({
   title,
   columns = queueColumns,
+  compact = false,
   items,
   isLoading,
   search,
@@ -125,7 +127,7 @@ export default function QueueListPage({
             <div className="size-10 animate-spin rounded-full border-4 border-[#286aa6] border-t-transparent" />
           </div>
         ) : (
-          <DataTable columns={columns} data={items} />
+          <DataTable columns={compact ? visaQueueColumns : columns} data={items} />
         )}
         <PaginationContainer
           currentPage={currentPage}

@@ -1,16 +1,15 @@
 import { GetApi, Http, PostApi } from "@/features/http";
 import type {
-  AssignApplicationPayload,
   ApplicationsQueryParams,
-  AssignPayload,
   DepartmentsResponse,
   FileReviewPayload,
-  ForwardApplicationPayload,
-  PrepareDocumentPayload,
   StatusChangePayload,
   PaginatedApplicationsResponse,
   ApplicationDetailResponse,
-  ExecutorsResponse,
+  ApplicationsCollectionResponse,
+  CreateConfirmationSequencePayload,
+  RouteApplicationPayload,
+  RoutingCandidatesResponse,
   StatusChangeResponse,
 } from "./types";
 
@@ -25,32 +24,48 @@ export function getApplicationById(id: number) {
   return GetApi<ApplicationDetailResponse>(`/admin/permit-applications/${id}`);
 }
 
-export function getExecutors() {
-  return GetApi<ExecutorsResponse>("/admin/executors");
+export function getRoutingCandidates() {
+  return GetApi<RoutingCandidatesResponse>("/admin/routing-candidates");
 }
 
 export function getDepartments() {
   return GetApi<DepartmentsResponse>("/admin/departments");
 }
 
-export function forwardApplication(id: number, payload: ForwardApplicationPayload) {
-  return PostApi<StatusChangeResponse, ForwardApplicationPayload>(
-    `/admin/permit-applications/${id}/forward`,
+export function routeApplication(id: number, payload: RouteApplicationPayload) {
+  return PostApi<StatusChangeResponse, RouteApplicationPayload>(
+    `/admin/permit-applications/${id}/route`,
     payload,
   );
 }
 
-export function assignApplication(id: number, payload: AssignApplicationPayload) {
-  return PostApi<StatusChangeResponse, AssignApplicationPayload>(
-    `/admin/permit-applications/${id}/assign`,
+export function createConfirmationSequence(
+  id: number,
+  payload: CreateConfirmationSequencePayload,
+) {
+  return PostApi<StatusChangeResponse, CreateConfirmationSequencePayload>(
+    `/admin/permit-applications/${id}/confirmation-sequences`,
     payload,
   );
 }
 
-export function assignExecutor(id: number, payload: AssignPayload) {
-  return PostApi<StatusChangeResponse, AssignPayload>(
-    `/admin/permit-applications/${id}/assign`,
-    payload,
+export function confirmPaymentReceived(id: number) {
+  return PostApi<StatusChangeResponse, Record<string, never>>(
+    `/admin/permit-applications/${id}/confirm-payment-received`,
+    {},
+  );
+}
+
+export function getAwaitingSignatureApplications() {
+  return GetApi<ApplicationsCollectionResponse>(
+    "/admin/permit-applications-awaiting-signature",
+  );
+}
+
+export function signApplication(id: number) {
+  return PostApi<StatusChangeResponse, Record<string, never>>(
+    `/admin/permit-applications/${id}/sign`,
+    {},
   );
 }
 
@@ -68,16 +83,20 @@ export function reviewApplicationFile(id: number, fileId: number, payload: FileR
   );
 }
 
-export function prepareApplicationDocument(id: number, payload: PrepareDocumentPayload) {
-  return PostApi<StatusChangeResponse, PrepareDocumentPayload>(
-    `/admin/permit-applications/${id}/documents`,
-    payload,
-  );
-}
-
 export async function getFileBlob(applicationId: number, fileId: number) {
   const response = await Http.get(
     `/admin/permit-applications/${applicationId}/files/${fileId}/download`,
+    { responseType: "blob" },
+  );
+  return response.data as Blob;
+}
+
+export async function getApplicationDocumentBlob(
+  applicationId: number,
+  documentId: number,
+) {
+  const response = await Http.get(
+    `/admin/permit-applications/${applicationId}/documents/${documentId}/download`,
     { responseType: "blob" },
   );
   return response.data as Blob;

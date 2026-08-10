@@ -2,7 +2,7 @@ import * as React from "react";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
-import QueueListPage, { visaQueueColumns } from "@/components/QueueListPage";
+import QueueListPage from "@/components/QueueListPage";
 import { useVisaQueue } from "@/features/visa-queue/hooks";
 
 export default function VisaQueuePage() {
@@ -25,7 +25,7 @@ export default function VisaQueuePage() {
   return (
     <QueueListPage
       title="Viza gözləyən sənədlər"
-      columns={visaQueueColumns}
+      compact
       items={response?.data?.map((item) => ({
         id: item.id,
         applicationId: item.document.application.id,

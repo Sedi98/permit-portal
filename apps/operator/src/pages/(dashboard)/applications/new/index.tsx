@@ -22,8 +22,13 @@ const statusLabels: Record<ApplicationStatus, string> = {
   assigned: "Yönləndirilmiş",
   under_review: "İcrada",
   in_document_flow: "Sənəd dövriyyəsində",
+  deficiency_confirmation: "Çatışmazlıq bildirişi təsdiqlənir",
+  report_confirmation: "Xidməti məruzə təsdiqlənir",
+  payment_confirmation: "Ödəniş tapşırığı təsdiqlənir",
   awaiting_payment: "Ödəniş gözlənilir",
+  payment_review: "Ödəniş yoxlanılır",
   awaiting_revision: "Düzəliş gözlənilir",
+  awaiting_signature: "İmza gözlənilir",
   sent_for_approval: "Təsdiq gözləyir",
   completed: "Tamamlanmış",
   rejected: "Geri qaytarılmış",
@@ -36,8 +41,13 @@ const statusBadgeVariants: Record<ApplicationStatus, React.ComponentProps<typeof
   assigned: "assigned",
   under_review: "under_review",
   in_document_flow: "under_review",
+  deficiency_confirmation: "sent_for_approval",
+  report_confirmation: "sent_for_approval",
+  payment_confirmation: "sent_for_approval",
   awaiting_payment: "sent_for_approval",
+  payment_review: "under_review",
   awaiting_revision: "registered",
+  awaiting_signature: "sent_for_approval",
   sent_for_approval: "sent_for_approval",
   completed: "completed",
   rejected: "rejected",
@@ -57,10 +67,10 @@ function ActionCell({ id, status: itemStatus }: { id: number; status: Applicatio
         if (role === "executor" && itemStatus === "assigned") {
           statusMutation.mutate(
             { status: "under_review" },
-            { onSuccess: () => { toast.success("Müraciət icraya qəbul edildi"); navigate(`/noncompliance-notices/gonderilenler/${id}`); }, onError: () => { toast.error("Status dəyişdirilərkən xəta baş verdi"); } },
+            { onSuccess: () => { toast.success("Müraciət icraya qəbul edildi"); navigate(`/applications/assigned/manage/${id}`); }, onError: () => { toast.error("Status dəyişdirilərkən xəta baş verdi"); } },
           );
         } else {
-          navigate(`/noncompliance-notices/gonderilenler/${id}`);
+          navigate(`/applications/assigned/manage/${id}`);
         }
       }}
       className="inline-flex size-12 items-center justify-center rounded-lg border border-[#dfdfdf] bg-white text-[#286aa6] transition-colors hover:bg-[#f7f9fc]"

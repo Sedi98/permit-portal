@@ -25,8 +25,13 @@ const statusLabels: Record<ApplicationStatus, string> = {
   assigned: "Yönləndirilmiş",
   under_review: "İcrada",
   in_document_flow: "Sənəd dövriyyəsində",
+  deficiency_confirmation: "Çatışmazlıq bildirişi təsdiqlənir",
+  report_confirmation: "Xidməti məruzə təsdiqlənir",
+  payment_confirmation: "Ödəniş tapşırığı təsdiqlənir",
   awaiting_payment: "Ödəniş gözlənilir",
+  payment_review: "Ödəniş yoxlanılır",
   awaiting_revision: "Düzəliş gözlənilir",
+  awaiting_signature: "İmza gözlənilir",
   sent_for_approval: "Təsdiq gözləyir",
   completed: "Tamamlanmış",
   rejected: "Geri qaytarılmış",
@@ -39,8 +44,13 @@ const statusBadgeVariants: Record<ApplicationStatus, React.ComponentProps<typeof
   assigned: "assigned",
   under_review: "under_review",
   in_document_flow: "under_review",
+  deficiency_confirmation: "sent_for_approval",
+  report_confirmation: "sent_for_approval",
+  payment_confirmation: "sent_for_approval",
   awaiting_payment: "sent_for_approval",
+  payment_review: "under_review",
   awaiting_revision: "registered",
+  awaiting_signature: "sent_for_approval",
   sent_for_approval: "sent_for_approval",
   completed: "completed",
   rejected: "rejected",
@@ -130,7 +140,17 @@ const columns: ColumnDef<ApplicationListItem>[] = [
   },
 ];
 
-export default function ApplicationListPage({ title, initialStatus }: { title: string; initialStatus: string }) {
+interface ApplicationListPageProps {
+  title: string;
+  initialStatus?: string;
+  statusGroup?: string;
+}
+
+export default function ApplicationListPage({
+  title,
+  initialStatus = "all",
+  statusGroup,
+}: ApplicationListPageProps) {
   const showStatus = initialStatus === "assigned,under_review,in_document_flow";
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>();
   const [search, setSearch] = React.useState("");
@@ -142,13 +162,14 @@ export default function ApplicationListPage({ title, initialStatus }: { title: s
     () => ({
       ...(search ? { search } : {}),
       ...(status !== "all" ? { status } : {}),
+      ...(statusGroup ? { status_group: statusGroup } : {}),
       ...(applicantType !== "all" ? { applicant_type: applicantType as ApplicantType } : {}),
       ...(dateRange?.from ? { date_from: format(dateRange.from, "yyyy-MM-dd") } : {}),
       ...(dateRange?.to ? { date_to: format(dateRange.to, "yyyy-MM-dd") } : {}),
       page,
       per_page: 20,
     }),
-    [applicantType, dateRange, page, search, status],
+    [applicantType, dateRange, page, search, status, statusGroup],
   );
 
   const { data: applicationsData, isLoading } = useApplications(params);

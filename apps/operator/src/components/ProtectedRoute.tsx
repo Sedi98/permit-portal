@@ -1,10 +1,15 @@
 import { Navigate, Outlet } from "react-router";
 import { useMe } from "@/features/auth/hooks";
+import type { User } from "@/features/auth/types";
 import { getToken, removeToken } from "@/lib/cookies";
 
-export default function ProtectedRoute() {
+type ProtectedRouteProps = {
+  allowedRoles?: User["role"][];
+};
+
+export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   const token = getToken();
-  const { isLoading, isError } = useMe();
+  const { data, isLoading, isError } = useMe();
 
   if (!token || isError) {
     if (isError) removeToken();
@@ -17,6 +22,10 @@ export default function ProtectedRoute() {
         <div className="size-10 animate-spin rounded-full border-4 border-[#286aa6] border-t-transparent" />
       </div>
     );
+  }
+
+  if (allowedRoles && (!data?.data.role || !allowedRoles.includes(data.data.role))) {
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;

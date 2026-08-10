@@ -6,8 +6,13 @@ export type ApplicationStatus =
   | "assigned"
   | "under_review"
   | "in_document_flow"
+  | "deficiency_confirmation"
+  | "report_confirmation"
+  | "payment_confirmation"
   | "awaiting_payment"
+  | "payment_review"
   | "awaiting_revision"
+  | "awaiting_signature"
   | "sent_for_approval"
   | "completed"
   | "rejected"
@@ -17,6 +22,7 @@ export type ApplicantType = "physical" | "legal";
 
 export interface ApplicationsQueryParams {
   status?: ApplicationStatus | string;
+  status_group?: string;
   permit_service_id?: number;
   search?: string;
   applicant_type?: ApplicantType;
@@ -26,26 +32,13 @@ export interface ApplicationsQueryParams {
   page?: number;
 }
 
-export interface AssignPayload {
-  assigned_to: number;
+export interface RouteApplicationPayload {
+  main_user_id: number;
+  joint_user_ids: number[];
+  note?: string;
 }
 
 export type AssignmentRole = "main" | "joint" | "observer";
-
-export interface ApplicationAssigneePayload {
-  user_id: number;
-  assignment_role: AssignmentRole;
-}
-
-export interface AssignApplicationPayload {
-  assignees: ApplicationAssigneePayload[];
-  note?: string;
-}
-
-export interface ForwardApplicationPayload {
-  department_id: number;
-  note?: string;
-}
 
 export interface StatusChangePayload {
   status: ApplicationStatus;
@@ -64,12 +57,14 @@ export interface PermitService {
   updated_at: string;
 }
 
-export interface Executor {
+export interface RoutingCandidate {
   id: number;
   name: string;
   email: string;
   fin?: string;
   department_id?: number;
+  role?: User["role"];
+  department?: Pick<Department, "id" | "name"> | null;
 }
 
 export interface Department {
@@ -102,7 +97,7 @@ export interface AppFile {
   size: number;
   created_at: string;
   updated_at: string;
-  review_status?: "accepted" | "rejected" | null;
+  review_status?: "pending" | "accepted" | "rejected" | null;
   review_note?: string | null;
 }
 
@@ -131,9 +126,39 @@ export interface FileReviewPayload {
   review_note?: string;
 }
 
-export interface PrepareDocumentPayload {
-  type: "deficiency" | "permit" | string;
+export type ConfirmationSequenceType = "deficiency" | "report" | "payment";
+export type ConfirmationParticipantRole = "visa" | "sign" | "approve";
+
+export interface ConfirmationParticipantPayload {
+  user_id: number;
+  role: ConfirmationParticipantRole;
+}
+
+export interface CreateConfirmationSequencePayload {
+  type: ConfirmationSequenceType;
+  title?: string;
   body: string;
+  amount?: number;
+  participants: ConfirmationParticipantPayload[];
+}
+
+export interface ConfirmationParticipant {
+  id: number;
+  user_id: number;
+  role: ConfirmationParticipantRole;
+  status?: string;
+  note?: string | null;
+  user?: Pick<User, "id" | "name">;
+}
+
+export interface ConfirmationSequence {
+  id: number;
+  type: ConfirmationSequenceType;
+  title?: string | null;
+  body?: string | null;
+  amount?: number | string | null;
+  status?: string;
+  participants?: ConfirmationParticipant[];
 }
 
 export interface StatusHistory {
@@ -173,6 +198,9 @@ export interface ApplicationListItem {
   approved_at: string | null;
   rejected_at: string | null;
   rejection_reason: string | null;
+  payment_amount?: number | string | null;
+  invoice_no?: string | null;
+  paid_at?: string | null;
   created_at: string;
   updated_at: string;
   files_count: number;
@@ -208,6 +236,9 @@ export interface ApplicationDetail {
   approved_at: string | null;
   rejected_at: string | null;
   rejection_reason: string | null;
+  payment_amount?: number | string | null;
+  invoice_no?: string | null;
+  paid_at?: string | null;
   created_at: string;
   updated_at: string;
   applicant_full_name: string;
@@ -217,6 +248,8 @@ export interface ApplicationDetail {
   files: AppFile[];
   documents: AppDocument[];
   status_histories: StatusHistory[];
+  confirmationSequences?: ConfirmationSequence[];
+  confirmation_sequences?: ConfirmationSequence[];
   assignees: ApplicationAssignee[];
   assigned_user: User | null;
   user: User | null;
@@ -238,9 +271,16 @@ export interface ApplicationDetailResponse {
   data: ApplicationDetail;
 }
 
-export interface ExecutorsResponse {
+export interface ApplicationsCollectionResponse {
   status: string;
-  data: Executor[];
+  data:
+    | ApplicationListItem[]
+    | PaginatedApplicationsResponse["data"];
+}
+
+export interface RoutingCandidatesResponse {
+  status: string;
+  data: RoutingCandidate[];
 }
 
 export interface StatusChangeResponse {

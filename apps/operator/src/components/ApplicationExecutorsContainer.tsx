@@ -19,7 +19,11 @@ export default function ApplicationExecutorsContainer({
         {title}
       </p>
       <div className="flex flex-col gap-3 w-full">
-        {executors.map((executor, i) => (
+        {executors.length === 0 ? (
+          <p className="px-4 py-3 text-sm text-[#797979]">
+            Müraciətə icraçı təyin edilməyib.
+          </p>
+        ) : executors.map((executor, i) => (
           <div
             key={i}
             className={`flex gap-5 items-center px-4 py-2 w-full ${

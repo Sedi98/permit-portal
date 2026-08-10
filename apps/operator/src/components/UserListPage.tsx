@@ -1,16 +1,25 @@
 import * as React from "react";
 import { useNavigate } from "react-router";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
 import TableLayout from "@/app/layouts/TableLayout";
 import PageTitle from "@/components/PageTitle";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { EyeIcon } from "@/components/icons";
 import { PaginationContainer } from "@/components/PaginationContainer";
 import { useUsers } from "@/features/users/hooks";
 import type { AdminUser } from "@/features/users/types";
+import type { Role } from "@/app/navigation";
 
 type UserRow = AdminUser;
 
@@ -43,9 +52,16 @@ const columns: ColumnDef<UserRow>[] = [
 ];
 
 export default function UserListPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = React.useState("");
+  const [role, setRole] = React.useState<Role | "all">("all");
   const [page, setPage] = React.useState(1);
-  const { data, isLoading } = useUsers({ search: search || undefined, page, per_page: 20 });
+  const { data, isLoading } = useUsers({
+    search: search || undefined,
+    role: role === "all" ? undefined : role,
+    page,
+    per_page: 20,
+  });
   const response = data?.data;
   const items: UserRow[] = response?.data ?? [];
 
@@ -53,8 +69,15 @@ export default function UserListPage() {
     <div className="relative space-y-4">
       <h1 className="pl-4 text-base font-medium leading-6 text-stone-900">İstifadəçilər</h1>
       <TableLayout className="space-y-5">
-        <PageTitle title="İstifadəçilər siyahısı" text={`Cəmi ${response?.total ?? 0} istifadəçi tapıldı`} />
-        <div className="flex w-[400px] items-center gap-3 rounded-lg bg-[#f5f5f5] px-4 py-3">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <PageTitle title="İstifadəçilər siyahısı" text={`Cəmi ${response?.total ?? 0} istifadəçi tapıldı`} />
+          <Button className="gap-2" onClick={() => navigate("/users/new")}>
+            <Plus className="size-4" />
+            Yeni işçi
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <div className="flex w-[400px] items-center gap-3 rounded-lg bg-[#f5f5f5] px-4 py-3">
           <Search className="size-5 shrink-0 text-[#797979]" />
           <Input
             placeholder="Axtar..."
@@ -62,6 +85,16 @@ export default function UserListPage() {
             onChange={(event) => { setSearch(event.target.value); setPage(1); }}
             className="h-auto rounded-none border-none bg-transparent px-0 py-0 text-base shadow-none placeholder:text-[#797979]"
           />
+          </div>
+          <Select value={role} onValueChange={(value) => { setRole(value as Role | "all"); setPage(1); }}>
+            <SelectTrigger className="w-52"><SelectValue placeholder="Rol" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Bütün rollar</SelectItem>
+              <SelectItem value="executor">İcraçı</SelectItem>
+              <SelectItem value="department_head">Şöbə müdiri</SelectItem>
+              <SelectItem value="deputy_minister">Nazir müavini</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         {isLoading ? (
           <div className="flex items-center justify-center py-20">

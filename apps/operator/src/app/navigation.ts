@@ -1,10 +1,13 @@
 import type { LucideIcon } from "lucide-react";
 import {
   ChartLine,
+  CircleCheckBig,
   CreditCard,
   FileText,
   Home,
+  Package,
   SignatureIcon,
+  Star,
   Users,
 } from "lucide-react";
 
@@ -38,76 +41,26 @@ const allRoles: Role[] = [
 ];
 
 export const sidebarItems: SidebarItem[] = [
-  // Roles: all roles
-  // Endpoint: GET /api/admin/permit-applications (role-scoped by backend)
   { label: "Əsas səhifə", path: "/", icon: Home, roles: allRoles },
-
-  // Roles: all roles
-  // Endpoint: GET /api/admin/statistics (role-scoped by backend)
   { label: "Lövhə", path: "/board", icon: ChartLine, roles: allRoles },
-
-  // Roles: super_admin
-  // Endpoint: user-management endpoints (documented separately)
-  { label: "İstifadəçilər", path: "/users", icon: Users, roles: ["super_admin"] },
-
   {
-    // Roles: all roles
-    // Endpoint: GET /api/admin/permit-applications (status-specific below)
     label: "Müraciətlər",
     path: "/applications",
     icon: FileText,
     roles: allRoles,
     subItems: [
-      // Roles: super_admin, executor
-      // Endpoint: GET /api/admin/permit-applications?status=assigned
       {
         label: "Yeni daxil olanlar",
         path: "/applications/assigned",
-        roles: ["super_admin", "executor"],
-        endpoint: "GET /api/admin/permit-applications?status=assigned",
+        roles: allRoles,
+        endpoint: "GET /api/admin/permit-applications?status=registered|assigned",
       },
-      // Roles: super_admin, executor
-      // Endpoint: GET /api/admin/permit-applications?status=under_review
       {
-        label: "İcrada olanlar",
-        path: "/applications/under_review",
-        roles: ["super_admin", "executor"],
-        endpoint: "GET /api/admin/permit-applications?status=under_review",
+        label: "Yönləndirdiklərim",
+        path: "/applications/routed",
+        roles: allRoles,
+        endpoint: "GET /api/admin/permit-applications?status_group=routed_by_me",
       },
-      // Roles: super_admin, executor
-      // Endpoint: GET /api/admin/permit-applications?status=in_document_flow
-      {
-        label: "Göndərilmişlər",
-        path: "/applications/in_document_flow",
-        roles: ["super_admin", "executor"],
-        endpoint: "GET /api/admin/permit-applications?status=in_document_flow",
-      },
-      // Roles: super_admin, deputy_minister
-      // Endpoint: GET /api/admin/permit-applications?status=registered
-      {
-        label: "Yeni (yönləndirmə gözləyir)",
-        path: "/applications/registered",
-        roles: ["super_admin", "deputy_minister"],
-        endpoint: "GET /api/admin/permit-applications?status=registered",
-      },
-      // Roles: super_admin, deputy_minister, department_head
-      // Endpoint: GET /api/admin/permit-applications?status=forwarded
-      {
-        label: "Yönləndirilmişlər",
-        path: "/applications/forwarded",
-        roles: ["super_admin", "deputy_minister", "department_head"],
-        endpoint: "GET /api/admin/permit-applications?status=forwarded",
-      },
-      // Roles: super_admin, department_head
-      // Endpoint: GET /api/admin/permit-applications?status=assigned,under_review,in_document_flow
-      {
-        label: "İcrada olanlar",
-        path: "/applications/on_assigned",
-        roles: ["super_admin", "department_head"],
-        endpoint: "GET /api/admin/permit-applications?status=assigned,under_review,in_document_flow",
-      },
-      // Roles: all roles
-      // Endpoint: GET /api/admin/permit-applications?status=completed
       {
         label: "İcra edilmişlər",
         path: "/applications/completed",
@@ -116,36 +69,64 @@ export const sidebarItems: SidebarItem[] = [
       },
     ],
   },
-
-  // Roles: super_admin, department_head
-  // Endpoint: GET /api/admin/visa-queue
   {
-    label: "Viza gözləyən sənədlər",
-    path: "/visa-queue",
+    label: "Çatışmazlıq haqqında bildiriş",
+    path: "/confirmations/deficiency",
     icon: SignatureIcon,
-    roles: ["super_admin", "department_head"],
-    endpoint: "GET /api/admin/visa-queue",
+    roles: allRoles,
+    subItems: [
+      { label: "Viza üçün", path: "/confirmations/deficiency/visa", roles: allRoles },
+      { label: "İmza üçün", path: "/confirmations/deficiency/sign", roles: allRoles },
+    ],
   },
-
-  // Roles: super_admin, deputy_minister
-  // Endpoint: GET /api/admin/sign-queue
   {
-    label: "İmza gözləyən sənədlər",
-    path: "/sign-queue",
+    label: "Xidməti məruzə",
+    path: "/confirmations/report",
     icon: SignatureIcon,
-    roles: ["super_admin", "deputy_minister"],
-    endpoint: "GET /api/admin/sign-queue",
+    roles: allRoles,
+    subItems: [
+      { label: "Viza üçün", path: "/confirmations/report/visa", roles: allRoles },
+      { label: "İmza üçün", path: "/confirmations/report/sign", roles: allRoles },
+      { label: "Təsdiqləyən", path: "/confirmations/report/approve", roles: allRoles },
+    ],
   },
-
-  // Roles: super_admin, deputy_minister
-  // Endpoint: GET /api/admin/permit-applications?status=awaiting_payment
   {
-    label: "Ödəniş təsdiqi gözləyənlər",
-    path: "/awaiting_payment",
+    label: "Ödənişlər",
+    path: "/payments",
     icon: CreditCard,
-    roles: ["executor"],
-    endpoint: "GET /api/admin/permit-applications?status=awaiting_payment",
+    roles: allRoles,
+    subItems: [
+      { label: "Viza üçün", path: "/confirmations/payment/visa", roles: allRoles },
+      { label: "İmza üçün", path: "/confirmations/payment/sign", roles: allRoles },
+      { label: "Təsdiq olunanlar", path: "/payments/review", roles: allRoles },
+    ],
   },
+  {
+    label: "İcazələrin rəsmiləşdirilməsi",
+    path: "/formalization",
+    icon: CircleCheckBig,
+    roles: ["super_admin", "deputy_minister"],
+    subItems: [
+      {
+        label: "İmzalanmamışlar",
+        path: "/formalization/unsigned",
+        roles: ["super_admin", "deputy_minister"],
+      },
+      {
+        label: "İcazələr",
+        path: "/formalization/permits",
+        roles: ["super_admin", "deputy_minister"],
+      },
+    ],
+  },
+  {
+    label: "Xidmət məmnuniyyəti",
+    path: "/service-ratings",
+    icon: Star,
+    roles: ["super_admin", "deputy_minister"],
+  },
+  { label: "İstifadəçilər", path: "/users", icon: Users, roles: ["super_admin"] },
+  { label: "İcazələr (növlər)", path: "/permit-services", icon: Package, roles: ["super_admin"] },
 ];
 
 export function getVisibleSidebarItems(userRole: Role | undefined) {
