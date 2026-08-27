@@ -45,6 +45,7 @@ export default function PermissionDetailPage({ permitService }: { permitService:
           ))}
         </div>
         <PermissionSummary
+        id={permitService.id}
           type={permitService.category_label}
           reviewTime={`${permitService.review_duration_days} iş günü`}
           fee={`${permitService.state_fee} AZN`}

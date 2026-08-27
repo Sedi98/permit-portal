@@ -1,7 +1,9 @@
 import axios, { type AxiosRequestConfig, isAxiosError } from "axios";
 
+import { apiUrl } from "@/lib/api";
+
 export const Http = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api`,
+  baseURL: apiUrl(""),
   headers: {
     "Content-Type": "application/json",
   },

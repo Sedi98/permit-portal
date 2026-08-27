@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 type PermissionSummaryProps = {
+  id: number;
   type: string;
   reviewTime: string;
   fee: string;
@@ -16,7 +17,7 @@ const summaryRows = [
   ["Sənəd sayı", "documentCount"],
 ] as const;
 
-export function PermissionSummary({ type, reviewTime, fee, documentCount, requirements }: PermissionSummaryProps) {
+export function PermissionSummary({ id, type, reviewTime, fee, documentCount, requirements }: PermissionSummaryProps) {
   const values = { type, reviewTime, fee, documentCount };
 
   return (
@@ -44,7 +45,7 @@ export function PermissionSummary({ type, reviewTime, fee, documentCount, requir
         </ul>
       </div>
 
-      <Link href="/login" className="mt-8 flex h-12 w-full items-center justify-center rounded-lg bg-[#286aa6] px-4 text-base font-semibold leading-6 text-white transition-colors hover:bg-[#1f5688] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#286aa6] focus-visible:ring-offset-2">
+      <Link href={`/apply/${id}`} className="mt-8 flex h-12 w-full items-center justify-center rounded-lg bg-[#286aa6] px-4 text-base font-semibold leading-6 text-white transition-colors hover:bg-[#1f5688] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#286aa6] focus-visible:ring-offset-2">
         Müraciət et
       </Link>
     </aside>
