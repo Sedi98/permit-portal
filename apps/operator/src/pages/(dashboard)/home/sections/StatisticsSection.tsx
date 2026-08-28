@@ -1,31 +1,45 @@
 import StatisticsCard from "@/components/StatisticsCard"
-import { TickCircleIcon, DocumentTextIcon, VisaIcon, Edit2Icon } from "@/components/icons"
+import {
+  DocumentTextIcon,
+  Edit2Icon,
+  TickCircleIcon,
+  VisaIcon,
+} from "@/components/icons"
 import { useStatistics } from "@/features/statistics/hooks"
+import type { StatisticsData } from "@/features/statistics/types"
 
-const STATIC_STATS = [
-  { icon: <VisaIcon />, label: "Viza", value: 87 },
-  { icon: <Edit2Icon />, label: "İmza", value: 54 },
+const STATISTICS_ITEMS: Array<{
+  field: keyof StatisticsData
+  label: string
+  icon: typeof DocumentTextIcon
+}> = [
+  { field: "pending", label: "Yeni daxil olan", icon: DocumentTextIcon },
+  { field: "in_progress", label: "İcrada olan", icon: TickCircleIcon },
+  { field: "pending_visa", label: "Vizada olan", icon: VisaIcon },
+  { field: "pending_signature", label: "İmzada olan", icon: Edit2Icon },
 ]
 
 export default function StatisticsSection() {
-  const { data } = useStatistics()
-
-  const stats = data
-    ? [
-        { icon: <TickCircleIcon />, label: "İcra", value: data.data.in_progress },
-        { icon: <DocumentTextIcon />, label: "Müraciət", value: data.data.pending },
-        ...STATIC_STATS,
-      ]
-    : [
-        { icon: <TickCircleIcon />, label: "İcra", value: "—" },
-        { icon: <DocumentTextIcon />, label: "Müraciət", value: "—" },
-        ...STATIC_STATS,
-      ]
+  const { data, isError, isLoading } = useStatistics()
+  const statistics = data?.data
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 p-4">
-      {stats.map((stat) => (
-        <StatisticsCard key={stat.label} icon={stat.icon} label={stat.label} value={stat.value} />
+    <div
+      className="grid grid-cols-1 gap-6 p-4 sm:grid-cols-2 lg:grid-cols-4"
+      aria-busy={isLoading}
+    >
+      {isError ? (
+        <p className="col-span-full text-sm text-destructive">
+          Statistika məlumatları yüklənmədi.
+        </p>
+      ) : null}
+      {STATISTICS_ITEMS.map(({ field, label, icon: Icon }) => (
+        <StatisticsCard
+          key={field}
+          icon={<Icon />}
+          label={label}
+          value={statistics?.[field] ?? "—"}
+        />
       ))}
     </div>
   )

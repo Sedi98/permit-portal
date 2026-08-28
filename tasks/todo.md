@@ -1,3 +1,15 @@
+# Task: Integrate operator dashboard statistics API
+
+- [x] Inspect the dashboard statistics guide and existing operator API/query patterns.
+- [x] Extend the statistics response model to the complete documented payload.
+- [x] Render the first four documented statistics cards directly from the API response with loading/error fallbacks.
+- [x] Run focused ESLint, full operator lint, and operator production build checks.
+- [x] Review the final diff and document verification results.
+
+## Review
+
+Expanded the response type to the complete nine-counter API contract and replaced the dashboard's two partial live values plus two hard-coded placeholders with the first four documented cards driven entirely by `GET /admin/statistics`: Yeni daxil olan, İcrada olan, Vizada olan, and İmzada olan. The remaining counters stay typed for later UI work but are not rendered. The section sends no date or role parameters, preserves zero values, shows placeholders while loading, and surfaces a localized fetch error. Focused ESLint and full operator lint pass; full lint retains only the existing TanStack Table React Compiler warning. The operator TypeScript and Vite production build also pass, retaining the existing large-chunk advisory.
+
 # Task: Add permit-service applicant type
 
 - [x] Audit the permit-service type, create/edit state, validation, and multipart serialization.

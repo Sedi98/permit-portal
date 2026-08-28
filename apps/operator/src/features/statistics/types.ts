@@ -1,13 +1,16 @@
 export interface StatisticsData {
   total: number;
-  in_progress: number;
   pending: number;
+  in_progress: number;
   completed: number;
   rejected: number;
   suspended: number;
+  unprocessed: number;
+  pending_visa: number;
+  pending_signature: number;
 }
 
 export interface StatisticsResponse {
-  status: string;
+  status: "success";
   data: StatisticsData;
 }
