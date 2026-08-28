@@ -1,5 +1,6 @@
 import { type ComponentProps } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 interface NoteTextareaProps extends ComponentProps<typeof Textarea> {
   label?: string;
@@ -15,23 +16,27 @@ export default function NoteTextarea({
   ...props
 }: NoteTextareaProps) {
   return (
-    <div className="flex flex-col gap-1 w-full">
-      <div className="flex flex-col gap-2 w-full">
-        <label className="text-[#797979] text-sm font-medium leading-5">
-          {label}
-        </label>
-        <div className="relative w-full">
-          <Textarea
-            className={`bg-[#F5F5F5] rounded-lg px-4 py-3 border-none shadow-none text-[#797979] text-base leading-6 placeholder:text-[#797979] resize-none min-h-[48px] h-30 ${className ?? ""}`}
-            placeholder="Əlavə qeyd və ya göstərişlər..."
-            maxLength={maxLength}
-            value={value}
-            {...props}
-          />
-          <p className="absolute bottom-3 right-4 text-[#797979] text-xs leading-4">
-            {value.length}/{maxLength}
-          </p>
-        </div>
+    <div className="flex w-full flex-col gap-2">
+      <label
+        htmlFor={props.id}
+        className="text-sm font-medium leading-5 text-[#a5a5a5]"
+      >
+        {label}
+      </label>
+      <div className="relative w-full">
+        <Textarea
+          className={cn("h-[152px] pb-9 pr-16", className)}
+          placeholder="Əlavə qeyd və ya göstərişlər..."
+          maxLength={maxLength}
+          value={value}
+          {...props}
+        />
+        <p
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-3 right-4 text-xs leading-4 text-[#797979]"
+        >
+          {value.length}/{maxLength}
+        </p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 export type PermitServiceCategory = "permit" | "certificate";
+export type AllowedApplicantType = "physical" | "legal" | "both";
 
 export interface ManagedPermitService {
   id: number;
@@ -8,6 +9,7 @@ export interface ManagedPermitService {
   slug: string;
   category: PermitServiceCategory;
   category_label: string;
+  allowed_applicant_types: AllowedApplicantType;
   is_active: boolean;
   icon_url: string | null;
   legal_basis: string | null;
@@ -33,6 +35,7 @@ export interface PermitServiceFormValues {
   name: string;
   short_name: string;
   category: PermitServiceCategory;
+  allowed_applicant_types: AllowedApplicantType;
   is_active: boolean;
   icon: File | null;
   legal_basis: string;

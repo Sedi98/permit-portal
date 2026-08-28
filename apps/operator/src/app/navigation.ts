@@ -126,7 +126,7 @@ export const sidebarItems: SidebarItem[] = [
     roles: ["super_admin", "deputy_minister"],
   },
   { label: "İstifadəçilər", path: "/users", icon: Users, roles: ["super_admin"] },
-  { label: "İcazələr (növlər)", path: "/permit-services", icon: Package, roles: ["super_admin"] },
+  { label: "İcazələr", path: "/permit-services", icon: Package, roles: ["super_admin"] },
 ];
 
 export function getVisibleSidebarItems(userRole: Role | undefined) {
@@ -147,6 +147,20 @@ export function getVisibleSidebarItems(userRole: Role | undefined) {
 
 export function getSidebarBreadcrumbs(pathname: string) {
   const normalizedPath = pathname === "/" ? "/" : pathname.replace(/\/+$/, "");
+
+  if (normalizedPath === "/permit-services/new") {
+    return [
+      { label: "İcazələr", path: "/permit-services" },
+      { label: "Yeni icazə", path: normalizedPath },
+    ];
+  }
+
+  if (/^\/permit-services\/[^/]+$/.test(normalizedPath)) {
+    return [
+      { label: "İcazələr", path: "/permit-services" },
+      { label: "İcazəni redaktə et", path: normalizedPath },
+    ];
+  }
 
   for (const item of sidebarItems) {
     if (normalizedPath === item.path) {

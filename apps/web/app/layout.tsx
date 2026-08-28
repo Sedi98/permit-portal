@@ -61,6 +61,8 @@ export const viewport: Viewport = {
   themeColor: "#286aa6",
 };
 
+export const revalidate = 120;
+
 export default function RootLayout({
   children,
 }: Readonly<{

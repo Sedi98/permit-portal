@@ -1,14 +1,13 @@
 import { useNavigate } from "react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { DateRange } from "react-day-picker";
-import { Search } from "lucide-react";
 
 import TableLayout from "@/app/layouts/TableLayout";
 import PageTitle from "@/components/PageTitle";
 import { DataTable } from "@/components/ui/data-table";
 import { DatePickerWithRange } from "@/components/ui/range-picker";
 import { PaginationContainer } from "@/components/PaginationContainer";
-import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/ui/search-input";
 import { EyeIcon } from "@/components/icons";
 
 export type QueueRow = {
@@ -113,15 +112,12 @@ export default function QueueListPage({
           <PageTitle title="Siyahı" text={`Cəmi ${totalItems} nəticə tapıldı`} />
           <DatePickerWithRange value={dateRange} onChange={onDateRangeChange} placeholder="Tarix aralığı seç" />
         </div>
-        <div className="flex w-[400px] items-center gap-3 rounded-lg bg-[#f5f5f5] px-4 py-3">
-          <Search className="size-5 shrink-0 text-[#797979]" />
-          <Input
-            placeholder="Axtar..."
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            className="h-auto rounded-none border-none bg-transparent px-0 py-0 text-base shadow-none placeholder:text-[#797979]"
-          />
-        </div>
+        <SearchInput
+          containerClassName="w-[400px]"
+          placeholder="Axtar..."
+          value={search}
+          onChange={(event) => onSearchChange(event.target.value)}
+        />
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="size-10 animate-spin rounded-full border-4 border-[#286aa6] border-t-transparent" />

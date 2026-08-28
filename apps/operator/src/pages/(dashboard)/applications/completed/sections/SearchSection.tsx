@@ -1,5 +1,4 @@
-import { Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { SearchInput } from "@/components/ui/search-input"
 import {
   Select,
   SelectTrigger,
@@ -44,15 +43,12 @@ export default function SearchSection({
 }: SearchSectionProps) {
   return (
     <div className="flex gap-4">
-      <div className="flex items-center gap-3 bg-[#f5f5f5] rounded-lg px-4 py-3 w-[400px]">
-        <Search className="size-5 text-[#797979] shrink-0" />
-        <Input
-          placeholder="Axtar..."
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="bg-transparent border-none px-0 py-0 rounded-none shadow-none h-auto text-base text-[#1F1F1F] placeholder:text-[#797979]"
-        />
-      </div>
+      <SearchInput
+        containerClassName="w-[400px]"
+        placeholder="Axtar..."
+        value={search}
+        onChange={(event) => onSearchChange(event.target.value)}
+      />
 
       <div className="w-[200px]">
         <Select value={applicantType} onValueChange={onApplicantTypeChange}>

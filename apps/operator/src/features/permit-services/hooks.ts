@@ -57,9 +57,13 @@ export function useDeactivateManagedPermitService() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deactivateManagedPermitService,
-    onSuccess: () =>
+    onSuccess: (_data, id) => {
       queryClient.invalidateQueries({
         queryKey: ["permit-services", "admin", "list"],
-      }),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["permit-services", "admin", "detail", id],
+      });
+    },
   });
 }

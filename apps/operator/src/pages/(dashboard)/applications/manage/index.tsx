@@ -25,10 +25,10 @@ import type {
   ApplicationStatus,
 } from "@/features/applications/types";
 
-import ApplicationAssignSection from "./ApplicationAssignSection";
-import ApplicationFileReviewSection from "./ApplicationFileReviewSection";
-import ConfirmationSequenceForm from "./ConfirmationSequenceForm";
-import ConfirmationHistorySection from "./ConfirmationHistorySection";
+import ApplicationAssignSection from "@/features/applications/components/ApplicationAssignSection";
+import ApplicationFileReviewSection from "@/features/applications/components/ApplicationFileReviewSection";
+import ConfirmationHistorySection from "@/features/applications/components/ConfirmationHistorySection";
+import ConfirmationSequenceForm from "@/features/applications/components/ConfirmationSequenceForm";
 
 const APPLICATION_STEPS = [
   { label: "Sahə seçimi" },

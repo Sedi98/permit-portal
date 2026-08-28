@@ -38,6 +38,10 @@ export default function PermitServicesPage() {
           <div className="rounded-lg bg-destructive/5 p-6 text-center text-sm text-destructive">
             İcazələr yüklənmədi.
           </div>
+        ) : items.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-[#DFDFDF] p-12 text-center text-sm text-[#797979]">
+              İcazə tapılmadı.
+            </div>
         ) : (
           <div className="space-y-3">
             {items.map((service) => (
@@ -45,13 +49,20 @@ export default function PermitServicesPage() {
                 key={service.id}
                 className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#DFDFDF] bg-white p-4"
               >
-                <div className="flex min-w-0 items-center gap-4">
+                <button
+                  type="button"
+                  className="flex min-w-0 flex-1 items-center gap-4 text-left"
+                  onClick={() => navigate(`/permit-services/${service.id}`)}
+                  aria-label={`${service.short_name || service.name} icazəsini redaktə et`}
+                >
                   {service.icon_url ? (
-                    <img
-                      src={service.icon_url}
-                      alt=""
-                      className="size-12 rounded-lg object-contain"
-                    />
+                    <div className="flex size-12 items-center justify-center rounded-lg bg-[#EEF4FB] p-2 text-primary">
+                      <img
+                        src={service.icon_url}
+                        alt=""
+                        className="size-6 object-contain"
+                      />
+                    </div>
                   ) : (
                     <div className="flex size-12 items-center justify-center rounded-lg bg-[#EEF4FB] text-primary">
                       <Package className="size-6" />
@@ -66,7 +77,7 @@ export default function PermitServicesPage() {
                       {service.is_active ? "Aktiv" : "Deaktiv"}
                     </p>
                   </div>
-                </div>
+                </button>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"

@@ -20,21 +20,23 @@ function toFormData(values: PermitServiceFormValues, update: boolean) {
   formData.append("name", values.name);
   formData.append("short_name", values.short_name);
   formData.append("category", values.category);
+  formData.append("allowed_applicant_types", values.allowed_applicant_types);
   formData.append("is_active", values.is_active ? "1" : "0");
   if (values.icon) formData.append("icon", values.icon);
-  if (values.legal_basis) formData.append("legal_basis", values.legal_basis);
-  if (values.required_documents) {
-    formData.append("required_documents", values.required_documents);
-  }
-  if (values.suspension_basis) {
-    formData.append("suspension_basis", values.suspension_basis);
-  }
-  if (values.review_duration_days) {
-    formData.append("review_duration_days", values.review_duration_days);
-  }
-  if (values.state_fee) formData.append("state_fee", values.state_fee);
-  if (values.document_count) {
-    formData.append("document_count", values.document_count);
+
+  const optionalFields = [
+    "legal_basis",
+    "required_documents",
+    "suspension_basis",
+    "review_duration_days",
+    "state_fee",
+    "document_count",
+  ] as const;
+
+  for (const field of optionalFields) {
+    if (update || values[field]) {
+      formData.append(field, values[field]);
+    }
   }
   return formData;
 }

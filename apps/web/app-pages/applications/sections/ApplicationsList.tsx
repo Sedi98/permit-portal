@@ -44,7 +44,7 @@ function StatusAction({ application }: { application: CitizenApplicationListItem
   if (application.status === "draft") {
     return (
       <Button asChild className={actionClassName}>
-        <Link href={`/applications/${application.id}`}>Davam et</Link>
+        <Link href={`/apply/${application.permit_service.id}`}>Davam et</Link>
       </Button>
     );
   }

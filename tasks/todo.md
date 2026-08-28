@@ -1,3 +1,88 @@
+# Task: Add permit-service applicant type
+
+- [x] Audit the permit-service type, create/edit state, validation, and multipart serialization.
+- [x] Add the required shadcn select with physical, legal, and both options.
+- [x] Include `allowed_applicant_types` in create and update `FormData` payloads.
+- [x] Run focused lint, full operator lint, and production build checks.
+
+## Review
+
+Added the typed `AllowedApplicantType` union to permit-service response/form models, defaulted new services to `both`, and hydrated the returned value for edit flows with a defensive `both` fallback. The manage form now exposes a required shadcn select with Fiziki (`physical`), Hüquqi (`legal`), and Hər ikisi (`both`) options and integrates backend/client validation messages. Multipart serialization now always appends `allowed_applicant_types` for both create and update requests. Removed leftover FormData debug expressions from the touched API helper. Focused ESLint, full operator lint, TypeScript compilation, and production build pass; full lint retains only the existing TanStack Table compiler warning and build retains the existing bundle-size advisory.
+
+# Task: Apply Figma textarea design across operator
+
+- [x] Fetch design context and screenshot for Figma node `40000185:70006`.
+- [x] Audit the shared shadcn textarea and existing composed textarea usage.
+- [x] Disable textarea resizing and align the shared primitive to the Figma visual contract.
+- [x] Use the label/counter textarea composition in permit-service multiline fields.
+- [x] Run focused lint and operator build checks.
+
+## Review
+
+Updated the shared shadcn `Textarea` to the Figma contract: fixed 152px minimum height, disabled resizing, 8px radius, neutral fill, 16px/24px typography, Figma padding, and matching placeholder/focus/invalid states. Refined `NoteTextarea` to produce the full 180px composition with the muted 14px label, 8px gap, bottom-right character counter, correct label association, and reserved counter space. Permit-service multiline fields now use this composition with a 300-character limit while preserving validation attributes and controlled values. Focused ESLint and the operator production build pass. Full operator lint was also run; it remains blocked by an unrelated user-side bare `console.log` expression in `features/permit-services/api.ts:59`, plus the existing TanStack Table compiler warning.
+
+# Task: Apply Figma input design across operator
+
+- [x] Fetch design context and screenshot for Figma node `40000060:1673`.
+- [x] Audit shared shadcn `Input`, `Select`, input groups, and all operator usages.
+- [x] Update shared input/select primitives to the Figma dimensions, colors, radius, and typography.
+- [x] Add a reusable Figma-matched search input without changing base input behavior.
+- [x] Replace duplicated operator search wrappers with the shared search input.
+- [x] Run operator lint/build checks and visually review the implementation.
+
+## Review
+
+Implemented the Figma `Search Input` contract as a reusable operator component and aligned the shared shadcn `Input` and default `SelectTrigger` to its 48px height, 8px radius, 16px horizontal/12px vertical padding, DM Sans 16/24 typography, and neutral colors. Migrated all six duplicated operator search fields to the shared component, retained the compact select variant, and constrained `InputGroupInput` so the larger base input does not alter compact composite controls. The focused ESLint check, full operator lint, TypeScript compilation, and production build pass. Full lint retains only the existing TanStack Table React Compiler warning; the build retains the existing bundle-size advisory.
+
+# Task: Fix operator permit-service management
+
+- [x] Audit permit-service pages, routes, API helpers, hooks, and types against the operator guide.
+- [x] Correct create/update `FormData` behavior and preserve the documented HTTP methods.
+- [x] Add guide-required icon validation and robust form validation.
+- [x] Fix invalid edit IDs and documented list-row navigation behavior.
+- [x] Verify query invalidation and all admin-only route wiring.
+- [x] Run operator lint/build checks and review the diff.
+
+## Review
+
+Audited the full super-admin permit-service flow against the supplied guide. The documented GET/POST/DELETE endpoints and `_method: PUT` update contract remain intact. Updates can now clear optional scalar fields while omitting an unchanged icon, each FormData request overrides the Axios JSON default so the browser can generate the multipart boundary, and deactivation invalidates both list and detail caches. The pages now validate required/numeric fields and JPG/PNG/SVG icons up to 2 MB, surface backend validation messages, reject invalid route IDs, show current icon/code, provide clickable list content and an empty state, and use Azerbaijani nested breadcrumbs. Focused ESLint/TypeScript checks and full operator lint/build pass; lint retains the pre-existing TanStack Table compiler warning and build retains the existing large-chunk advisory.
+
+# Task: Add web layout revalidation
+
+- [x] Inspect the web root layout and existing changes.
+- [x] Add a 120-second route-segment revalidation interval.
+- [x] Run focused verification and document the result.
+
+## Review
+
+Added `export const revalidate = 120` to the web root layout. Focused ESLint and TypeScript checks pass.
+
+# Task: Move operator route pages out of features
+
+- [x] Inventory every route-level page under `apps/operator/src/features` and map it to `pages/(dashboard)`.
+- [x] Move the page modules into route-shaped dashboard page directories.
+- [x] Update router imports and any imports affected by the new locations.
+- [x] Confirm no page modules remain under `features` and no stale imports remain.
+- [x] Run operator lint and build checks.
+- [x] Review the final diff and document the result.
+
+## Review
+
+Moved all seven feature-hosted route screens into route-shaped directories under `pages/(dashboard)`: shared application management, unsigned formalization, confirmation queues, permit-service list/manage, service ratings, and user creation. Updated the router to import only from `@/pages/(dashboard)` for these screens and changed the moved application page's relative section imports to stable feature aliases. No page-named modules or stale feature-page imports remain under `features`; empty feature component directories were removed. Operator lint passes with the existing TanStack Table/React Compiler warning, and the production build passes with the existing large-chunk advisory.
+
+# Task: Remove operator EmptyPage placeholders
+
+- [x] Inspect the operator app and enumerate every `EmptyPage` consumer.
+- [x] Verify affected placeholder pages are not registered in the active router or sidebar.
+- [x] Remove all placeholder page files and the now-unused `EmptyPage` component.
+- [x] Confirm no `EmptyPage` references remain.
+- [x] Run operator lint and build checks.
+- [x] Review the diff and document the result.
+
+## Review
+
+Removed 30 orphan dashboard placeholder pages, their empty directories, and the shared `EmptyPage` component. The active router and sidebar required no changes because they did not reference these pages. A fresh operator-wide search reports zero `EmptyPage` matches. Operator lint passes with one pre-existing React Compiler/TanStack Table warning, and the operator production build passes with the existing large-chunk advisory.
+
 # Task: Pass the dynamic apply route id to ApplyPermissionPage
 
 - [x] Inspect the dynamic route, target component, and project conventions.

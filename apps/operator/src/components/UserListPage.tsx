@@ -1,12 +1,12 @@
 import * as React from "react";
 import { useNavigate } from "react-router";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import TableLayout from "@/app/layouts/TableLayout";
 import PageTitle from "@/components/PageTitle";
 import { DataTable } from "@/components/ui/data-table";
-import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/ui/search-input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -22,6 +22,13 @@ import type { AdminUser } from "@/features/users/types";
 import type { Role } from "@/app/navigation";
 
 type UserRow = AdminUser;
+
+const ROLE_LABELS: Record<Role, string> = {
+  super_admin: "Super admin",
+  executor: "İcraçı",
+  department_head: "Şöbə müdiri",
+  deputy_minister: "Nazir müavini",
+};
 
 function DetailButton({ userId }: { userId: number }) {
   const navigate = useNavigate();
@@ -41,7 +48,11 @@ function DetailButton({ userId }: { userId: number }) {
 const columns: ColumnDef<UserRow>[] = [
   { header: "Ad", accessorKey: "name" },
   { header: "FİN", accessorKey: "fin" },
-  { header: "Rol", accessorKey: "role" },
+  {
+    header: "Rol",
+    accessorKey: "role",
+    cell: ({ row }) => ROLE_LABELS[row.original.role],
+  },
   { header: "Şöbə", accessorKey: "department_name" },
   { header: "Status", accessorKey: "is_active", cell: ({ row }) => row.original.is_active ? "Aktiv" : "Deaktiv" },
   {
@@ -77,22 +88,23 @@ export default function UserListPage() {
           </Button>
         </div>
         <div className="flex flex-wrap gap-3">
-          <div className="flex w-[400px] items-center gap-3 rounded-lg bg-[#f5f5f5] px-4 py-3">
-          <Search className="size-5 shrink-0 text-[#797979]" />
-          <Input
+          <SearchInput
+            containerClassName="w-[400px]"
             placeholder="Axtar..."
             value={search}
             onChange={(event) => { setSearch(event.target.value); setPage(1); }}
-            className="h-auto rounded-none border-none bg-transparent px-0 py-0 text-base shadow-none placeholder:text-[#797979]"
           />
-          </div>
           <Select value={role} onValueChange={(value) => { setRole(value as Role | "all"); setPage(1); }}>
             <SelectTrigger className="w-52"><SelectValue placeholder="Rol" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Bütün rollar</SelectItem>
-              <SelectItem value="executor">İcraçı</SelectItem>
-              <SelectItem value="department_head">Şöbə müdiri</SelectItem>
-              <SelectItem value="deputy_minister">Nazir müavini</SelectItem>
+              <SelectItem value="executor">{ROLE_LABELS.executor}</SelectItem>
+              <SelectItem value="department_head">
+                {ROLE_LABELS.department_head}
+              </SelectItem>
+              <SelectItem value="deputy_minister">
+                {ROLE_LABELS.deputy_minister}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
