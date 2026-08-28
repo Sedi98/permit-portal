@@ -22,6 +22,7 @@ export type RatingStepProps = {
   onSkip?: () => void;
   onSubmit?: (values: RatingStepValues) => void | Promise<void>;
   isSubmitting?: boolean;
+  error?: string | null;
 };
 
 const RatingStep = ({
@@ -30,6 +31,7 @@ const RatingStep = ({
   onSkip,
   onSubmit,
   isSubmitting = false,
+  error,
 }: RatingStepProps) => {
   const [rating, setRating] = useState<RatingValue | null>(initialRating ?? null);
   const [comment, setComment] = useState(initialComment);
@@ -98,6 +100,11 @@ const RatingStep = ({
         </fieldset>
 
         <div className="w-full">
+          {error ? (
+            <p className="mb-3 text-sm text-[#d90b0b]" role="alert">
+              {error}
+            </p>
+          ) : null}
           <label htmlFor="rating-comment" className="sr-only">
             Xidmət haqqında rəy
           </label>

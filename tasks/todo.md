@@ -1,3 +1,16 @@
+# Task: Complete service-rating API integration
+
+- [x] Inspect the service-satisfaction guide and current web/operator rating integrations.
+- [x] Add the documented web `POST /service-ratings` API helper with the exact payload fields.
+- [x] Submit the completed application ID and selected rating from the web rating view.
+- [x] Surface API validation and duplicate-rating errors without leaving the rating view.
+- [x] Verify the operator statistics integration remains aligned with the guide.
+- [x] Run focused lint, web/operator lint, and web/operator production builds.
+
+## Review
+
+Added the documented citizen-side `POST /service-ratings` call with the exact `permit_application_id` and `rating` payload, using the submitted application ID retained by the apply flow. Rating submission now shows in-place backend errors (including duplicate/validation responses), disables while pending, and returns home only after a successful response. The existing operator statistics integration remains on `/admin/service-ratings/statistics` with the documented period/date filters and response fields. Focused lint passes for both apps; web and operator production builds pass. Full web lint retains only the pre-existing login-page effect error, and operator lint retains only the existing TanStack Table compiler warning.
+
 # Task: Open rating after application success
 
 - [x] Inspect the success component, apply state machine, and available rating APIs.

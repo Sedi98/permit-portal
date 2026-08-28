@@ -13,6 +13,12 @@ type ApiResponse<T> = {
   data: T;
 };
 
+export type ServiceRating = {
+  id: number;
+  permit_application_id: number;
+  rating: number;
+};
+
 export type ContactInformationPayload = {
   email: string;
   phones: Array<{ phone: string }>;
@@ -77,4 +83,14 @@ export async function submitApplication(applicationId: number) {
     `/permit-applications/${applicationId}/submit`,
     undefined,
   );
+}
+
+export async function submitServiceRating(applicationId: number, rating: number) {
+  return PostApi<
+    ApiResponse<ServiceRating>,
+    { permit_application_id: number; rating: number }
+  >("/service-ratings", {
+    permit_application_id: applicationId,
+    rating,
+  });
 }

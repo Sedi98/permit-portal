@@ -8,6 +8,7 @@ import { useAuth } from '@/features/auth/context'
 import {
   createPhysicalApplication,
   submitApplication,
+  submitServiceRating,
   updateApplicationContact,
   updateApplicationTradeDetail,
   uploadApplicationFile,
@@ -30,6 +31,7 @@ import PersonalInformation, {
   type PersonalInformationValues,
 } from '@/app-pages/apply/steps/personal-information'
 import RatingStep from '@/app-pages/apply/steps/rating-step'
+import type { RatingStepValues } from '@/app-pages/apply/steps/rating-step'
 import SuccessStep from '@/app-pages/apply/steps/success-step'
 import ToDraftStep from '@/app-pages/apply/steps/to-draft-step'
 
@@ -80,6 +82,8 @@ const ApplyPermissionPage = ({ id }: ApplyPermissionPageProps) => {
   const [step, setStep] = useState<ApplyView>(1)
   const [isCreating, setIsCreating] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRatingSubmitting, setIsRatingSubmitting] = useState(false)
+  const [ratingError, setRatingError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -211,6 +215,22 @@ const ApplyPermissionPage = ({ id }: ApplyPermissionPageProps) => {
     }
   }
 
+  const handleRatingSubmit = async ({ rating }: RatingStepValues) => {
+    if (!application) return
+
+    setIsRatingSubmitting(true)
+    setRatingError(null)
+
+    try {
+      await submitServiceRating(application.id, rating)
+      window.location.assign('/')
+    } catch (requestError: unknown) {
+      setRatingError(getErrorMessage(requestError))
+    } finally {
+      setIsRatingSubmitting(false)
+    }
+  }
+
   const checkoutDocuments: CheckoutDocument[] = documents.map((document) => ({
     name: document.name,
     size: document.size,
@@ -323,7 +343,9 @@ const ApplyPermissionPage = ({ id }: ApplyPermissionPageProps) => {
       {step === 'rating' ? (
         <RatingStep
           onSkip={() => window.location.assign('/')}
-          onSubmit={() => window.location.assign('/')}
+          onSubmit={handleRatingSubmit}
+          isSubmitting={isRatingSubmitting}
+          error={ratingError}
         />
       ) : null}
 
