@@ -1,3 +1,52 @@
+# Task: Open rating after application success
+
+- [x] Inspect the success component, apply state machine, and available rating APIs.
+- [x] Replace the success home action with `Xidməti qiymətləndir`.
+- [x] Add a post-success rating view to the apply flow.
+- [x] Preserve a home exit after skipping or completing the UI-only rating.
+- [x] Run focused lint, full web lint, and the web production build.
+
+## Review
+
+Replaced the success card's `Ana səhifəyə qayıt` action with `Xidməti qiymətləndir` and renamed its callback contract from `onHome` to `onRate`. The apply state now includes a semantic post-success `rating` view, hides the application progress stepper there, and renders `RatingStep` only after the user chooses the new action. Because the repository defines no rating endpoint, skipping or completing the UI-only rating returns to the home page instead of pretending feedback was persisted. Focused ESLint and the complete web production build pass. Full web lint was run and remains blocked only by the pre-existing login effect error at `app-pages/login/index.tsx:51`.
+
+# Task: Implement Figma rating step
+
+- [x] Load the mandatory Figma design-to-code and React guidance.
+- [x] Fetch design context and screenshot for node `40000597:95844`.
+- [x] Inspect every existing apply page and step plus the shared controls they use.
+- [x] Download and commit the exact Figma star assets.
+- [x] Replace the existing rating placeholder with the responsive interactive design.
+- [x] Run focused lint, full web lint, and the web production build.
+- [x] Review the implementation against the Figma screenshot.
+
+## Review
+
+Replaced the existing `RatingStep` placeholder with the responsive 550px Figma card, using the exact downloaded filled and outline star exports. The component provides accessible 1–5 selection, an optional controlled comment, design-matched disabled submit state, and typed `onSkip`/`onSubmit` callbacks while remaining intentionally separate from the existing apply state machine. Its dimensions, spacing, colors, typography, textarea, and actions were checked against node `40000597:95844`. Focused ESLint and the complete web production build pass. Full web lint was run and remains blocked only by the pre-existing login effect error at `app-pages/login/index.tsx:51`.
+
+# Task: Configure backend images from environment
+
+- [x] Inspect the web API environment, Next image config, and permit-service icon consumers.
+- [x] Configure `next/image` to allow the backend origin derived from `NEXT_PUBLIC_API_BASE_URL`.
+- [x] Normalize backend asset paths and absolute URLs to the environment-defined backend origin.
+- [x] Remove the hard-coded API fallback and update permit-service icon consumers.
+- [x] Run focused lint, full web lint, and the web production build.
+
+## Review
+
+Configured Next image optimization from the origin parsed out of `NEXT_PUBLIC_API_BASE_URL`, allowing every backend storage path without hard-coding a hostname. Added `backendAssetUrl` to preserve an API-provided asset path while replacing its protocol and host with the environment origin, so an `http://.../storage/...` response becomes the configured `https://.../storage/...` URL. Permit-service list and detail icons use the helper, and the API helper no longer has a hard-coded fallback. The generated Next config confirms `https://permit-back.secop.az/**`; focused ESLint and the complete web production build pass. Full web lint was run and remains blocked only by the pre-existing login effect error at `app-pages/login/index.tsx:51`.
+
+# Task: Redirect unauthenticated apply users to login
+
+- [x] Inspect the apply initialization flow and web auth conventions.
+- [x] Redirect unauthenticated users to `/login` before creating an application draft.
+- [x] Verify authenticated initialization and non-auth error handling remain unchanged.
+- [x] Run focused lint, web lint, and web build checks.
+
+## Review
+
+The apply initialization now waits for auth resolution and redirects users without an authenticated `user` to `/login` before any draft-creation request is made. Authenticated users retain the existing application initialization and API error handling. The initialization callback is deferred and cancellable so it passes the React effect rule and avoids stale updates when the route changes. Focused ESLint passes and the complete web production build succeeds. Full web lint was run and remains blocked only by the pre-existing `react-hooks/set-state-in-effect` error in `app-pages/login/index.tsx:51`.
+
 # Task: Integrate operator dashboard statistics API
 
 - [x] Inspect the dashboard statistics guide and existing operator API/query patterns.

@@ -14,7 +14,7 @@ export type SuccessStepProps = {
   applicationNumber?: string;
   applicationDate?: string;
   onApplications?: () => void;
-  onHome?: () => void;
+  onRate?: () => void;
 };
 
 const SummaryRow = ({
@@ -36,7 +36,7 @@ const SuccessStep = ({
   applicationNumber = "ENR-2025-2026",
   applicationDate = "25.11.2026",
   onApplications,
-  onHome,
+  onRate,
 }: SuccessStepProps) => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4">
@@ -86,10 +86,10 @@ const SuccessStep = ({
           <Button
             type="button"
             variant="outline"
-            onClick={onHome}
+            onClick={onRate}
             className="h-12 min-w-0 flex-1 rounded-lg border-[#dfdfdf] bg-white px-4 py-3 text-base font-semibold text-[#286aa6] hover:bg-white hover:text-[#286aa6]"
           >
-            Ana səhifəyə qayıt
+            Xidməti qiymətləndir
           </Button>
         </div>
       </section>

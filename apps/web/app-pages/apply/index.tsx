@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { ProgressStepper } from '@/components/progress-stepper'
 import { useAuth } from '@/features/auth/context'
@@ -28,6 +29,7 @@ import OperationStep, {
 import PersonalInformation, {
   type PersonalInformationValues,
 } from '@/app-pages/apply/steps/personal-information'
+import RatingStep from '@/app-pages/apply/steps/rating-step'
 import SuccessStep from '@/app-pages/apply/steps/success-step'
 import ToDraftStep from '@/app-pages/apply/steps/to-draft-step'
 
@@ -36,6 +38,7 @@ type ApplyPermissionPageProps = {
 }
 
 type ApplyStep = 1 | 2 | 3 | 4 | 5 | 6 | 7
+type ApplyView = ApplyStep | 'rating'
 
 type SubmissionResult = {
   application_no: string
@@ -60,6 +63,8 @@ function getErrorMessage(error: unknown) {
 
 const ApplyPermissionPage = ({ id }: ApplyPermissionPageProps) => {
   const { user, loading } = useAuth()
+  const router = useRouter()
+  const isAuthenticated = Boolean(user)
   const permitServiceId = Number(id)
   const isValidPermitServiceId = Number.isInteger(permitServiceId) && permitServiceId > 0
   const creationKey = useRef<string | null>(null)
@@ -72,7 +77,7 @@ const ApplyPermissionPage = ({ id }: ApplyPermissionPageProps) => {
   const [operationInformation, setOperationInformation] = useState<OperationInformationValues | undefined>()
   const [documents, setDocuments] = useState<SelectedApplicationDocument[]>([])
   const [submission, setSubmission] = useState<SubmissionResult | null>(null)
-  const [step, setStep] = useState<ApplyStep>(1)
+  const [step, setStep] = useState<ApplyView>(1)
   const [isCreating, setIsCreating] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -90,30 +95,51 @@ const ApplyPermissionPage = ({ id }: ApplyPermissionPageProps) => {
       return
     }
 
-    creationKey.current = id
-    setIsCreating(true)
-    setError(null)
+    if (!isAuthenticated) {
+      router.replace('/login')
+      return
+    }
 
     if (!isValidPermitServiceId) {
       return
     }
 
-    void createPhysicalApplication(permitServiceId)
-      .then((response) => {
-        setApplication(response.data)
-        setPersonalInformation({
-          fin: response.data.fin,
-          firstName: response.data.first_name,
-          lastName: response.data.last_name,
-          fatherName: response.data.father_name,
+    let cancelled = false
+    const creationTimer = window.setTimeout(() => {
+      if (cancelled || creationKey.current === id) return
+
+      creationKey.current = id
+      setIsCreating(true)
+      setError(null)
+
+      void createPhysicalApplication(permitServiceId)
+        .then((response) => {
+          if (cancelled) return
+
+          setApplication(response.data)
+          setPersonalInformation({
+            fin: response.data.fin,
+            firstName: response.data.first_name,
+            lastName: response.data.last_name,
+            fatherName: response.data.father_name,
+          })
         })
-      })
-      .catch((requestError: unknown) => {
-        creationKey.current = null
-        setError(getErrorMessage(requestError))
-      })
-      .finally(() => setIsCreating(false))
-  }, [id, isValidPermitServiceId, loading, permitServiceId])
+        .catch((requestError: unknown) => {
+          if (cancelled) return
+
+          creationKey.current = null
+          setError(getErrorMessage(requestError))
+        })
+        .finally(() => {
+          if (!cancelled) setIsCreating(false)
+        })
+    }, 0)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(creationTimer)
+    }
+  }, [id, isAuthenticated, isValidPermitServiceId, loading, permitServiceId, router])
 
   const handleContactNext = async (values: ContactInformationValues) => {
     if (!application) return
@@ -213,7 +239,7 @@ const ApplyPermissionPage = ({ id }: ApplyPermissionPageProps) => {
 
   return (
     <main className="flex w-full flex-col items-center pb-10">
-      {step < 7 ? <ProgressStepper activeStep={step} /> : null}
+      {typeof step === 'number' && step < 7 ? <ProgressStepper activeStep={step} /> : null}
 
       {error ? (
         <div className="mx-4 mb-6 w-full max-w-7xl rounded-xl bg-[#fef1f1] p-3 text-sm text-[#d90b0b]" role="alert">
@@ -284,13 +310,20 @@ const ApplyPermissionPage = ({ id }: ApplyPermissionPageProps) => {
         <SuccessStep
           applicationNumber={submission.application_no}
           onApplications={() => window.location.assign('/applications')}
-          onHome={() => window.location.assign('/')}
+          onRate={() => setStep('rating')}
         />
       ) : (
         <ToDraftStep
           completedSteps={`${permitServiceId === 1 ? 6 : 5}/6 tamamlandı`}
           onContinue={() => setStep(6)}
           onDrafts={() => window.location.assign('/applications')}
+        />
+      ) : null}
+
+      {step === 'rating' ? (
+        <RatingStep
+          onSkip={() => window.location.assign('/')}
+          onSubmit={() => window.location.assign('/')}
         />
       ) : null}
 

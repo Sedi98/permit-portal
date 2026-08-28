@@ -2,6 +2,7 @@ import { PermissionIdentity } from "./sections/PermissionIdentity";
 import { PermissionInfoSection } from "./sections/PermissionInfoSection";
 import { PermissionSummary } from "./sections/PermissionSummary";
 import type { PermitServiceDetail } from "@/features/permit-services/types";
+import { backendAssetUrl } from "@/lib/api";
 
 const fallbackIcon = "/icons/permission-detail/globe.svg";
 
@@ -16,6 +17,7 @@ function splitDocuments(value: string | null | undefined) {
 }
 
 export default function PermissionDetailPage({ permitService }: { permitService: PermitServiceDetail }) {
+  const permitServiceIcon = permitService.icon_url ?? permitService.icon_path;
   const sections = [
     {
       title: "Hüquqi əsas",
@@ -38,7 +40,7 @@ export default function PermissionDetailPage({ permitService }: { permitService:
           <PermissionIdentity
             category={permitService.category_label}
             title={permitService.name}
-            icon={permitService.icon_url ?? permitService.icon_path ?? fallbackIcon}
+            icon={permitServiceIcon ? backendAssetUrl(permitServiceIcon) : fallbackIcon}
           />
           {sections.map((section, index) => (
             <PermissionInfoSection key={section.title} index={index + 1} {...section} />

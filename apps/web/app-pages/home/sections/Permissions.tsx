@@ -2,6 +2,7 @@ import { PermissionCard } from "@/components/PermissionCard";
 import { SectionHeader } from "@/components/SectionHeader";
 import { getPermitServices } from "@/features/permit-services/api";
 import type { PermitService } from "@/features/permit-services/types";
+import { backendAssetUrl } from "@/lib/api";
 
 export async function Permissions() {
   let permitServices: PermitService[] = [];
@@ -41,7 +42,11 @@ export async function Permissions() {
                 key={service.id}
                 title={service.name}
                 href={`/permissions/${service.id}`}
-                icon="/icons/permissions/permission-default.svg"
+                icon={
+                  service.icon_url
+                    ? backendAssetUrl(service.icon_url)
+                    : "/icons/permissions/permission-default.svg"
+                }
               />
             ))}
           </div>

@@ -6,6 +6,7 @@ export interface PermitService {
   category: string;
   category_label: string;
   is_active: boolean;
+  icon_url: string | null;
 }
 
 export interface PermitServiceDetail extends PermitService {
