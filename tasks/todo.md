@@ -1,3 +1,15 @@
+# Task: Remove 300-character textarea limits
+
+- [x] Audit shadcn and native textarea usages across operator and web apps.
+- [x] Remove the operator `NoteTextarea` 300-character limit and counter.
+- [x] Remove the web operations textarea 300-character limit and counter.
+- [x] Run focused searches, lint, and production builds.
+- [x] Review the diff and document the result.
+
+## Review
+
+Removed the 300-character restriction and counter from the shared operator `NoteTextarea`, which covers permit-service and application note fields. Removed the matching limit, counter, and counter-only padding from the web application operations textarea. The web rating textarea was audited and had no limit. Focused app-code search reports no 300-character textarea references; unrelated FIN inputs retain their required seven-character limit. Operator lint passes with the existing TanStack Table compiler warning; web lint remains blocked by the pre-existing login effect error. Operator typecheck/build and web production build pass.
+
 # Task: Complete service-rating API integration
 
 - [x] Inspect the service-satisfaction guide and current web/operator rating integrations.

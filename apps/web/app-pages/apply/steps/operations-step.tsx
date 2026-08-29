@@ -137,14 +137,10 @@ const OperationStep = ({
             <textarea
               id="operation-description"
               value={description}
-              maxLength={300}
               onChange={(event) => setDescription(event.target.value)}
               placeholder="Daxil edin"
-              className="h-[110px] w-full resize-none rounded-lg border-0 bg-[#f5f5f5] px-4 py-3 pb-8 text-base font-normal leading-6 text-[#797979] outline-none placeholder:text-[#797979] focus-visible:ring-2 focus-visible:ring-[#286aa6]/30"
+              className="h-[110px] w-full resize-none rounded-lg border-0 bg-[#f5f5f5] px-4 py-3 text-base font-normal leading-6 text-[#797979] outline-none placeholder:text-[#797979] focus-visible:ring-2 focus-visible:ring-[#286aa6]/30"
             />
-            <span className="pointer-events-none absolute bottom-3 right-4 text-xs font-normal leading-4 text-[#797979]">
-              {description.length}/300
-            </span>
           </div>
         </Field>
       </div>
