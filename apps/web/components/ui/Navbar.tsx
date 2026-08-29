@@ -9,9 +9,9 @@ import { useAuth } from "@/features/auth/context";
 import { clearAuthCookies } from "@/features/auth/cookies";
 
 const links = [
-  { label: "İcazələr", href: "#icazələr" },
-  { label: "Necə işləyir?", href: "#necə-işləyir" },
-  { label: "Faq", href: "#faq" },
+  { label: "İcazələr", href: "/#icazələr" },
+  { label: "Necə işləyir?", href: "/#necə-işləyir" },
+  { label: "Faq", href: "/#faq" },
 ];
 
 export function Navbar() {
