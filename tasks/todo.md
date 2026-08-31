@@ -1,3 +1,18 @@
+# Task: Integrate citizen notifications API
+
+- [x] Inspect the notifications page and identify its current data/state behavior.
+- [x] Inspect existing `apps/web/features` API, type, and hook conventions.
+- [x] Read `docs/latest/frontend-bildirisler-bələdçisi.md` and map its citizen endpoints to the UI.
+- [x] Implement the smallest typed notification feature/API integration required by the guide.
+- [x] Run focused checks, full web lint, and the web production build.
+- [x] Review the diff and document verification results.
+
+## Review
+
+Added a typed `features/notifications` API/query layer for the documented list, unread-count, and bulk mark-all-read endpoints. The citizen notifications page now renders live data with loading, empty, and error states; refreshes both list and count after the bulk mutation; and routes notification clicks to the same `/applications/{id}` detail path already used by the citizen application list. The profile-menu badge now comes from the unread-count endpoint. Removed the mock list and its unsupported rich-detail dialog behavior; no per-notification read endpoint or undocumented pagination parameter was invented.
+
+Focused ESLint, TypeScript (`tsc --noEmit`), and `git diff --check` pass. Full web lint remains blocked only by the pre-existing `app-pages/login/index.tsx:51` `react-hooks/set-state-in-effect` error. The production build remains blocked only because the environment cannot fetch DM Sans from Google Fonts. The `pnpm` launcher stalled without output in this shell, so equivalent local app binaries were used for the completed lint, typecheck, and build attempts.
+
 # Task: Remove 300-character textarea limits
 
 - [x] Audit shadcn and native textarea usages across operator and web apps.
