@@ -1,10 +1,12 @@
 import { Progress } from "@/components/ui/progress";
+import Link from "next/link";
 
 export type DraftCardProps = {
   title: string;
   currentStep: number;
   totalSteps: number;
   progress: number;
+  continueHref: string;
 };
 
 export default function DraftCard({
@@ -12,6 +14,7 @@ export default function DraftCard({
   currentStep,
   totalSteps,
   progress,
+  continueHref,
 }: DraftCardProps) {
   const clampedProgress = Math.min(100, Math.max(0, progress));
   const safeTotalSteps = Math.max(0, Math.trunc(totalSteps));
@@ -52,6 +55,15 @@ export default function DraftCard({
             />
           ))}
         </div>
+      </div>
+
+      <div className="flex w-full justify-end border-t border-[#dfdfdf] pt-4">
+        <Link
+          href={continueHref}
+          className="flex h-12 w-full items-center justify-center rounded-lg bg-[#286aa6] px-4 py-3 text-base leading-6 font-semibold text-white transition-colors hover:bg-[#1f5688] focus-visible:ring-2 focus-visible:ring-[#286aa6] focus-visible:outline-none sm:w-[120px]"
+        >
+          Davam et
+        </Link>
       </div>
     </article>
   );

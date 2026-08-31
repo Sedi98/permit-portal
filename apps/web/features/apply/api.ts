@@ -1,4 +1,4 @@
-import { PostApi, PutApi } from "@/features/http";
+import { GetApi, PostApi, PutApi } from "@/features/http";
 
 export type PhysicalApplicant = {
   id: number;
@@ -9,9 +9,24 @@ export type PhysicalApplicant = {
   father_name: string | null;
 };
 
+export type ApplicationDetails = PhysicalApplicant & {
+  email?: string | null;
+  phones?: Array<{ phone: string }>;
+  permit_service?: { id: number; name: string };
+  trade_detail?: {
+    operation_type?: TradeDetailPayload["trade_detail"]["operation_type"];
+    goods_category?: string;
+    goods_name_volume?: string;
+  } | null;
+};
+
 type ApiResponse<T> = {
   data: T;
 };
+
+export async function getApplication(applicationId: number) {
+  return GetApi<ApiResponse<ApplicationDetails>>(`/permit-applications/${applicationId}`);
+}
 
 export type ServiceRating = {
   id: number;

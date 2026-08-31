@@ -32,6 +32,7 @@ export default function DraftList({ drafts, errorMessage }: DraftListProps) {
       {drafts.map((draft) => (
         <DraftCard
           key={draft.id}
+          continueHref={`/apply/${draft.id}?draft=1`}
           title={draft.permit_service.name}
           currentStep={draft.progress.completed_steps}
           totalSteps={draft.progress.total_steps}

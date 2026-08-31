@@ -1,3 +1,26 @@
+# Task: Handle 422 errors when creating applications
+
+- [x] Detect HTTP 422 responses from the new-application POST request.
+- [x] Show only the server error message and a centered Qaralamalar button for 422 responses.
+- [x] Keep the existing stepper/error behavior for other request failures.
+- [x] Run focused ESLint and TypeScript checks.
+
+## Review
+
+New-application creation failures with HTTP 422 now render a dedicated centered error state without any application steps. The user can return to `/drafts`; draft hydration and non-422 error handling are unchanged. Focused lint and TypeScript checks pass.
+
+# Task: Restore draft continuation and hydrate existing applications
+
+- [x] Restore the draft card's "Davam et" action and route with the draft application ID.
+- [x] Add typed GET `/permit-applications/:id` support for application details.
+- [x] Hydrate draft application identity, contact, and trade fields without creating a new application.
+- [x] Preserve POST creation only for new application flows.
+- [x] Run focused lint/type checks and the web production build.
+
+## Review
+
+Draft continuation uses `/apply/{id}?draft=1`; draft mode calls the detail endpoint and keeps the existing application ID for subsequent updates/submission. The new-application route remains POST-backed and unchanged in behavior. Focused ESLint/TypeScript checks and `pnpm build:web` pass.
+
 # Task: Integrate citizen draft progress
 
 - [x] Inspect the draft-progress guide, drafts route, page components, and current progress UI.
