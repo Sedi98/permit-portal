@@ -27,6 +27,7 @@ import UserCreatePage from "@/pages/(dashboard)/users/new";
 import VisaQueueManagePage from "@/pages/(dashboard)/visa-queue/manage";
 import SignQueueManagePage from "@/pages/(dashboard)/sign-queue/manage";
 import UserManagePage from "@/pages/(dashboard)/users/manage";
+import NotificationsPage from "@/pages/(dashboard)/notifications";
 
 export default function AppRouter() {
   return (
@@ -36,6 +37,8 @@ export default function AppRouter() {
         <Route element={<DashLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/board" element={<BoardPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/applications/manage/:id" element={<ApplicationDetailPage />} />
           <Route path="/applications/assigned" element={<AssignedApplicationsPage />} />
           <Route path="/applications/assigned/manage/:id" element={<ApplicationDetailPage />} />
           <Route path="/applications/under_review" element={<UnderReviewApplicationsPage />} />

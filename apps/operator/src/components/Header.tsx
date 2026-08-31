@@ -6,9 +6,11 @@ import {
   UserRound,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { useNavigate } from "react-router";
 
 import { cn } from "@/lib/utils";
 import { useMe, useLogout } from "@/features/auth/hooks";
+import { useUnreadNotificationsCount } from "@/features/notifications/hooks";
 
 const menuItems = [
   { label: "Profilim", icon: UserRound },
@@ -17,8 +19,11 @@ const menuItems = [
 ] as const;
 
 export default function Header() {
+  const navigate = useNavigate();
   const menuId = useId();
   const { data: me } = useMe();
+  const unreadCountQuery = useUnreadNotificationsCount();
+  const unreadCount = unreadCountQuery.data?.data.count ?? 0;
   const logout = useLogout();
   const menuRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -55,10 +60,23 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <button
             type="button"
-            aria-label="Bildirişlər"
-            className="inline-flex size-12 items-center justify-center rounded-lg border border-[#dfdfdf] bg-white text-[#286aa6] transition-colors hover:bg-[#f7f9fc]"
+            aria-label={
+              unreadCount > 0
+                ? `Bildirişlər, ${unreadCount} oxunmamış bildiriş`
+                : "Bildirişlər"
+            }
+            className="relative inline-flex size-12 items-center justify-center rounded-lg border border-[#dfdfdf] bg-white text-[#286aa6] transition-colors hover:bg-[#f7f9fc]"
+            onClick={() => navigate("/notifications")}
           >
             <Bell className="size-6" />
+            {unreadCount > 0 ? (
+              <span
+                aria-hidden="true"
+                className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[11px] font-semibold leading-none text-white"
+              >
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            ) : null}
           </button>
 
           <div ref={menuRef} className="relative">

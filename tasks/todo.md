@@ -1,3 +1,19 @@
+# Task: Integrate operator notifications API
+
+- [x] Inspect the operator header, layouts, router, navigation, and application-detail route conventions.
+- [x] Inspect operator feature API/type/hook/query patterns and reread the shared notifications guide.
+- [x] Add a typed operator notifications feature for list, unread count, and mark-all-read.
+- [x] Build the operator notifications page using existing layout and UI conventions.
+- [x] Add the live unread badge and notifications navigation to the header bell.
+- [x] Run focused checks, full operator lint, and the operator production build.
+- [x] Review the diff and document verification results.
+
+## Review
+
+Added a typed operator notifications feature for the documented list, unread-count, and bulk mark-all-read endpoints using the operator Axios auth/interceptor conventions. The new `/notifications` page follows the existing dashboard page and `TableLayout` structure, renders loading/empty/error states, distinguishes unread rows, and navigates each notification to a canonical `/applications/manage/{id}` route backed by the existing application-detail page. The header bell now opens the notifications page and shows the live unread-count badge, capped visually at `99+`. No sidebar entry, single-notification read endpoint, or undocumented pagination behavior was added.
+
+Focused ESLint and TypeScript checks pass. Full operator lint passes with only the existing TanStack Table React Compiler warning in `components/ui/data-table.tsx`. The operator production build passes with the existing large-chunk advisory. `git diff --check` passes with only line-ending notices.
+
 # Task: Integrate citizen notifications API
 
 - [x] Inspect the notifications page and identify its current data/state behavior.
