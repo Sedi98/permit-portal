@@ -1,3 +1,36 @@
+# Task: Integrate citizen draft progress
+
+- [x] Inspect the draft-progress guide, drafts route, page components, and current progress UI.
+- [x] Inspect citizen application list API/types and authenticated server-fetch conventions.
+- [x] Confirm the correct draft continuation route and avoid creating duplicate drafts.
+- [x] Add the documented draft progress fields and fetch drafts with the exact `status=draft` filter.
+- [x] Replace draft mock data with API results while preserving the existing page design.
+- [x] Run focused checks, full web lint, and the web production build.
+- [x] Review the diff and document verification results.
+
+## Review
+
+The drafts route now fetches the authenticated citizen's applications with the exact `status=draft` filter and renders the API-provided permit-service name, completed/total steps, and percentage without deriving or hardcoding progress. Mock drafts, fake timestamps, and unsupported edit/delete/continue controls were removed. Explicit empty and API-error states preserve the existing page layout.
+
+Focused ESLint and TypeScript checks pass for every changed web file, and the web production build passes. Full web lint remains blocked only by the pre-existing `app-pages/login/index.tsx:51` `react-hooks/set-state-in-effect` error.
+
+# Task: Integrate public and operator FAQs
+
+- [x] Inspect the FAQ guide, current web FAQ section, and both apps' API/query conventions.
+- [x] Inspect operator sidebar authorization, routing, CRUD pages, and shadcn dialog/form patterns.
+- [x] Add the public web FAQ API integration without changing the established accordion design.
+- [x] Add typed operator FAQ CRUD APIs and React Query hooks.
+- [x] Build a super-admin-only operator FAQ page with create/edit dialogs and safe delete behavior.
+- [x] Add the FAQ sidebar item and protected route for super administrators only.
+- [x] Run focused checks, full lint, and production builds for both apps.
+- [x] Review the diff and document verification results.
+
+## Review
+
+Replaced the web homepage's static FAQ data with the public `GET /faqs` response while preserving the existing accordion design, backend order, first-item-open behavior, empty/error states, and live FAQPage JSON-LD. Added a typed operator FAQ feature for `GET/POST/PUT/DELETE /admin/faqs`, plus a super-admin-only sidebar item and protected `/faqs` route. The operator page lists active and inactive questions in server order and uses one reusable shadcn form dialog for both create and edit. Hard delete requires a separate confirmation dialog that explicitly warns the operation cannot be reversed.
+
+Focused ESLint and TypeScript checks pass for both apps. Full operator lint passes with only the existing TanStack Table React Compiler warning. Full web lint remains blocked only by the pre-existing `app-pages/login/index.tsx:51` `react-hooks/set-state-in-effect` error. Both web and operator production builds pass; the operator build retains the existing large-chunk advisory.
+
 # Task: Integrate operator notifications API
 
 - [x] Inspect the operator header, layouts, router, navigation, and application-detail route conventions.

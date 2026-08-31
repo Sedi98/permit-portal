@@ -136,11 +136,17 @@ export default function Sidebar() {
 
   return (
     <aside className="flex w-[300px] flex-col bg-white px-6 pt-6 pb-8 text-[#1f1f1f] border-r border-[#dfdfdf] h-dvh overflow-scroll">
-      <img
-        src="/logo.svg"
-        alt="Azərbaycan Respublikası Energetika Nazirliyi"
-        className="h-12 w-[220.8px] shrink-0 object-contain"
-      />
+      <NavLink
+        to="/"
+        aria-label="Əsas səhifəyə keç"
+        className="w-fit shrink-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#286aa6]"
+      >
+        <img
+          src="/logo.svg"
+          alt="Azərbaycan Respublikası Energetika Nazirliyi"
+          className="h-12 w-[220.8px] object-contain"
+        />
+      </NavLink>
 
       <nav aria-label="Primary" className="mt-10">
         <ul className="space-y-2">

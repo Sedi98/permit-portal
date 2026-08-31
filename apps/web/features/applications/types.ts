@@ -37,7 +37,29 @@ export type CitizenApplicationListItem = {
   } | null;
 };
 
+export type DraftProgress = {
+  percentage: number;
+  completed_steps: number;
+  total_steps: number;
+};
+
+export type CitizenDraftListItem = {
+  id: number;
+  status: "draft";
+  applicant_type: string;
+  permit_service: {
+    id: number;
+    name: string;
+  };
+  progress: DraftProgress;
+};
+
 export type ApplicationsResponse = {
   status: string;
   data: CitizenApplicationListItem[];
+};
+
+export type DraftApplicationsResponse = {
+  status: "success";
+  data: CitizenDraftListItem[];
 };

@@ -13,8 +13,8 @@ import { useMe, useLogout } from "@/features/auth/hooks";
 import { useUnreadNotificationsCount } from "@/features/notifications/hooks";
 
 const menuItems = [
-  { label: "Profilim", icon: UserRound },
-  { label: "Ayarlar", icon: Settings2 },
+  // { label: "Profilim", icon: UserRound },
+  // { label: "Ayarlar", icon: Settings2 },
   { label: "Çıxış", icon: LogOut, destructive: true },
 ] as const;
 
