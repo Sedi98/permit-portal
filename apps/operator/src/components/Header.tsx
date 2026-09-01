@@ -2,8 +2,6 @@ import {
   Bell,
   ChevronDown,
   LogOut,
-  Settings2,
-  UserRound,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { useNavigate } from "react-router";

@@ -1,3 +1,13 @@
+# Task: Fix operator production build
+
+- [x] Run the operator production build and identify the TypeScript failure.
+- [x] Remove unused Header icon imports left behind by disabled menu entries.
+- [x] Re-run the operator build and lint.
+
+## Review
+
+`pnpm build:operator` now completes successfully. `pnpm lint:operator` reports no errors and retains only the existing React Compiler/TanStack Table warning in `src/components/ui/data-table.tsx`.
+
 # Task: Redesign citizen applications list with status actions
 
 - [x] Inspect the Figma applications-list design and current application API shape.
