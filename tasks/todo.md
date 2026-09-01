@@ -1,3 +1,15 @@
+# Task: Redesign citizen applications list with status actions
+
+- [x] Inspect the Figma applications-list design and current application API shape.
+- [x] Replace application cards with the responsive Figma-inspired table layout.
+- [x] Cover every defined application status with a label, color, message, and appropriate operation.
+- [x] Add status-specific Ödə, Yüklə, Bax, and Davam et actions with existing routes.
+- [x] Run focused lint/type checks and the web production build.
+
+## Review
+
+Applications now render in a responsive table matching the referenced Figma structure. Status handling is configuration-driven for all `applicationStatusOptions`, including payment and completed-document actions, draft continuation, revision review, and process/view states. Focused ESLint/TypeScript checks and `pnpm build:web` pass.
+
 # Task: Send complete service rating payload
 
 - [x] Update the rating API payload to use `application_id`.

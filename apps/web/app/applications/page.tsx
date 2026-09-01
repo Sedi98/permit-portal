@@ -46,6 +46,7 @@ const Applications = async ({ searchParams }: ApplicationsProps) => {
   try {
     const response = await getApplications(query, token);
     applications = response.data;
+    console.log(applications);
   } catch (error) {
     console.error("Applications load error:", error);
     errorMessage = "Müraciətlər yüklənərkən xəta baş verdi.";
