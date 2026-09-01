@@ -100,12 +100,18 @@ export async function submitApplication(applicationId: number) {
   );
 }
 
-export async function submitServiceRating(applicationId: number, rating: number) {
+export async function submitServiceRating(applicationId: number, rating: number, comment?: string) {
+  const payload: { application_id: number; rating: number; comment?: string } = {
+    application_id: applicationId,
+    rating,
+  };
+
+  if (comment?.trim()) {
+    payload.comment = comment.trim();
+  }
+
   return PostApi<
     ApiResponse<ServiceRating>,
-    { permit_application_id: number; rating: number }
-  >("/service-ratings", {
-    permit_application_id: applicationId,
-    rating,
-  });
+    typeof payload
+  >("/service-ratings", payload);
 }

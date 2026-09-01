@@ -8,3 +8,4 @@
 - When applying a repeated visual treatment, inspect equivalent list and detail views so the pattern is consistent everywhere, including requested inner padding.
 - For enum-backed table values, render user-facing labels through the same typed mapping used by related filters instead of exposing raw API keys.
 - When a statistics API documents more counters than the current dashboard design exposes, wire only the explicitly requested cards and keep the remaining fields typed for later UI work.
+- When a rating form collects a comment, verify the submit handler forwards it and matches the backend request field names instead of dropping it during destructuring.

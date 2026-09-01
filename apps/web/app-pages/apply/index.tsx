@@ -290,14 +290,14 @@ const ApplyPermissionPage = ({
     }
   };
 
-  const handleRatingSubmit = async ({ rating }: RatingStepValues) => {
+  const handleRatingSubmit = async ({ rating, comment }: RatingStepValues) => {
     if (!application) return;
 
     setIsRatingSubmitting(true);
     setRatingError(null);
 
     try {
-      await submitServiceRating(application.id, rating);
+      await submitServiceRating(application.id, rating, comment);
       window.location.assign("/");
     } catch (requestError: unknown) {
       setRatingError(getErrorMessage(requestError));

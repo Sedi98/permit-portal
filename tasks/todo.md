@@ -1,3 +1,14 @@
+# Task: Send complete service rating payload
+
+- [x] Update the rating API payload to use `application_id`.
+- [x] Forward the trimmed comment from the rating form.
+- [x] Keep `rating` required and omit the optional `comment` key when blank.
+- [x] Run focused ESLint and TypeScript checks.
+
+## Review
+
+Rating submission now posts required `{ application_id, rating }` and adds optional `comment` only when non-empty to `/service-ratings`. Focused lint and TypeScript checks pass.
+
 # Task: Handle 422 errors when creating applications
 
 - [x] Detect HTTP 422 responses from the new-application POST request.
