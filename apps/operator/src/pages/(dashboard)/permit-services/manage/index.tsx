@@ -28,6 +28,8 @@ import type {
   PermitServiceFormValues,
 } from "@/features/permit-services/types";
 
+import DocumentTypeSelector from "./document-type-selector";
+
 const emptyValues: PermitServiceFormValues = {
   name: "",
   short_name: "",
@@ -40,7 +42,7 @@ const emptyValues: PermitServiceFormValues = {
   suspension_basis: "",
   review_duration_days: "",
   state_fee: "",
-  document_count: "",
+  document_type_ids: [],
 };
 
 const MAX_ICON_SIZE = 2 * 1024 * 1024;
@@ -87,6 +89,9 @@ function validateValues(values: PermitServiceFormValues) {
   if (!values.allowed_applicant_types) {
     errors.allowed_applicant_types = "Müraciətçi tipi məcburidir.";
   }
+  if (values.document_type_ids.length === 0) {
+    errors.document_type_ids = "Ən azı bir sənəd növü seçilməlidir.";
+  }
 
   const iconError = validateIcon(values.icon);
   if (iconError) errors.icon = iconError;
@@ -94,7 +99,6 @@ function validateValues(values: PermitServiceFormValues) {
   const numericFields = [
     ["review_duration_days", "Baxılma müddəti", true],
     ["state_fee", "Dövlət rüsumu", false],
-    ["document_count", "Sənəd sayı", true],
   ] as const;
 
   for (const [field, label, integer] of numericFields) {
@@ -125,7 +129,8 @@ function getApiValidation(error: unknown) {
   const errors: FormErrors = {};
   for (const [field, messages] of Object.entries(response?.errors ?? {})) {
     const message = Array.isArray(messages) ? messages[0] : messages;
-    if (message) errors[field as keyof PermitServiceFormValues] = message;
+    const normalizedField = field.split(".")[0] as keyof PermitServiceFormValues;
+    if (message) errors[normalizedField] = message;
   }
 
   return { message: response?.message ?? fallback, errors };
@@ -133,6 +138,10 @@ function getApiValidation(error: unknown) {
 
 function getInitialValues(service?: ManagedPermitService): PermitServiceFormValues {
   if (!service) return emptyValues;
+  const documentTypes = [...(service.document_types ?? [])].sort(
+    (first, second) => first.pivot.display_order - second.pivot.display_order,
+  );
+
   return {
     name: service.name,
     short_name: service.short_name,
@@ -145,7 +154,7 @@ function getInitialValues(service?: ManagedPermitService): PermitServiceFormValu
     suspension_basis: service.suspension_basis ?? "",
     review_duration_days: service.review_duration_days?.toString() ?? "",
     state_fee: service.state_fee?.toString() ?? "",
-    document_count: service.document_count?.toString() ?? "",
+    document_type_ids: documentTypes.map((item) => item.id),
   };
 }
 
@@ -322,6 +331,14 @@ function PermitServiceForm({
             </p>
           ) : null}
         </div>
+        <div className="md:col-span-2">
+          <DocumentTypeSelector
+            selectedIds={values.document_type_ids}
+            initialDocumentTypes={service?.document_types}
+            onChange={(ids) => setField("document_type_ids", ids)}
+            error={errors.document_type_ids}
+          />
+        </div>
         <div className="space-y-2">
           <Label htmlFor="permit-icon">İkon</Label>
           {service ? (
@@ -377,12 +394,10 @@ function PermitServiceForm({
         {[
           ["review_duration_days", "Baxılma müddəti (gün)", "number"],
           ["state_fee", "Dövlət rüsumu (AZN)", "number"],
-          ["document_count", "Sənəd sayı", "number"],
         ].map(([field, label, type]) => {
           const typedField = field as
             | "review_duration_days"
-            | "state_fee"
-            | "document_count";
+            | "state_fee";
           const error = errors[typedField];
           return (
             <div key={field} className="space-y-2">

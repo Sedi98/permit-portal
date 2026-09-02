@@ -1,19 +1,119 @@
+import type { ColumnDef } from "@tanstack/react-table";
 import { LoaderCircle, Package, Pencil, Plus } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
 import TableLayout from "@/app/layouts/TableLayout";
 import PageTitle from "@/components/PageTitle";
+import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/ui/data-table";
 import {
   useDeactivateManagedPermitService,
   useManagedPermitServices,
 } from "@/features/permit-services/hooks";
+import type {
+  AllowedApplicantType,
+  ManagedPermitService,
+} from "@/features/permit-services/types";
+
+const applicantTypeLabels: Record<AllowedApplicantType, string> = {
+  physical: "Fiziki şəxs",
+  legal: "Hüquqi şəxs",
+  both: "Hər ikisi",
+};
+
+function PermitServiceCell({ service }: { service: ManagedPermitService }) {
+  const navigate = useNavigate();
+
+  return (
+    <button
+      type="button"
+      className="flex min-w-64 items-center gap-3 text-left"
+      onClick={() => navigate(`/permit-services/${service.id}`)}
+      aria-label={`${service.short_name || service.name} icazəsini redaktə et`}
+    >
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#EEF4FB] text-primary">
+        {service.icon_url ? (
+          <img src={service.icon_url} alt="" className="size-6 object-contain" />
+        ) : (
+          <Package className="size-5" />
+        )}
+      </span>
+      <span className="font-medium text-[#1F1F1F]">
+        {service.short_name || service.name}
+      </span>
+    </button>
+  );
+}
+
+function PermitServiceActions({ service }: { service: ManagedPermitService }) {
+  const navigate = useNavigate();
+  const deactivate = useDeactivateManagedPermitService();
+
+  return (
+    <div className="flex min-w-max items-center gap-2">
+      <Button
+        variant="outline"
+        className="gap-2"
+        onClick={() => navigate(`/permit-services/${service.id}`)}
+      >
+        <Pencil className="size-4" />
+        Redaktə et
+      </Button>
+      {service.is_active ? (
+        <Button
+          variant="outline"
+          className="text-destructive"
+          disabled={deactivate.isPending}
+          onClick={() =>
+            deactivate.mutate(service.id, {
+              onSuccess: () => toast.success("İcazə deaktiv edildi"),
+              onError: () =>
+                toast.error("İcazə deaktiv edilərkən xəta baş verdi"),
+            })
+          }
+        >
+          Deaktiv et
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+const columns: ColumnDef<ManagedPermitService>[] = [
+  {
+    header: "İcazə",
+    id: "permit_service",
+    cell: ({ row }) => <PermitServiceCell service={row.original} />,
+  },
+  { header: "Kod", accessorKey: "code" },
+  { header: "Kateqoriya", accessorKey: "category_label" },
+  {
+    header: "Müraciətçi tipi",
+    accessorKey: "allowed_applicant_types",
+    cell: ({ row }) => applicantTypeLabels[row.original.allowed_applicant_types],
+  },
+  {
+    header: "Status",
+    accessorKey: "is_active",
+    cell: ({ row }) => (
+      <StatusBadge
+        variant={row.original.is_active ? "completed" : "suspended"}
+        label={row.original.is_active ? "Aktiv" : "Deaktiv"}
+      />
+    ),
+  },
+  {
+    header: "Əməliyyatlar",
+    id: "actions",
+    cell: ({ row }) => <PermitServiceActions service={row.original} />,
+  },
+];
 
 export default function PermitServicesPage() {
   const navigate = useNavigate();
   const services = useManagedPermitServices();
-  const deactivate = useDeactivateManagedPermitService();
   const items = services.data?.data ?? [];
 
   return (
@@ -39,73 +139,11 @@ export default function PermitServicesPage() {
             İcazələr yüklənmədi.
           </div>
         ) : items.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-[#DFDFDF] p-12 text-center text-sm text-[#797979]">
-              İcazə tapılmadı.
-            </div>
-        ) : (
-          <div className="space-y-3">
-            {items.map((service) => (
-              <article
-                key={service.id}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#DFDFDF] bg-white p-4"
-              >
-                <button
-                  type="button"
-                  className="flex min-w-0 flex-1 items-center gap-4 text-left"
-                  onClick={() => navigate(`/permit-services/${service.id}`)}
-                  aria-label={`${service.short_name || service.name} icazəsini redaktə et`}
-                >
-                  {service.icon_url ? (
-                    <div className="flex size-12 items-center justify-center rounded-lg bg-[#EEF4FB] p-2 text-primary">
-                      <img
-                        src={service.icon_url}
-                        alt=""
-                        className="size-6 object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex size-12 items-center justify-center rounded-lg bg-[#EEF4FB] text-primary">
-                      <Package className="size-6" />
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold text-[#1F1F1F]">
-                      {service.short_name || service.name}
-                    </p>
-                    <p className="mt-1 text-sm text-[#797979]">
-                      {service.code} · {service.category_label} ·{" "}
-                      {service.is_active ? "Aktiv" : "Deaktiv"}
-                    </p>
-                  </div>
-                </button>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="gap-2"
-                    onClick={() => navigate(`/permit-services/${service.id}`)}
-                  >
-                    <Pencil className="size-4" />
-                    Redaktə et
-                  </Button>
-                  {service.is_active ? (
-                    <Button
-                      variant="outline"
-                      className="text-destructive"
-                      disabled={deactivate.isPending}
-                      onClick={() =>
-                        deactivate.mutate(service.id, {
-                          onSuccess: () => toast.success("İcazə deaktiv edildi"),
-                          onError: () => toast.error("İcazə deaktiv edilərkən xəta baş verdi"),
-                        })
-                      }
-                    >
-                      Deaktiv et
-                    </Button>
-                  ) : null}
-                </div>
-              </article>
-            ))}
+          <div className="rounded-lg border border-dashed border-[#DFDFDF] p-12 text-center text-sm text-[#797979]">
+            İcazə tapılmadı.
           </div>
+        ) : (
+          <DataTable columns={columns} data={items} />
         )}
       </TableLayout>
     </div>

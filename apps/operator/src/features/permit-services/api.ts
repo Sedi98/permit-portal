@@ -23,6 +23,9 @@ function toFormData(values: PermitServiceFormValues, update: boolean) {
   formData.append("allowed_applicant_types", values.allowed_applicant_types);
   formData.append("is_active", values.is_active ? "1" : "0");
   if (values.icon) formData.append("icon", values.icon);
+  for (const documentTypeId of values.document_type_ids) {
+    formData.append("document_type_ids[]", documentTypeId.toString());
+  }
 
   const optionalFields = [
     "legal_basis",
@@ -30,7 +33,6 @@ function toFormData(values: PermitServiceFormValues, update: boolean) {
     "suspension_basis",
     "review_duration_days",
     "state_fee",
-    "document_count",
   ] as const;
 
   for (const field of optionalFields) {

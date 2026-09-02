@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 
 import { ProgressStepper } from "@/components/progress-stepper";
 import { useAuth } from "@/features/auth/context";
+import { getPermitService } from "@/features/permit-services/api";
+import type {
+  DocumentType,
+  PermitServiceDetail,
+} from "@/features/permit-services/types";
 import {
   createPhysicalApplication,
   getApplication,
@@ -41,6 +46,7 @@ import ToDraftStep from "@/app-pages/apply/steps/to-draft-step";
 type ApplyPermissionPageProps = {
   id: string;
   isDraft?: boolean;
+  initialPermitService?: PermitServiceDetail;
 };
 
 type ApplyStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -61,6 +67,18 @@ function getErrorMessage(error: unknown) {
       "data" in response
     ) {
       const data = response.data;
+
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "errors" in data &&
+        typeof data.errors === "object" &&
+        data.errors !== null &&
+        "files" in data.errors &&
+        typeof data.errors.files === "string"
+      ) {
+        return data.errors.files;
+      }
 
       if (
         typeof data === "object" &&
@@ -98,6 +116,7 @@ function getErrorStatus(error: unknown) {
 const ApplyPermissionPage = ({
   id,
   isDraft = false,
+  initialPermitService,
 }: ApplyPermissionPageProps) => {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -122,6 +141,12 @@ const ApplyPermissionPage = ({
     OperationInformationValues | undefined
   >();
   const [documents, setDocuments] = useState<SelectedApplicationDocument[]>([]);
+  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>(
+    initialPermitService?.documentTypes ?? [],
+  );
+  const [permitServiceCode, setPermitServiceCode] = useState<string | null>(
+    initialPermitService?.code ?? null,
+  );
   const [submission, setSubmission] = useState<SubmissionResult | null>(null);
   const [step, setStep] = useState<ApplyView>(1);
   const [isCreating, setIsCreating] = useState(true);
@@ -130,14 +155,6 @@ const ApplyPermissionPage = ({
   const [ratingError, setRatingError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showCreationError, setShowCreationError] = useState(false);
-
-  useEffect(() => {
-    console.log("ApplyPermissionPage auth data:", {
-      permitServiceId: id,
-      loading,
-      user,
-    });
-  }, [id, loading, user]);
 
   useEffect(() => {
     if (loading || creationKey.current === id) {
@@ -162,9 +179,10 @@ const ApplyPermissionPage = ({
       setError(null);
       setShowCreationError(false);
 
-      const handleApplication = (response: {
-        data: PhysicalApplicant | ApplicationDetails;
-      }) => {
+      const handleApplication = (
+        response: { data: PhysicalApplicant | ApplicationDetails },
+        permitService?: PermitServiceDetail,
+      ) => {
         const data = response.data as ApplicationDetails;
 
         if (cancelled) return;
@@ -173,6 +191,10 @@ const ApplyPermissionPage = ({
         if (data.permit_service?.id) {
           setPermitServiceId(data.permit_service.id);
         }
+        setDocumentTypes(data.documentTypes ?? permitService?.documentTypes ?? []);
+        setPermitServiceCode(
+          data.permit_service?.code ?? permitService?.code ?? null,
+        );
         setPersonalInformation({
           fin: data.fin,
           firstName: data.first_name,
@@ -194,12 +216,26 @@ const ApplyPermissionPage = ({
         }
       };
 
-      void (
-        isDraft ? getApplication(routeId) : createPhysicalApplication(routeId)
-      )
-        .then((response) => {
-          handleApplication(response);
-        })
+      void (async () => {
+        if (!isDraft) {
+          const response = await createPhysicalApplication(routeId);
+          handleApplication(response, initialPermitService);
+          return;
+        }
+
+        const response = await getApplication(routeId);
+        const serviceId = response.data.permit_service?.id;
+        const needsPermitService =
+          serviceId &&
+          (!response.data.permit_service?.code ||
+            !response.data.documentTypes?.length);
+        const permitService = needsPermitService
+          ? await getPermitService(serviceId)
+              .then((serviceResponse) => serviceResponse.data)
+              .catch(() => undefined)
+          : undefined;
+        handleApplication(response, permitService);
+      })()
         .catch((requestError: unknown) => {
           if (cancelled) return;
 
@@ -218,7 +254,16 @@ const ApplyPermissionPage = ({
       cancelled = true;
       window.clearTimeout(creationTimer);
     };
-  }, [id, isAuthenticated, isDraft, isValidRouteId, loading, routeId, router]);
+  }, [
+    id,
+    initialPermitService,
+    isAuthenticated,
+    isDraft,
+    isValidRouteId,
+    loading,
+    routeId,
+    router,
+  ]);
 
   const handleContactNext = async (values: ContactInformationValues) => {
     if (!application) return;
@@ -263,13 +308,15 @@ const ApplyPermissionPage = ({
     }
   };
 
-  const handleDocumentUpload = async (documentType: string, file: File) => {
+  const handleDocumentUpload = async (documentTypeId: number, file: File) => {
     if (!application) return;
 
+    setError(null);
     try {
-      await uploadApplicationFile(application.id, documentType, file);
+      await uploadApplicationFile(application.id, documentTypeId, file);
     } catch (requestError: unknown) {
       setError(getErrorMessage(requestError));
+      throw requestError;
     }
   };
 
@@ -307,6 +354,7 @@ const ApplyPermissionPage = ({
   };
 
   const checkoutDocuments: CheckoutDocument[] = documents.map((document) => ({
+    documentTypeName: document.documentTypeName,
     name: document.name,
     size: document.size,
     type: "PDF",
@@ -318,6 +366,8 @@ const ApplyPermissionPage = ({
   ]
     .filter(Boolean)
     .join(" ");
+  const maxFileSizeMb =
+    permitServiceCode === "PS-013" || permitServiceId === 13 ? 25 : 10;
 
   if (isCreating) {
     return (
@@ -401,6 +451,9 @@ const ApplyPermissionPage = ({
 
       {step === 4 ? (
         <DocumentsStep
+          documentTypes={documentTypes}
+          initialDocuments={documents}
+          maxFileSizeMb={maxFileSizeMb}
           onBack={() => setStep(permitServiceId === 1 ? 3 : 2)}
           onUpload={handleDocumentUpload}
           onNext={(selectedDocuments) => {

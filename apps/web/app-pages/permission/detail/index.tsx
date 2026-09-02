@@ -6,18 +6,9 @@ import { backendAssetUrl } from "@/lib/api";
 
 const fallbackIcon = "/icons/permission-detail/globe.svg";
 
-function splitDocuments(value: string | null | undefined) {
-  if (!value) return [];
-
-  return value
-    .split(";")
-    .map((document) => document.trim())
-    .filter(Boolean)
-    .map((text) => ({ text }));
-}
-
 export default function PermissionDetailPage({ permitService }: { permitService: PermitServiceDetail }) {
   const permitServiceIcon = permitService.icon_url ?? permitService.icon_path;
+  const documentTypes = permitService.documentTypes ?? [];
   const sections = [
     {
       title: "Hüquqi əsas",
@@ -25,7 +16,7 @@ export default function PermissionDetailPage({ permitService }: { permitService:
     },
     {
       title: "Tələb olunan sənədlər",
-      items: splitDocuments(permitService.required_documents),
+      items: documentTypes.map(({ name }) => ({ text: name })),
     },
     {
       title: "Dayandırılma və imtinanın hüquqi əsasları",
@@ -51,7 +42,7 @@ export default function PermissionDetailPage({ permitService }: { permitService:
           type={permitService.category_label}
           reviewTime={`${permitService.review_duration_days} iş günü`}
           fee={`${permitService.state_fee} AZN`}
-          documentCount={`${permitService.document_count} sənəd`}
+          documentCount={`${documentTypes.length} sənəd`}
           requirements={["MYGOV hesabı", "Tələb olunan sənədlər"]}
         />
       </div>

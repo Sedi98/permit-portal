@@ -436,3 +436,92 @@ The draft-save step matches the Figma layout with the centered book icon, draft-
 The physical-person apply flow now creates its draft on page load using the route's permit-service id, displays the API-provided FIN/name fields as disabled inputs, updates contact details, conditionally sends `trade_detail` for service `1`, uploads selected PDF files as multipart requests, and submits the application. The review and success screens consume live flow state, while the existing draft-save view remains available without an additional endpoint because the guide does not define one.
 
 Focused ESLint and TypeScript checks pass for all changed flow files. The full web lint remains blocked by the pre-existing `apps/web/app-pages/login/index.tsx:51` `react-hooks/set-state-in-effect` error. The web production build remains blocked by the environment's inability to fetch Google Fonts (`DM Sans`) during `next build`.
+
+# Task: Derive the mygov redirect URL from the current web origin
+
+- [x] Inspect the citizen auth request, login caller, HTTP helper, and deployment configuration.
+- [x] Replace the environment-controlled localhost URL with the browser's current origin plus `/login`.
+- [x] Remove the obsolete auth test-mode build/runtime configuration.
+- [x] Run focused lint, full web lint, and the web production build.
+- [x] Review the diff and document verification results.
+
+## Review
+
+The mygov redirect request now always calls the configured API endpoint with a `redirect_base` query parameter derived from `window.location.origin` and the `/login` path. This produces `http://localhost:3000/login` locally and the equivalent HTTPS login URL on deployed domains without a separate environment switch. Removed `NEXT_PUBLIC_AUTH_TEST_MODE` from the web Dockerfile and Compose configuration.
+
+Focused ESLint and the complete web TypeScript check pass. Full web lint remains blocked only by the pre-existing `react-hooks/set-state-in-effect` error in `app-pages/login/index.tsx:51`, and the production build remains blocked only because the environment cannot fetch DM Sans from Google Fonts. URL derivation was checked for localhost and `https://energy.az`; `git diff --check` passes. Docker Compose validation could not run because Docker is not installed in this environment.
+## Task: Implement dynamic document configuration in the admin panel
+
+- [x] Read the new guide and scope the work to HİSSƏ 1 only.
+- [x] Audit the operator permit-service pages, API/types/hooks, and reusable selectors.
+- [x] Add typed document-type list/create API integration and query hooks.
+- [x] Replace `document_count` with required ordered `document_type_ids` in permit-service state and multipart payloads.
+- [x] Add searchable multi-selection, inline document-type creation, and explicit ordering controls to create/edit forms.
+- [x] Run focused checks, full operator lint, and the operator production build.
+- [x] Review the final diff and document verification results.
+
+### Review
+
+Added a focused document-types feature for the documented admin list/create endpoints, with React Query caching and immediate cache insertion after creation. Permit-service create/update state now requires an ordered `document_type_ids` array, edit mode hydrates it from `documentTypes`, and multipart requests preserve the selected order using repeated `document_type_ids[]` fields. Removed `document_count` from the operator model, validation, payload, and form while retaining the separate legacy descriptive `required_documents` field because the new guide only removes the count.
+
+The create/edit form now uses the existing searchable multi-select, supports creating a missing Azerbaijani document name through the API and immediately selecting its returned ID, prevents duplicate selections, displays API/loading errors, and exposes explicit up/down controls for citizen-facing order. No citizen-side implementation from HİSSƏ 2 was changed.
+
+Focused ESLint and TypeScript checks pass. Full operator lint passes with only the existing TanStack Table/React Compiler warning in `components/ui/data-table.tsx`, and the operator production build passes with the existing large-chunk advisory. `git diff --check` passes with line-ending notices only.
+## Task: Implement dynamic citizen document uploads
+
+- [x] Read HİSSƏ 2 and inspect the apply route, flow state, upload component, API helpers, draft hydration, review, submit, and public permit detail.
+- [x] Add `documentTypes` to citizen permit-service and application contracts.
+- [x] Pass new-flow permit-service configuration from the dynamic route and hydrate draft configuration from the application detail.
+- [x] Replace hardcoded/free-form upload rows with ordered named rows from `documentTypes`.
+- [x] Send `document_type_id`, enforce PS-013's 25 MB limit and the 10 MB default, and keep failed uploads incomplete.
+- [x] Derive the public detail document count/list and surface named missing-document submit errors.
+- [x] Run focused checks, full web lint, and the web production build.
+- [x] Review the final diff and document verification results.
+
+### Review
+
+The citizen apply route now server-fetches the public permit-service detail for new applications and passes its ordered document configuration into the client flow without an extra client waterfall. Draft continuation hydrates `documentTypes` from the application detail and fetches the related permit service only when its code/configuration is missing. Existing live permit services that have not yet received the new array are handled as unconfigured instead of crashing prerendering.
+
+The documents step now renders exactly one named upload row per configured document type in backend order; all hardcoded and free-form additional rows were removed. Uploads send numeric `document_type_id`, use 25 MB for PS-013 and 10 MB otherwise, show local PDF/size validation, and become complete only after the API resolves. Failed replacement uploads restore the previous successful file. Because the guide defines no delete endpoint, configured required uploads do not expose a misleading local-only delete action. Review preserves document names and configured types, and all required rows must upload successfully before continuing.
+
+The public permit detail derives its document list and count from `documentTypes`, while submit errors prioritize the backend's exact `errors.files` text so missing documents are shown by name. Focused ESLint and TypeScript checks pass. Full web lint remains blocked only by the pre-existing `react-hooks/set-state-in-effect` error in `app-pages/login/index.tsx:51`. The full web production build passes and prerenders all permit detail routes. `git diff --check` passes with line-ending notices only.
+
+## Task: Convert the permit-service list to a table
+
+- [x] Inspect the permit-service list and established operator table patterns.
+- [x] Replace the permit-service cards with the shared `DataTable` while preserving all data and actions.
+- [x] Run focused checks, full operator lint, and the operator production build.
+- [x] Review the final diff and document verification results.
+
+### Review
+
+Replaced the permit-service card stack with the operator's shared `DataTable`. The table keeps the service icon/name navigation and adds dedicated code, category, applicant-type, and status columns, followed by the existing edit and active-only deactivate actions. Loading, API error, and localized empty states remain outside the table because the list endpoint is not paginated and the shared empty message is English.
+
+Focused ESLint passes. Full operator lint passes with only the existing TanStack Table/React Compiler warning in `components/ui/data-table.tsx`, and the operator production build passes with the existing large-chunk advisory. `git diff --check` passes with line-ending notices only.
+
+## Task: Hydrate document types when editing a permit service
+
+- [x] Trace edit-form hydration and the document-type selector's option mapping.
+- [x] Seed the selector with document types already attached to the permit service.
+- [x] Verify focused lint, full operator lint, and the operator production build.
+- [x] Review the final diff and document the result.
+
+### Review
+
+The edit form now passes the permit service's attached `documentTypes` into the selector. The selector merges those records with the asynchronously loaded admin document-type catalog before resolving selected IDs into labeled combobox values. Existing selections therefore remain visible and ordered even when a legacy or inactive attached type is absent from the general list endpoint.
+
+Full operator lint passes with only the existing TanStack Table/React Compiler warning in `components/ui/data-table.tsx`. The operator production build passes with the existing large-chunk advisory, and `git diff --check` passes with line-ending notices only. The initial focused ESLint invocation stalled without output and was stopped; the subsequent full-project lint covered both changed files successfully.
+
+## Task: Match admin permit-detail document response
+
+- [x] Compare the real admin detail payload with the operator response type and edit hydration.
+- [x] Model `document_types` and its pivot ordering from the admin response.
+- [x] Hydrate the edit selector and ordering list from the attached document types.
+- [x] Run focused checks, full operator lint, and the operator production build.
+- [x] Review the final diff and document verification results.
+
+### Review
+
+Updated the operator permit-service detail contract to match the real admin response's snake_case `document_types` array and typed its pivot metadata. Edit initialization copies and sorts the attached document records by `pivot.display_order`, then hydrates `document_type_ids` from that order. The same attached records seed the combobox option catalog, so selected labels and the existing citizen-facing reorder list render immediately and can be changed exactly as during creation.
+
+Full operator lint passes with only the existing TanStack Table/React Compiler warning in `components/ui/data-table.tsx`, and the operator production build passes with the existing large-chunk advisory. `git diff --check` passes with line-ending notices only. The focused ESLint invocation again stalled without output and was stopped; full-project lint covered all changed files successfully.

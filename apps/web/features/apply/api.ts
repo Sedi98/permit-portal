@@ -1,4 +1,5 @@
 import { GetApi, PostApi, PutApi } from "@/features/http";
+import type { DocumentType } from "@/features/permit-services/types";
 
 export type PhysicalApplicant = {
   id: number;
@@ -12,7 +13,8 @@ export type PhysicalApplicant = {
 export type ApplicationDetails = PhysicalApplicant & {
   email?: string | null;
   phones?: Array<{ phone: string }>;
-  permit_service?: { id: number; name: string };
+  permit_service?: { id: number; name: string; code?: string };
+  documentTypes?: DocumentType[];
   trade_detail?: {
     operation_type?: TradeDetailPayload["trade_detail"]["operation_type"];
     goods_category?: string;
@@ -79,11 +81,11 @@ export async function updateApplicationTradeDetail(
 
 export async function uploadApplicationFile(
   applicationId: number,
-  documentType: string,
+  documentTypeId: number,
   file: File,
 ) {
   const formData = new FormData();
-  formData.append("document_type", documentType);
+  formData.append("document_type_id", documentTypeId.toString());
   formData.append("file", file);
 
   return PostApi<ApiResponse<unknown>, FormData>(
