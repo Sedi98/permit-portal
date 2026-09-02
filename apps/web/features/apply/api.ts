@@ -1,5 +1,8 @@
 import { GetApi, PostApi, PutApi } from "@/features/http";
-import type { DocumentType } from "@/features/permit-services/types";
+import type {
+  ConfiguredDocumentType,
+  DocumentType,
+} from "@/features/permit-services/types";
 
 export type PhysicalApplicant = {
   id: number;
@@ -13,7 +16,13 @@ export type PhysicalApplicant = {
 export type ApplicationDetails = PhysicalApplicant & {
   email?: string | null;
   phones?: Array<{ phone: string }>;
-  permit_service?: { id: number; name: string; code?: string };
+  permit_service?: {
+    id: number;
+    name: string;
+    code?: string;
+    documentTypes?: DocumentType[];
+    document_types?: ConfiguredDocumentType[];
+  };
   documentTypes?: DocumentType[];
   trade_detail?: {
     operation_type?: TradeDetailPayload["trade_detail"]["operation_type"];
@@ -96,9 +105,15 @@ export async function uploadApplicationFile(
 }
 
 export async function submitApplication(applicationId: number) {
-  return PostApi<ApiResponse<{ status: string; application_no: string }>, undefined>(
+  const formData = new FormData();
+
+  return PostApi<
+    ApiResponse<{ status: string; application_no: string }>,
+    FormData
+  >(
     `/permit-applications/${applicationId}/submit`,
-    undefined,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } },
   );
 }
 

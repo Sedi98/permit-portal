@@ -8,6 +8,7 @@ import { ProgressStepper } from "@/components/progress-stepper";
 import { useAuth } from "@/features/auth/context";
 import { getPermitService } from "@/features/permit-services/api";
 import type {
+  ConfiguredDocumentType,
   DocumentType,
   PermitServiceDetail,
 } from "@/features/permit-services/types";
@@ -113,6 +114,27 @@ function getErrorStatus(error: unknown) {
   return undefined;
 }
 
+function getConfiguredDocumentTypes(
+  application: ApplicationDetails,
+  permitService?: PermitServiceDetail,
+): DocumentType[] {
+  const documentTypes: ConfiguredDocumentType[] =
+    application.documentTypes ??
+    application.permit_service?.documentTypes ??
+    application.permit_service?.document_types ??
+    permitService?.documentTypes ??
+    permitService?.document_types ??
+    [];
+
+  return [...documentTypes]
+    .sort(
+      (first, second) =>
+        (first.pivot?.display_order ?? 0) -
+        (second.pivot?.display_order ?? 0),
+    )
+    .map(({ id, name }) => ({ id, name }));
+}
+
 const ApplyPermissionPage = ({
   id,
   isDraft = false,
@@ -191,7 +213,7 @@ const ApplyPermissionPage = ({
         if (data.permit_service?.id) {
           setPermitServiceId(data.permit_service.id);
         }
-        setDocumentTypes(data.documentTypes ?? permitService?.documentTypes ?? []);
+        setDocumentTypes(getConfiguredDocumentTypes(data, permitService));
         setPermitServiceCode(
           data.permit_service?.code ?? permitService?.code ?? null,
         );
@@ -225,10 +247,13 @@ const ApplyPermissionPage = ({
 
         const response = await getApplication(routeId);
         const serviceId = response.data.permit_service?.id;
+        const applicationDocumentTypes = getConfiguredDocumentTypes(
+          response.data,
+        );
         const needsPermitService =
           serviceId &&
           (!response.data.permit_service?.code ||
-            !response.data.documentTypes?.length);
+            applicationDocumentTypes.length === 0);
         const permitService = needsPermitService
           ? await getPermitService(serviceId)
               .then((serviceResponse) => serviceResponse.data)

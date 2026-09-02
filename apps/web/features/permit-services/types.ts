@@ -14,6 +14,12 @@ export interface DocumentType {
   name: string;
 }
 
+export interface ConfiguredDocumentType extends DocumentType {
+  pivot?: {
+    display_order: number;
+  };
+}
+
 export interface PermitServiceDetail extends PermitService {
   short_name: string;
   allowed_applicant_types: string;
@@ -26,6 +32,7 @@ export interface PermitServiceDetail extends PermitService {
   review_duration_days: number;
   state_fee: string;
   documentTypes?: DocumentType[];
+  document_types?: ConfiguredDocumentType[];
   icon_url: string | null;
 }
 

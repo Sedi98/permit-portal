@@ -525,3 +525,36 @@ Full operator lint passes with only the existing TanStack Table/React Compiler w
 Updated the operator permit-service detail contract to match the real admin response's snake_case `document_types` array and typed its pivot metadata. Edit initialization copies and sorts the attached document records by `pivot.display_order`, then hydrates `document_type_ids` from that order. The same attached records seed the combobox option catalog, so selected labels and the existing citizen-facing reorder list render immediately and can be changed exactly as during creation.
 
 Full operator lint passes with only the existing TanStack Table/React Compiler warning in `components/ui/data-table.tsx`, and the operator production build passes with the existing large-chunk advisory. `git diff --check` passes with line-ending notices only. The focused ESLint invocation again stalled without output and was stopped; full-project lint covered all changed files successfully.
+
+## Task: Fix citizen document-type hydration
+
+- [x] Compare the live draft-application payload with the citizen response contracts.
+- [x] Normalize the documented `documentTypes` and live nested `permit_service.document_types` formats.
+- [x] Preserve the backend-provided display order for document uploads.
+- [x] Run focused lint and TypeScript checks; production build is blocked by Google Fonts network access.
+- [x] Review the final diff and document the result.
+
+### Review
+
+The citizen apply flow now accepts the documented nested
+`permit_service.documentTypes` contract, with the live
+`permit_service.document_types` response retained as a backward-compatible
+fallback. It maps the records to the upload UI's `{ id, name }` contract and
+sorts by the backend-provided `pivot.display_order` when present.
+
+Focused ESLint, TypeScript, and `git diff --check` pass. The web production
+build reaches Next.js compilation but is blocked because this environment cannot
+fetch the DM Sans Google Font.
+
+## Task: Submit citizen applications as multipart data
+
+- [x] Trace the final submit request through the shared HTTP client.
+- [x] Replace the implicit JSON request with an explicit empty multipart body.
+- [x] Run focused lint and TypeScript checks.
+- [x] Review the final diff and document the result.
+
+### Review
+
+`POST /permit-applications/{id}/submit` now sends an empty `FormData` body with
+the multipart content type instead of inheriting the HTTP client's JSON default.
+Focused ESLint, TypeScript, and `git diff --check` pass.
