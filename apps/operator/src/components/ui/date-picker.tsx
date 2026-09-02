@@ -17,6 +17,7 @@ interface DatePickerProps {
   onChange?: (date: Date | undefined) => void
   placeholder?: string
   className?: string
+  disabled?: React.ComponentProps<typeof Calendar>["disabled"]
 }
 
 export function DatePicker({
@@ -24,6 +25,7 @@ export function DatePicker({
   onChange,
   placeholder = "Tarix seç",
   className,
+  disabled,
 }: DatePickerProps) {
   const [internalDate, setInternalDate] = React.useState<Date | undefined>()
 
@@ -65,6 +67,7 @@ export function DatePicker({
           defaultMonth={date}
           selected={date}
           onSelect={handleSelect}
+          disabled={disabled}
         />
       </PopoverContent>
     </Popover>

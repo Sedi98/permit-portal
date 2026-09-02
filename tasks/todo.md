@@ -1,3 +1,27 @@
+# Task: Validate service-rating date range
+
+- [x] Inspect the existing service-rating date picker state and shared picker API.
+- [x] Prevent selecting a starting date later than the ending date.
+- [x] Prevent selecting an ending date earlier than the starting date.
+- [x] Run operator lint, typecheck, and production build.
+- [x] Review the diff and document the result.
+
+## Review
+
+The shared `DatePicker` now accepts calendar disabled matchers. Service-rating filters disable invalid dates in each direction and guard their change handlers, so the start date cannot be later than the end date and the end date cannot be earlier than the start date. Focused ESLint, TypeScript compilation, and the operator production build pass; the build retains the existing large-chunk advisory.
+
+# Task: Use date pickers for service-rating filters
+
+- [x] Inspect the service-ratings page and existing operator date-picker components.
+- [x] Replace the start/end date inputs with controlled shadcn date pickers.
+- [x] Preserve the API's `YYYY-MM-DD` query format.
+- [x] Run operator lint, typecheck, and production build.
+- [x] Review the diff and document the result.
+
+## Review
+
+Replaced the service-ratings start and end date inputs with the shared operator `DatePicker` component. The selected dates remain serialized as `YYYY-MM-DD` strings for the existing statistics API, and clearing a date removes its query parameter. Focused ESLint, TypeScript compilation, and the operator production build pass; the build retains the existing large-chunk advisory.
+
 # Task: Remove 300-character textarea limits
 
 - [x] Audit shadcn and native textarea usages across operator and web apps.

@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { format, parseISO } from "date-fns";
 import { LoaderCircle, Star } from "lucide-react";
 
 import TableLayout from "@/app/layouts/TableLayout";
 import PageTitle from "@/components/PageTitle";
-import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -19,6 +20,19 @@ export default function ServiceRatingsPage() {
   const [period, setPeriod] = useState<RatingPeriod>("monthly");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const fromDate = from ? parseISO(from) : undefined;
+  const toDate = to ? parseISO(to) : undefined;
+
+  const handleFromChange = (date: Date | undefined) => {
+    if (date && toDate && date > toDate) return;
+    setFrom(date ? format(date, "yyyy-MM-dd") : "");
+  };
+
+  const handleToChange = (date: Date | undefined) => {
+    if (date && fromDate && date < fromDate) return;
+    setTo(date ? format(date, "yyyy-MM-dd") : "");
+  };
+
   const statistics = useServiceRatingsStatistics({
     period,
     ...(from ? { from } : {}),
@@ -58,21 +72,21 @@ export default function ServiceRatingsPage() {
               </Select>
             </div>
             <div className="space-y-1">
-              <Label htmlFor="rating-from">Başlanğıc</Label>
-              <Input
-                id="rating-from"
-                type="date"
-                value={from}
-                onChange={(event) => setFrom(event.target.value)}
+              <Label>Başlanğıc</Label>
+              <DatePicker
+                value={fromDate}
+                onChange={handleFromChange}
+                placeholder="Başlanğıc tarix"
+                disabled={toDate ? { after: toDate } : undefined}
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="rating-to">Son</Label>
-              <Input
-                id="rating-to"
-                type="date"
-                value={to}
-                onChange={(event) => setTo(event.target.value)}
+              <Label>Son</Label>
+              <DatePicker
+                value={toDate}
+                onChange={handleToChange}
+                placeholder="Son tarix"
+                disabled={fromDate ? { before: fromDate } : undefined}
               />
             </div>
           </div>
