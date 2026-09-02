@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   ChartLine,
   CircleCheckBig,
+  CircleHelp,
   CreditCard,
   FileText,
   Home,
@@ -127,6 +128,12 @@ export const sidebarItems: SidebarItem[] = [
   },
   { label: "İstifadəçilər", path: "/users", icon: Users, roles: ["super_admin"] },
   { label: "İcazələr", path: "/permit-services", icon: Package, roles: ["super_admin"] },
+  {
+    label: "Tez-tez verilən suallar",
+    path: "/faqs",
+    icon: CircleHelp,
+    roles: ["super_admin"],
+  },
 ];
 
 export function getVisibleSidebarItems(userRole: Role | undefined) {

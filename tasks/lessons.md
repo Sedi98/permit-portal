@@ -8,3 +8,6 @@
 - When applying a repeated visual treatment, inspect equivalent list and detail views so the pattern is consistent everywhere, including requested inner padding.
 - For enum-backed table values, render user-facing labels through the same typed mapping used by related filters instead of exposing raw API keys.
 - When a statistics API documents more counters than the current dashboard design exposes, wire only the explicitly requested cards and keep the remaining fields typed for later UI work.
+- When a rating form collects a comment, verify the submit handler forwards it and matches the backend request field names instead of dropping it during destructuring.
+- When editing an entity with an async multi-select catalog, merge the entity's attached options into the catalog so existing selections remain visible even when the list endpoint omits inactive or legacy options.
+- When a user provides a real API payload, model its exact field casing and nested metadata at the response boundary; do not reuse the casing documented for a related endpoint.

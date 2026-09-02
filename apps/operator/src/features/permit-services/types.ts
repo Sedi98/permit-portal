@@ -1,5 +1,17 @@
+import type { DocumentType } from "@/features/document-types/types";
+
 export type PermitServiceCategory = "permit" | "certificate";
 export type AllowedApplicantType = "physical" | "legal" | "both";
+
+export interface ManagedPermitServiceDocumentType extends DocumentType {
+  created_at: string;
+  updated_at: string;
+  pivot: {
+    permit_service_id: number;
+    document_type_id: number;
+    display_order: number;
+  };
+}
 
 export interface ManagedPermitService {
   id: number;
@@ -17,7 +29,7 @@ export interface ManagedPermitService {
   suspension_basis: string | null;
   review_duration_days: number | null;
   state_fee: string | number | null;
-  document_count: number | null;
+  document_types?: ManagedPermitServiceDocumentType[];
 }
 
 export interface PermitServicesResponse {
@@ -43,5 +55,5 @@ export interface PermitServiceFormValues {
   suspension_basis: string;
   review_duration_days: string;
   state_fee: string;
-  document_count: string;
+  document_type_ids: number[];
 }

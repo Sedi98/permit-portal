@@ -18,7 +18,10 @@ type DocumentUploadItemProps = {
   documentIconSrc?: string;
   refreshIconSrc?: string;
   trashIconSrc?: string;
+  maxFileSizeMb?: number;
+  canRemove?: boolean;
   onFileSelected?: (file: File) => void | Promise<void>;
+  onRemove?: () => void;
 };
 
 type SelectedFile = {
@@ -26,7 +29,6 @@ type SelectedFile = {
   size: number;
 };
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const DEFAULT_UPLOAD_ICON = "/icons/apply/documents/upload.svg";
 const DEFAULT_DOCUMENT_ICON = "/icons/apply/documents/document-text.svg";
 const DEFAULT_REFRESH_ICON = "/icons/apply/documents/refresh-2.svg";
@@ -54,13 +56,17 @@ function DocumentUploadItem({
   documentIconSrc = DEFAULT_DOCUMENT_ICON,
   refreshIconSrc = DEFAULT_REFRESH_ICON,
   trashIconSrc = DEFAULT_TRASH_ICON,
+  maxFileSizeMb = 10,
+  canRemove = true,
   onFileSelected,
+  onRemove,
 }: DocumentUploadItemProps) {
   const [status, setStatus] = useState<DocumentUploadStatus>(initialStatus);
   const [progress, setProgress] = useState(initialProgress);
   const [file, setFile] = useState<SelectedFile | null>(
     initialFileName ? { name: initialFileName, size: initialFileSize } : null,
   );
+  const [error, setError] = useState<string | null>(null);
   const progressRef = useRef(initialProgress);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -70,13 +76,12 @@ function DocumentUploadItem({
     }
 
     const interval = window.setInterval(() => {
-      const nextProgress = Math.min(progressRef.current + 5, 100);
+      const nextProgress = Math.min(progressRef.current + 5, 90);
       progressRef.current = nextProgress;
       setProgress(nextProgress);
 
-      if (nextProgress === 100) {
+      if (nextProgress === 90) {
         window.clearInterval(interval);
-        setStatus("completed");
       }
     }, 120);
 
@@ -87,19 +92,42 @@ function DocumentUploadItem({
     inputRef.current?.click();
   };
 
-  const handleFileSelected = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelected = async (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
 
-    if (!selectedFile || !isPdf(selectedFile) || selectedFile.size > MAX_FILE_SIZE) {
+    if (!selectedFile) return;
+    if (!isPdf(selectedFile)) {
+      setError("Yalnız PDF formatında fayl yükləmək olar.");
+      event.target.value = "";
+      return;
+    }
+    if (selectedFile.size > maxFileSizeMb * 1024 * 1024) {
+      setError(`Faylın ölçüsü maksimum ${maxFileSizeMb} MB ola bilər.`);
       event.target.value = "";
       return;
     }
 
+    const previousFile = file;
+    const previousStatus = status;
+    setError(null);
     setFile({ name: selectedFile.name, size: selectedFile.size });
     progressRef.current = 0;
     setProgress(0);
     setStatus("uploading");
-    void onFileSelected?.(selectedFile);
+
+    try {
+      await onFileSelected?.(selectedFile);
+      progressRef.current = 100;
+      setProgress(100);
+      setStatus("completed");
+    } catch {
+      setFile(previousFile);
+      progressRef.current = 0;
+      setProgress(0);
+      setStatus(previousStatus === "completed" ? "completed" : "idle");
+      setError("Fayl yüklənmədi. Yenidən cəhd edin.");
+      event.target.value = "";
+    }
   };
 
   const handleRemove = () => {
@@ -107,6 +135,8 @@ function DocumentUploadItem({
     progressRef.current = 0;
     setProgress(0);
     setStatus("idle");
+    setError(null);
+    onRemove?.();
 
     if (inputRef.current) {
       inputRef.current.value = "";
@@ -171,21 +201,23 @@ function DocumentUploadItem({
               aria-hidden="true"
             />
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            aria-label={`${file.name} faylını sil`}
-            onClick={handleRemove}
-            className="size-10 rounded-lg bg-[#fef1f1] p-2 text-[#f32020] hover:bg-[#fef1f1] hover:text-[#f32020]"
-          >
-            <Image
-              src={trashIconSrc}
-              alt=""
-              width={24}
-              height={24}
-              aria-hidden="true"
-            />
-          </Button>
+          {canRemove ? (
+            <Button
+              type="button"
+              variant="ghost"
+              aria-label={`${file.name} faylını sil`}
+              onClick={handleRemove}
+              className="size-10 rounded-lg bg-[#fef1f1] p-2 text-[#f32020] hover:bg-[#fef1f1] hover:text-[#f32020]"
+            >
+              <Image
+                src={trashIconSrc}
+                alt=""
+                width={24}
+                height={24}
+                aria-hidden="true"
+              />
+            </Button>
+          ) : null}
         </div>
 
         <input
@@ -201,44 +233,51 @@ function DocumentUploadItem({
   }
 
   return (
-    <div className="flex min-h-[71px] w-full flex-col items-start justify-between gap-3 rounded-xl border-[1.5px] border-dashed border-[#dfdfdf] bg-[#f5f5f5] p-[13.5px] sm:flex-row sm:items-center">
-      <div className="flex min-w-0 flex-1 items-center gap-3">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-lg p-3">
-          <Image
-            src={uploadIconSrc}
-            alt=""
-            width={24}
-            height={24}
-            aria-hidden="true"
-          />
+    <div className="w-full space-y-2">
+      <div className="flex min-h-[71px] w-full flex-col items-start justify-between gap-3 rounded-xl border-[1.5px] border-dashed border-[#dfdfdf] bg-[#f5f5f5] p-[13.5px] sm:flex-row sm:items-center">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-lg p-3">
+            <Image
+              src={uploadIconSrc}
+              alt=""
+              width={24}
+              height={24}
+              aria-hidden="true"
+            />
+          </div>
+          <div className="min-w-0">
+            <p className="text-base font-medium leading-6 text-[#1f1f1f]">
+              Sürükləyin və ya seçin
+            </p>
+            <p className="text-sm font-normal leading-5 text-[#797979]">
+              .pdf · maks. {maxFileSizeMb}MB
+            </p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className="text-base font-medium leading-6 text-[#1f1f1f]">
-            Sürükləyin və ya seçin
-          </p>
-          <p className="text-sm font-normal leading-5 text-[#797979]">
-            .pdf · maks. 10MB
-          </p>
-        </div>
-      </div>
 
-      <div className="shrink-0 self-end sm:self-auto">
-        <input
-          ref={inputRef}
-          id={id}
-          type="file"
-          accept=".pdf,application/pdf"
-          className="sr-only"
-          onChange={handleFileSelected}
-        />
-        <Button
-          type="button"
-          onClick={openFilePicker}
-          className="h-10 w-[120px] rounded-lg bg-[#286aa6] px-3 py-2 text-base font-semibold leading-6 text-white hover:bg-[#286aa6]"
-        >
-          Faylı seçin
-        </Button>
+        <div className="shrink-0 self-end sm:self-auto">
+          <input
+            ref={inputRef}
+            id={id}
+            type="file"
+            accept=".pdf,application/pdf"
+            className="sr-only"
+            onChange={handleFileSelected}
+          />
+          <Button
+            type="button"
+            onClick={openFilePicker}
+            className="h-10 w-[120px] rounded-lg bg-[#286aa6] px-3 py-2 text-base font-semibold leading-6 text-white hover:bg-[#286aa6]"
+          >
+            Faylı seçin
+          </Button>
+        </div>
       </div>
+      {error ? (
+        <p className="text-sm text-[#d90b0b]" role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -13,6 +13,7 @@ const DOCUMENT_ICON = "/icons/apply/checkout/document-text.svg";
 const INFO_ICON = "/icons/apply/checkout/info-circle.svg";
 
 export type CheckoutDocument = {
+  documentTypeName?: string;
   name: string;
   size: number;
   type?: string;
@@ -142,9 +143,10 @@ const CheckoutStep = ({
                   </div>
                   <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-0">
                     <p className="truncate text-base font-medium leading-6 text-[#1f1f1f]">
-                      {document.name}
+                      {document.documentTypeName ?? document.name}
                     </p>
                     <p className="text-sm font-normal leading-5 text-[#797979]">
+                      {document.documentTypeName ? `${document.name} · ` : ""}
                       {formatFileSize(document.size)} · {document.type ?? "PDF"}
                     </p>
                   </div>

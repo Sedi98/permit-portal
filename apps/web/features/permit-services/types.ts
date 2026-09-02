@@ -9,6 +9,11 @@ export interface PermitService {
   icon_url: string | null;
 }
 
+export interface DocumentType {
+  id: number;
+  name: string;
+}
+
 export interface PermitServiceDetail extends PermitService {
   short_name: string;
   allowed_applicant_types: string;
@@ -20,7 +25,7 @@ export interface PermitServiceDetail extends PermitService {
   suspension_basis: string;
   review_duration_days: number;
   state_fee: string;
-  document_count: number;
+  documentTypes?: DocumentType[];
   icon_url: string | null;
 }
 

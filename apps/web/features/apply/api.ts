@@ -1,4 +1,5 @@
-import { PostApi, PutApi } from "@/features/http";
+import { GetApi, PostApi, PutApi } from "@/features/http";
+import type { DocumentType } from "@/features/permit-services/types";
 
 export type PhysicalApplicant = {
   id: number;
@@ -9,9 +10,25 @@ export type PhysicalApplicant = {
   father_name: string | null;
 };
 
+export type ApplicationDetails = PhysicalApplicant & {
+  email?: string | null;
+  phones?: Array<{ phone: string }>;
+  permit_service?: { id: number; name: string; code?: string };
+  documentTypes?: DocumentType[];
+  trade_detail?: {
+    operation_type?: TradeDetailPayload["trade_detail"]["operation_type"];
+    goods_category?: string;
+    goods_name_volume?: string;
+  } | null;
+};
+
 type ApiResponse<T> = {
   data: T;
 };
+
+export async function getApplication(applicationId: number) {
+  return GetApi<ApiResponse<ApplicationDetails>>(`/permit-applications/${applicationId}`);
+}
 
 export type ServiceRating = {
   id: number;
@@ -64,11 +81,11 @@ export async function updateApplicationTradeDetail(
 
 export async function uploadApplicationFile(
   applicationId: number,
-  documentType: string,
+  documentTypeId: number,
   file: File,
 ) {
   const formData = new FormData();
-  formData.append("document_type", documentType);
+  formData.append("document_type_id", documentTypeId.toString());
   formData.append("file", file);
 
   return PostApi<ApiResponse<unknown>, FormData>(
@@ -85,12 +102,18 @@ export async function submitApplication(applicationId: number) {
   );
 }
 
-export async function submitServiceRating(applicationId: number, rating: number) {
+export async function submitServiceRating(applicationId: number, rating: number, comment?: string) {
+  const payload: { application_id: number; rating: number; comment?: string } = {
+    application_id: applicationId,
+    rating,
+  };
+
+  if (comment?.trim()) {
+    payload.comment = comment.trim();
+  }
+
   return PostApi<
     ApiResponse<ServiceRating>,
-    { permit_application_id: number; rating: number }
-  >("/service-ratings", {
-    permit_application_id: applicationId,
-    rating,
-  });
+    typeof payload
+  >("/service-ratings", payload);
 }

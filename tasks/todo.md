@@ -1,26 +1,122 @@
-# Task: Validate service-rating date range
+# Task: Fix operator production build
 
-- [x] Inspect the existing service-rating date picker state and shared picker API.
-- [x] Prevent selecting a starting date later than the ending date.
-- [x] Prevent selecting an ending date earlier than the starting date.
-- [x] Run operator lint, typecheck, and production build.
-- [x] Review the diff and document the result.
+- [x] Run the operator production build and identify the TypeScript failure.
+- [x] Remove unused Header icon imports left behind by disabled menu entries.
+- [x] Re-run the operator build and lint.
 
 ## Review
 
-The shared `DatePicker` now accepts calendar disabled matchers. Service-rating filters disable invalid dates in each direction and guard their change handlers, so the start date cannot be later than the end date and the end date cannot be earlier than the start date. Focused ESLint, TypeScript compilation, and the operator production build pass; the build retains the existing large-chunk advisory.
+`pnpm build:operator` now completes successfully. `pnpm lint:operator` reports no errors and retains only the existing React Compiler/TanStack Table warning in `src/components/ui/data-table.tsx`.
 
-# Task: Use date pickers for service-rating filters
+# Task: Redesign citizen applications list with status actions
 
-- [x] Inspect the service-ratings page and existing operator date-picker components.
-- [x] Replace the start/end date inputs with controlled shadcn date pickers.
-- [x] Preserve the API's `YYYY-MM-DD` query format.
-- [x] Run operator lint, typecheck, and production build.
-- [x] Review the diff and document the result.
+- [x] Inspect the Figma applications-list design and current application API shape.
+- [x] Replace application cards with the responsive Figma-inspired table layout.
+- [x] Cover every defined application status with a label, color, message, and appropriate operation.
+- [x] Add status-specific Ödə, Yüklə, Bax, and Davam et actions with existing routes.
+- [x] Run focused lint/type checks and the web production build.
 
 ## Review
 
-Replaced the service-ratings start and end date inputs with the shared operator `DatePicker` component. The selected dates remain serialized as `YYYY-MM-DD` strings for the existing statistics API, and clearing a date removes its query parameter. Focused ESLint, TypeScript compilation, and the operator production build pass; the build retains the existing large-chunk advisory.
+Applications now render in a responsive table matching the referenced Figma structure. Status handling is configuration-driven for all `applicationStatusOptions`, including payment and completed-document actions, draft continuation, revision review, and process/view states. Focused ESLint/TypeScript checks and `pnpm build:web` pass.
+
+# Task: Send complete service rating payload
+
+- [x] Update the rating API payload to use `application_id`.
+- [x] Forward the trimmed comment from the rating form.
+- [x] Keep `rating` required and omit the optional `comment` key when blank.
+- [x] Run focused ESLint and TypeScript checks.
+
+## Review
+
+Rating submission now posts required `{ application_id, rating }` and adds optional `comment` only when non-empty to `/service-ratings`. Focused lint and TypeScript checks pass.
+
+# Task: Handle 422 errors when creating applications
+
+- [x] Detect HTTP 422 responses from the new-application POST request.
+- [x] Show only the server error message and a centered Qaralamalar button for 422 responses.
+- [x] Keep the existing stepper/error behavior for other request failures.
+- [x] Run focused ESLint and TypeScript checks.
+
+## Review
+
+New-application creation failures with HTTP 422 now render a dedicated centered error state without any application steps. The user can return to `/drafts`; draft hydration and non-422 error handling are unchanged. Focused lint and TypeScript checks pass.
+
+# Task: Restore draft continuation and hydrate existing applications
+
+- [x] Restore the draft card's "Davam et" action and route with the draft application ID.
+- [x] Add typed GET `/permit-applications/:id` support for application details.
+- [x] Hydrate draft application identity, contact, and trade fields without creating a new application.
+- [x] Preserve POST creation only for new application flows.
+- [x] Run focused lint/type checks and the web production build.
+
+## Review
+
+Draft continuation uses `/apply/{id}?draft=1`; draft mode calls the detail endpoint and keeps the existing application ID for subsequent updates/submission. The new-application route remains POST-backed and unchanged in behavior. Focused ESLint/TypeScript checks and `pnpm build:web` pass.
+
+# Task: Integrate citizen draft progress
+
+- [x] Inspect the draft-progress guide, drafts route, page components, and current progress UI.
+- [x] Inspect citizen application list API/types and authenticated server-fetch conventions.
+- [x] Confirm the correct draft continuation route and avoid creating duplicate drafts.
+- [x] Add the documented draft progress fields and fetch drafts with the exact `status=draft` filter.
+- [x] Replace draft mock data with API results while preserving the existing page design.
+- [x] Run focused checks, full web lint, and the web production build.
+- [x] Review the diff and document verification results.
+
+## Review
+
+The drafts route now fetches the authenticated citizen's applications with the exact `status=draft` filter and renders the API-provided permit-service name, completed/total steps, and percentage without deriving or hardcoding progress. Mock drafts, fake timestamps, and unsupported edit/delete/continue controls were removed. Explicit empty and API-error states preserve the existing page layout.
+
+Focused ESLint and TypeScript checks pass for every changed web file, and the web production build passes. Full web lint remains blocked only by the pre-existing `app-pages/login/index.tsx:51` `react-hooks/set-state-in-effect` error.
+
+# Task: Integrate public and operator FAQs
+
+- [x] Inspect the FAQ guide, current web FAQ section, and both apps' API/query conventions.
+- [x] Inspect operator sidebar authorization, routing, CRUD pages, and shadcn dialog/form patterns.
+- [x] Add the public web FAQ API integration without changing the established accordion design.
+- [x] Add typed operator FAQ CRUD APIs and React Query hooks.
+- [x] Build a super-admin-only operator FAQ page with create/edit dialogs and safe delete behavior.
+- [x] Add the FAQ sidebar item and protected route for super administrators only.
+- [x] Run focused checks, full lint, and production builds for both apps.
+- [x] Review the diff and document verification results.
+
+## Review
+
+Replaced the web homepage's static FAQ data with the public `GET /faqs` response while preserving the existing accordion design, backend order, first-item-open behavior, empty/error states, and live FAQPage JSON-LD. Added a typed operator FAQ feature for `GET/POST/PUT/DELETE /admin/faqs`, plus a super-admin-only sidebar item and protected `/faqs` route. The operator page lists active and inactive questions in server order and uses one reusable shadcn form dialog for both create and edit. Hard delete requires a separate confirmation dialog that explicitly warns the operation cannot be reversed.
+
+Focused ESLint and TypeScript checks pass for both apps. Full operator lint passes with only the existing TanStack Table React Compiler warning. Full web lint remains blocked only by the pre-existing `app-pages/login/index.tsx:51` `react-hooks/set-state-in-effect` error. Both web and operator production builds pass; the operator build retains the existing large-chunk advisory.
+
+# Task: Integrate operator notifications API
+
+- [x] Inspect the operator header, layouts, router, navigation, and application-detail route conventions.
+- [x] Inspect operator feature API/type/hook/query patterns and reread the shared notifications guide.
+- [x] Add a typed operator notifications feature for list, unread count, and mark-all-read.
+- [x] Build the operator notifications page using existing layout and UI conventions.
+- [x] Add the live unread badge and notifications navigation to the header bell.
+- [x] Run focused checks, full operator lint, and the operator production build.
+- [x] Review the diff and document verification results.
+
+## Review
+
+Added a typed operator notifications feature for the documented list, unread-count, and bulk mark-all-read endpoints using the operator Axios auth/interceptor conventions. The new `/notifications` page follows the existing dashboard page and `TableLayout` structure, renders loading/empty/error states, distinguishes unread rows, and navigates each notification to a canonical `/applications/manage/{id}` route backed by the existing application-detail page. The header bell now opens the notifications page and shows the live unread-count badge, capped visually at `99+`. No sidebar entry, single-notification read endpoint, or undocumented pagination behavior was added.
+
+Focused ESLint and TypeScript checks pass. Full operator lint passes with only the existing TanStack Table React Compiler warning in `components/ui/data-table.tsx`. The operator production build passes with the existing large-chunk advisory. `git diff --check` passes with only line-ending notices.
+
+# Task: Integrate citizen notifications API
+
+- [x] Inspect the notifications page and identify its current data/state behavior.
+- [x] Inspect existing `apps/web/features` API, type, and hook conventions.
+- [x] Read `docs/latest/frontend-bildirisler-bələdçisi.md` and map its citizen endpoints to the UI.
+- [x] Implement the smallest typed notification feature/API integration required by the guide.
+- [x] Run focused checks, full web lint, and the web production build.
+- [x] Review the diff and document verification results.
+
+## Review
+
+Added a typed `features/notifications` API/query layer for the documented list, unread-count, and bulk mark-all-read endpoints. The citizen notifications page now renders live data with loading, empty, and error states; refreshes both list and count after the bulk mutation; and routes notification clicks to the same `/applications/{id}` detail path already used by the citizen application list. The profile-menu badge now comes from the unread-count endpoint. Removed the mock list and its unsupported rich-detail dialog behavior; no per-notification read endpoint or undocumented pagination parameter was invented.
+
+Focused ESLint, TypeScript (`tsc --noEmit`), and `git diff --check` pass. Full web lint remains blocked only by the pre-existing `app-pages/login/index.tsx:51` `react-hooks/set-state-in-effect` error. The production build remains blocked only because the environment cannot fetch DM Sans from Google Fonts. The `pnpm` launcher stalled without output in this shell, so equivalent local app binaries were used for the completed lint, typecheck, and build attempts.
 
 # Task: Remove 300-character textarea limits
 
@@ -340,3 +436,92 @@ The draft-save step matches the Figma layout with the centered book icon, draft-
 The physical-person apply flow now creates its draft on page load using the route's permit-service id, displays the API-provided FIN/name fields as disabled inputs, updates contact details, conditionally sends `trade_detail` for service `1`, uploads selected PDF files as multipart requests, and submits the application. The review and success screens consume live flow state, while the existing draft-save view remains available without an additional endpoint because the guide does not define one.
 
 Focused ESLint and TypeScript checks pass for all changed flow files. The full web lint remains blocked by the pre-existing `apps/web/app-pages/login/index.tsx:51` `react-hooks/set-state-in-effect` error. The web production build remains blocked by the environment's inability to fetch Google Fonts (`DM Sans`) during `next build`.
+
+# Task: Derive the mygov redirect URL from the current web origin
+
+- [x] Inspect the citizen auth request, login caller, HTTP helper, and deployment configuration.
+- [x] Replace the environment-controlled localhost URL with the browser's current origin plus `/login`.
+- [x] Remove the obsolete auth test-mode build/runtime configuration.
+- [x] Run focused lint, full web lint, and the web production build.
+- [x] Review the diff and document verification results.
+
+## Review
+
+The mygov redirect request now always calls the configured API endpoint with a `redirect_base` query parameter derived from `window.location.origin` and the `/login` path. This produces `http://localhost:3000/login` locally and the equivalent HTTPS login URL on deployed domains without a separate environment switch. Removed `NEXT_PUBLIC_AUTH_TEST_MODE` from the web Dockerfile and Compose configuration.
+
+Focused ESLint and the complete web TypeScript check pass. Full web lint remains blocked only by the pre-existing `react-hooks/set-state-in-effect` error in `app-pages/login/index.tsx:51`, and the production build remains blocked only because the environment cannot fetch DM Sans from Google Fonts. URL derivation was checked for localhost and `https://energy.az`; `git diff --check` passes. Docker Compose validation could not run because Docker is not installed in this environment.
+## Task: Implement dynamic document configuration in the admin panel
+
+- [x] Read the new guide and scope the work to HİSSƏ 1 only.
+- [x] Audit the operator permit-service pages, API/types/hooks, and reusable selectors.
+- [x] Add typed document-type list/create API integration and query hooks.
+- [x] Replace `document_count` with required ordered `document_type_ids` in permit-service state and multipart payloads.
+- [x] Add searchable multi-selection, inline document-type creation, and explicit ordering controls to create/edit forms.
+- [x] Run focused checks, full operator lint, and the operator production build.
+- [x] Review the final diff and document verification results.
+
+### Review
+
+Added a focused document-types feature for the documented admin list/create endpoints, with React Query caching and immediate cache insertion after creation. Permit-service create/update state now requires an ordered `document_type_ids` array, edit mode hydrates it from `documentTypes`, and multipart requests preserve the selected order using repeated `document_type_ids[]` fields. Removed `document_count` from the operator model, validation, payload, and form while retaining the separate legacy descriptive `required_documents` field because the new guide only removes the count.
+
+The create/edit form now uses the existing searchable multi-select, supports creating a missing Azerbaijani document name through the API and immediately selecting its returned ID, prevents duplicate selections, displays API/loading errors, and exposes explicit up/down controls for citizen-facing order. No citizen-side implementation from HİSSƏ 2 was changed.
+
+Focused ESLint and TypeScript checks pass. Full operator lint passes with only the existing TanStack Table/React Compiler warning in `components/ui/data-table.tsx`, and the operator production build passes with the existing large-chunk advisory. `git diff --check` passes with line-ending notices only.
+## Task: Implement dynamic citizen document uploads
+
+- [x] Read HİSSƏ 2 and inspect the apply route, flow state, upload component, API helpers, draft hydration, review, submit, and public permit detail.
+- [x] Add `documentTypes` to citizen permit-service and application contracts.
+- [x] Pass new-flow permit-service configuration from the dynamic route and hydrate draft configuration from the application detail.
+- [x] Replace hardcoded/free-form upload rows with ordered named rows from `documentTypes`.
+- [x] Send `document_type_id`, enforce PS-013's 25 MB limit and the 10 MB default, and keep failed uploads incomplete.
+- [x] Derive the public detail document count/list and surface named missing-document submit errors.
+- [x] Run focused checks, full web lint, and the web production build.
+- [x] Review the final diff and document verification results.
+
+### Review
+
+The citizen apply route now server-fetches the public permit-service detail for new applications and passes its ordered document configuration into the client flow without an extra client waterfall. Draft continuation hydrates `documentTypes` from the application detail and fetches the related permit service only when its code/configuration is missing. Existing live permit services that have not yet received the new array are handled as unconfigured instead of crashing prerendering.
+
+The documents step now renders exactly one named upload row per configured document type in backend order; all hardcoded and free-form additional rows were removed. Uploads send numeric `document_type_id`, use 25 MB for PS-013 and 10 MB otherwise, show local PDF/size validation, and become complete only after the API resolves. Failed replacement uploads restore the previous successful file. Because the guide defines no delete endpoint, configured required uploads do not expose a misleading local-only delete action. Review preserves document names and configured types, and all required rows must upload successfully before continuing.
+
+The public permit detail derives its document list and count from `documentTypes`, while submit errors prioritize the backend's exact `errors.files` text so missing documents are shown by name. Focused ESLint and TypeScript checks pass. Full web lint remains blocked only by the pre-existing `react-hooks/set-state-in-effect` error in `app-pages/login/index.tsx:51`. The full web production build passes and prerenders all permit detail routes. `git diff --check` passes with line-ending notices only.
+
+## Task: Convert the permit-service list to a table
+
+- [x] Inspect the permit-service list and established operator table patterns.
+- [x] Replace the permit-service cards with the shared `DataTable` while preserving all data and actions.
+- [x] Run focused checks, full operator lint, and the operator production build.
+- [x] Review the final diff and document verification results.
+
+### Review
+
+Replaced the permit-service card stack with the operator's shared `DataTable`. The table keeps the service icon/name navigation and adds dedicated code, category, applicant-type, and status columns, followed by the existing edit and active-only deactivate actions. Loading, API error, and localized empty states remain outside the table because the list endpoint is not paginated and the shared empty message is English.
+
+Focused ESLint passes. Full operator lint passes with only the existing TanStack Table/React Compiler warning in `components/ui/data-table.tsx`, and the operator production build passes with the existing large-chunk advisory. `git diff --check` passes with line-ending notices only.
+
+## Task: Hydrate document types when editing a permit service
+
+- [x] Trace edit-form hydration and the document-type selector's option mapping.
+- [x] Seed the selector with document types already attached to the permit service.
+- [x] Verify focused lint, full operator lint, and the operator production build.
+- [x] Review the final diff and document the result.
+
+### Review
+
+The edit form now passes the permit service's attached `documentTypes` into the selector. The selector merges those records with the asynchronously loaded admin document-type catalog before resolving selected IDs into labeled combobox values. Existing selections therefore remain visible and ordered even when a legacy or inactive attached type is absent from the general list endpoint.
+
+Full operator lint passes with only the existing TanStack Table/React Compiler warning in `components/ui/data-table.tsx`. The operator production build passes with the existing large-chunk advisory, and `git diff --check` passes with line-ending notices only. The initial focused ESLint invocation stalled without output and was stopped; the subsequent full-project lint covered both changed files successfully.
+
+## Task: Match admin permit-detail document response
+
+- [x] Compare the real admin detail payload with the operator response type and edit hydration.
+- [x] Model `document_types` and its pivot ordering from the admin response.
+- [x] Hydrate the edit selector and ordering list from the attached document types.
+- [x] Run focused checks, full operator lint, and the operator production build.
+- [x] Review the final diff and document verification results.
+
+### Review
+
+Updated the operator permit-service detail contract to match the real admin response's snake_case `document_types` array and typed its pivot metadata. Edit initialization copies and sorts the attached document records by `pivot.display_order`, then hydrates `document_type_ids` from that order. The same attached records seed the combobox option catalog, so selected labels and the existing citizen-facing reorder list render immediately and can be changed exactly as during creation.
+
+Full operator lint passes with only the existing TanStack Table/React Compiler warning in `components/ui/data-table.tsx`, and the operator production build passes with the existing large-chunk advisory. `git diff --check` passes with line-ending notices only. The focused ESLint invocation again stalled without output and was stopped; full-project lint covered all changed files successfully.
