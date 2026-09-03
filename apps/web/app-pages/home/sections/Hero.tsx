@@ -20,7 +20,7 @@ export function Hero() {
         priority
         quality={100}
         sizes="100vw"
-        className="object-cover object-center"
+        className=" object-cover object-right opacity-55"
         aria-hidden="true"
       />
       <div className="relative z-10 mx-auto flex min-h-[556px] max-w-7xl flex-col items-start justify-center gap-12 px-6 py-12 lg:px-0 lg:py-20">

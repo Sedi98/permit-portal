@@ -88,6 +88,7 @@ export default function NotificationsPage() {
           date={formatNotificationDate(selectedNotification.created_at)}
           message={selectedNotification.body}
           applicationId={selectedNotification.data.permit_application_id}
+          documentId={selectedNotification.data.document_id}
         />
       ) : null}
     </main>

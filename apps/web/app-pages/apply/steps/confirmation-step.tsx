@@ -20,6 +20,8 @@ type ConfirmationStepProps = {
   onSaveDraft?: () => void;
   onSubmit?: () => void | Promise<void>;
   isSubmitting?: boolean;
+  isBackDisabled?: boolean;
+  submitLabel?: string;
 };
 
 const SummaryRow = ({
@@ -44,6 +46,8 @@ const ConfirmationStep = ({
   onSaveDraft,
   onSubmit,
   isSubmitting = false,
+  isBackDisabled = false,
+  submitLabel = "Göndər",
 }: ConfirmationStepProps) => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4">
@@ -115,6 +119,7 @@ const ConfirmationStep = ({
             type="button"
             variant="outline"
             onClick={onBack}
+            disabled={isBackDisabled}
             className="h-12 w-[100px] gap-2 border-[#dfdfdf] bg-white px-4 py-3 text-base font-semibold text-[#286aa6] hover:bg-white hover:text-[#286aa6]"
           >
             <Image
@@ -133,9 +138,9 @@ const ConfirmationStep = ({
             type="button"
             onClick={onSubmit}
             disabled={isSubmitting}
-            className="h-12 w-[122px] gap-2 bg-[#286aa6] px-4 py-3 text-base font-semibold text-white hover:bg-[#286aa6] disabled:opacity-70"
+            className="h-12 min-w-[122px] gap-2 bg-[#286aa6] px-4 py-3 text-base font-semibold text-white hover:bg-[#286aa6] disabled:opacity-70"
           >
-            Göndər
+            {submitLabel}
             <Image src={isSubmitting ? SEND_DISABLED_ICON : SEND_ICON} alt="" width={24} height={24} aria-hidden="true" />
           </Button>
         </footer>

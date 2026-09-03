@@ -16,6 +16,7 @@ interface PaginationContainerProps {
   itemsPerPage: number
   onPageChange: (page: number) => void
   className?: string
+  itemLabel?: string
 }
 
 function getPageNumbers(current: number, total: number): (number | "ellipsis")[] {
@@ -51,6 +52,7 @@ export function PaginationContainer({
   itemsPerPage,
   onPageChange,
   className,
+  itemLabel = "müraciətin",
 }: PaginationContainerProps) {
   const from = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1
   const to = Math.min(currentPage * itemsPerPage, totalItems)
@@ -64,7 +66,7 @@ export function PaginationContainer({
       )}
     >
       <p className="text-sm leading-5 w-full text-[#797979]">
-        {totalItems} müraciətin {from}-{to} nəticəsi
+        {totalItems} {itemLabel} {from}-{to} nəticəsi
       </p>
 
       <Pagination>

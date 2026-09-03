@@ -7,11 +7,13 @@ export interface Executor {
 interface ApplicationExecutorsContainerProps {
   title?: string;
   executors: Executor[];
+  note?: string | null;
 }
 
 export default function ApplicationExecutorsContainer({
   title = "Müraciətin icraçıları",
   executors,
+  note,
 }: ApplicationExecutorsContainerProps) {
   return (
     <div className="bg-[#FEFEFE] flex flex-col gap-3 p-6">
@@ -48,6 +50,14 @@ export default function ApplicationExecutorsContainer({
           </div>
         ))}
       </div>
+      {note ? (
+        <div className="border-t border-[#F5F5F5] px-4 pt-4 grid grid-cols-2">
+          <p className="text-sm font-medium leading-5 text-[#797979]">Qeyd</p>
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-5 text-[#1F1F1F]">
+            {note}
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { LoaderCircle, X } from "lucide-react";
+import { Download, LoaderCircle, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import {
@@ -11,6 +11,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { getApplication } from "@/features/apply/api";
+import { getApplicationDocumentDownloadUrl } from "@/features/applications/api";
+import { Button } from "@/components/ui/button";
 
 type NotificationDialogProps = {
   open: boolean;
@@ -19,6 +21,7 @@ type NotificationDialogProps = {
   date: string;
   message: string;
   applicationId: number;
+  documentId?: number;
 };
 
 const applicationStatusLabels: Record<string, string> = {
@@ -64,6 +67,7 @@ export default function NotificationDialog({
   date,
   message,
   applicationId,
+  documentId,
 }: NotificationDialogProps) {
   const applicationQuery = useQuery({
     queryKey: ["permit-application", applicationId],
@@ -172,6 +176,21 @@ export default function NotificationDialog({
               <InfoRow label="E-poçt:" value="minenergy@minenergy.az" />
             </dl>
           </section>
+
+          {documentId ? (
+            <Button
+              className="h-12 gap-2 self-end"
+              onClick={() => {
+                window.location.href = getApplicationDocumentDownloadUrl(
+                  applicationId,
+                  documentId,
+                );
+              }}
+            >
+              <Download className="size-4" aria-hidden="true" />
+              İcazəni endir
+            </Button>
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>

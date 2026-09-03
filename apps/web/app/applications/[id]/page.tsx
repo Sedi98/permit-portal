@@ -1,4 +1,5 @@
 import ApplyPermissionPage from "@/app-pages/apply";
+import ApplicationDetailPage from "@/app-pages/applications/detail";
 import { getPermitService } from "@/features/permit-services/api";
 
 type ApplyPermissionProps = {
@@ -14,6 +15,15 @@ type ApplyPermissionProps = {
 const ApplyPermission = async ({ params, searchParams }: ApplyPermissionProps) => {
   const { id } = await params;
   const { action, section, status, view } = await searchParams;
+  const applicationId = Number(id);
+
+  if (
+    (action === "payment" || action === "download") &&
+    Number.isSafeInteger(applicationId) &&
+    applicationId > 0
+  ) {
+    return <ApplicationDetailPage applicationId={applicationId} />;
+  }
   const isExistingApplication =
     status === "draft" ||
     section === "deficiency" ||

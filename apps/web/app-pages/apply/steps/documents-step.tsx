@@ -6,7 +6,7 @@ import { useState } from "react";
 import { DocumentUploadItem } from "@/components/document-upload-item";
 import { Button } from "@/components/ui/button";
 import type { DocumentType } from "@/features/permit-services/types";
-import { backendAssetUrl } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export type SelectedApplicationDocument = {
   documentTypeId: number;
@@ -27,6 +27,7 @@ type DocumentsStepProps = {
   initialDocuments?: SelectedApplicationDocument[];
   maxFileSizeMb?: number;
   onBack?: () => void;
+  isBackDisabled?: boolean;
   onNext?: (documents: SelectedApplicationDocument[]) => void;
   onUpload?: (documentTypeId: number, file: File) => void | Promise<void>;
   onReplace?: (
@@ -53,7 +54,14 @@ function RequiredDocumentCard({
   onReplace,
 }: RequiredDocumentCardProps) {
   return (
-    <article className="flex w-full flex-col items-center gap-2 overflow-hidden rounded-2xl border border-[#dfdfdf] bg-white px-px pb-5">
+    <article
+      className={cn(
+        "flex w-full flex-col items-center gap-2 overflow-hidden rounded-2xl border bg-white px-px pb-5",
+        selectedDocument?.reviewStatus === "rejected"
+          ? "border-[#f32020]"
+          : "border-[#dfdfdf]",
+      )}
+    >
       <header className="flex w-full items-center gap-3 px-5 pb-3 pt-5">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-[#eef4fb] px-3 py-1.5 text-sm font-bold leading-5 text-[#286aa6]">
           {number}
@@ -75,28 +83,11 @@ function RequiredDocumentCard({
             selectedDocument?.reviewStatus === "rejected" ? onReplace : onUpload
           }
         />
-        {selectedDocument ? (
+        {selectedDocument?.reviewNote ? (
           <div className="mt-3 flex w-full flex-col gap-1 rounded-lg bg-[#f9fafc] p-3 text-sm leading-5">
-            {selectedDocument.reviewStatusLabel ? (
-              <p className="font-medium text-[#1f1f1f]">
-                Yoxlama statusu: {selectedDocument.reviewStatusLabel}
-              </p>
-            ) : null}
-            {selectedDocument.reviewNote ? (
-              <p className="text-[#797979]">
-                Qeyd: {selectedDocument.reviewNote}
-              </p>
-            ) : null}
-            {selectedDocument.path ? (
-              <a
-                href={backendAssetUrl(selectedDocument.path)}
-                target="_blank"
-                rel="noreferrer"
-                className="w-fit font-medium text-[#286aa6] underline"
-              >
-                Fayla bax
-              </a>
-            ) : null}
+            <p className="text-[#797979]">
+              Qeyd: {selectedDocument.reviewNote}
+            </p>
           </div>
         ) : null}
       </div>
@@ -119,6 +110,7 @@ const DocumentsStep = ({
   initialDocuments = EMPTY_SELECTED_DOCUMENTS,
   maxFileSizeMb = 10,
   onBack,
+  isBackDisabled = false,
   onNext,
   onUpload,
   onReplace,
@@ -214,6 +206,7 @@ const DocumentsStep = ({
           type="button"
           variant="outline"
           onClick={onBack}
+          disabled={isBackDisabled}
           className="h-12 w-[100px] gap-2 border-[#dfdfdf] bg-white px-4 py-3 text-base font-semibold text-[#286aa6] hover:bg-white hover:text-[#286aa6]"
         >
           <OperationArrow direction="left" />

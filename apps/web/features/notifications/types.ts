@@ -9,6 +9,7 @@ export type Notification = {
   body: string;
   data: {
     permit_application_id: number;
+    document_id?: number;
   };
   is_read: boolean;
   read_at: string | null;

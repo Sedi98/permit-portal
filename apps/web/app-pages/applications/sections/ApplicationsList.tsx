@@ -5,6 +5,7 @@ import { useState } from "react";
 import { CreditCard, Download, Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { getApplicationDocumentDownloadUrl } from "@/features/applications/api";
 import { applicationStatusOptions, type CitizenApplicationListItem } from "@/features/applications/types";
 
 const statusLabels = Object.fromEntries(applicationStatusOptions) as Record<string, string>;
@@ -71,7 +72,26 @@ function StatusAction({ application, action }: { application: CitizenApplication
     return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?action=payment`}><CreditCard className="size-4" aria-hidden="true" />Ödə</Link></Button>;
   }
   if (action === "download") {
-    return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?action=download`}><Download className="size-4" aria-hidden="true" />Yüklə</Link></Button>;
+    const document = application.documents?.[0];
+
+    if (!document) {
+      return null;
+    }
+
+    return (
+      <Button
+        className={actionClassName}
+        onClick={() => {
+          window.location.href = getApplicationDocumentDownloadUrl(
+            application.id,
+            document.id,
+          );
+        }}
+      >
+        <Download className="size-4" aria-hidden="true" />
+        Endir
+      </Button>
+    );
   }
   if (action === "revision") {
     return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?section=deficiency`}>Bax</Link></Button>;

@@ -10,23 +10,18 @@ import {
 } from "@/components/ui/chart"
 import { cn } from "@/lib/utils"
 
-const chartData = [
-  { year: "2017", icaze: 45, muracit: 65 },
-  { year: "2018", icaze: 85, muracit: 110 },
-  { year: "2019", icaze: 130, muracit: 160 },
-  { year: "2020", icaze: 95, muracit: 140 },
-  { year: "2021", icaze: 155, muracit: 195 },
-  { year: "2022", icaze: 185, muracit: 220 },
-  { year: "2023", icaze: 218, muracit: 248 },
-  { year: "2024", icaze: 380, muracit: 450 },
-]
+export type ApplicationBarChartItem = {
+  year: number
+  issued: number
+  applications: number
+}
 
 const chartConfig = {
-  icaze: {
+  issued: {
     label: "Verilmiş icazələr",
     color: "#286AA6",
   },
-  muracit: {
+  applications: {
     label: "Müraciət",
     color: "#A9C3DB",
   },
@@ -52,7 +47,7 @@ function BarTooltip({ active, payload, label }: BarTooltipProps) {
               style={{ backgroundColor: entry.fill }}
             />
             <span className="flex-1 text-sm font-medium leading-5 text-[#797979] min-w-px">
-              {entry.name === "icaze" ? "Verilmiş icazələr" : "Müraciət"}
+              {entry.name === "issued" ? "Verilmiş icazələr" : "Müraciət"}
             </span>
             <span className="text-sm font-medium leading-5 text-[#1f1f1f] text-center whitespace-nowrap">
               {entry.value}
@@ -65,14 +60,19 @@ function BarTooltip({ active, payload, label }: BarTooltipProps) {
 }
 
 type ApplicationBarChartProps = {
+  data: ApplicationBarChartItem[]
   className?: string
 }
 
-export default function ApplicationBarChart({ className }: ApplicationBarChartProps) {
+export default function ApplicationBarChart({ data, className }: ApplicationBarChartProps) {
+  if (data.length === 0) {
+    return <div className="flex h-[300px] items-center justify-center text-sm text-[#797979]">Seçilmiş illər üzrə məlumat yoxdur</div>
+  }
+
   return (
     <Card className={cn("rounded-xl border-[0.8px] border-none bg-white p-5 shadow-none", className)}>
       <ChartContainer config={chartConfig} className="w-full h-[300px]">
-        <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+        <BarChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
           <CartesianGrid vertical={false} stroke="#f0f0f0" />
           <XAxis
             dataKey="year"
@@ -86,21 +86,20 @@ export default function ApplicationBarChart({ className }: ApplicationBarChartPr
             axisLine={false}
             tick={{ fill: "#797979", fontSize: 14, fontWeight: 400 }}
             tickMargin={10}
-            domain={[0, 500]}
-            ticks={[0, 125, 250, 375, 500]}
+            allowDecimals={false}
           />
           <ChartTooltip
             cursor={false}
             content={<BarTooltip />}
           />
           <Bar
-            dataKey="icaze"
+            dataKey="issued"
             fill="#286AA6"
             radius={4}
             barSize={24}
           />
           <Bar
-            dataKey="muracit"
+            dataKey="applications"
             fill="#A9C3DB"
             radius={4}
             barSize={24}

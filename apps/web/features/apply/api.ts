@@ -3,6 +3,7 @@ import type {
   ConfiguredDocumentType,
   DocumentType,
 } from "@/features/permit-services/types";
+import type { CitizenApplicationDocument } from "@/features/applications/types";
 
 export type PhysicalApplicant = {
   id: number;
@@ -41,6 +42,10 @@ export type ApplicationDetails = PhysicalApplicant & {
   };
   documentTypes?: DocumentType[];
   files?: ApplicationFile[];
+  invoice_no?: string | null;
+  payment_amount?: number | string | null;
+  paid_at?: string | null;
+  documents?: CitizenApplicationDocument[];
   voen?: string | null;
   trade_detail?: {
     operation_type?: TradeDetailPayload["trade_detail"]["operation_type"];
@@ -149,6 +154,13 @@ export async function submitApplication(applicationId: number) {
     formData,
     { headers: { "Content-Type": "multipart/form-data" } },
   );
+}
+
+export async function resubmitApplication(applicationId: number) {
+  return PostApi<
+    ApiResponse<{ id: number; status: string; application_no?: string }>,
+    undefined
+  >(`/permit-applications/${applicationId}/resubmit`, undefined);
 }
 
 export async function submitServiceRating(applicationId: number, rating: number, comment?: string) {

@@ -1,3 +1,31 @@
+# Task: Fetch application details after initial creation
+
+- [x] Call `GET /permit-applications/{id}` after the initial application POST.
+- [x] Log both the creation POST and detail GET responses, then hydrate the apply flow from the GET response.
+- [x] Run focused lint, web TypeScript/build, and diff verification.
+
+## Review
+
+After the initial application POST, both the POST response and the subsequent GET
+response are logged separately with their endpoints. The apply flow requests the
+newly created application by its returned ID and uses the full GET response to hydrate
+document types and the remaining workflow state. Focused ESLint, TypeScript, the web production build, and targeted
+`git diff --check` pass. Full web lint still reports the two pre-existing errors in
+the login effect and the Navbar's raw applications link.
+
+# Task: Show application routing note with executors
+
+- [x] Read the routing note from the application detail GET response.
+- [x] Render the latest routing note at the bottom of `ApplicationExecutorsContainer`.
+- [x] Run focused lint, operator TypeScript/build, and diff verification.
+
+## Review
+
+The application detail page selects the latest non-empty note from a status-history
+entry whose destination is `assigned`, so unrelated workflow notes are excluded. The
+executors container renders that note beneath the assignee rows only when it exists.
+Focused ESLint, the operator production build, and targeted `git diff --check` pass.
+
 # Task: Fix collapsed system-message animation height
 
 - [x] Remove persistent padding from the collapsible animation row.
@@ -866,3 +894,131 @@ Removed the obsolete status-change mutation, auth lookup, toast import, status p
 and commented branch from the home-page action cell. The remaining action navigates
 directly to the application detail page. Focused ESLint, the operator production
 build, and `git diff --check` pass.
+# Task: Create Tailwind-based Figma news homepage
+
+- [x] Confirm edit access and inspect the empty target file.
+- [x] Attempt library and design-system discovery; record unavailable endpoints.
+- [ ] Create Tailwind-aligned variable collections, aliases, modes, and styles (blocked: Figma connector HTTP 404).
+- [ ] Create foundations documentation and the Azerbaijani news homepage (blocked: Figma connector HTTP 404).
+- [ ] Validate the resulting Figma structure and screenshots (blocked: Figma connector HTTP 404).
+
+## Review
+
+Edit access initially succeeded and confirmed an empty `Page 1`. Subsequent Figma
+library, identity, and `use_figma` calls all returned connector-level HTTP 404
+responses. No Figma mutations were made, so the file remains clean and unchanged.
+# Task: Build operator reports page
+
+- [x] Read the reports guide and inspect operator architecture, table, filter, API, routing, and navigation conventions.
+- [x] Add typed report list API/query support and a guide-compliant Excel export URL builder.
+- [x] Build the reports table with all twelve documented columns and responsive horizontal scrolling.
+- [x] Add permit-service, date, status, and 20/50/100 page-size filters with server pagination.
+- [x] Add the all-admin “Hesabatlar” sidebar item and route.
+- [x] Run focused checks, full operator lint/build, and review the final diff.
+
+## Review
+
+Added an all-admin `/reports` page backed by the documented paginated report endpoint.
+The page uses the existing permit-service catalog, single-select service/status filters,
+bounded date filters, 20/50/100 page sizes, the shared data table and pagination UI,
+and all twelve documented report fields. Excel export opens the direct download URL
+with only `permit_service_id`, `date_from`, and `date_to`. Focused ESLint, full
+operator lint, the operator production build, and `git diff --check` pass; full lint
+retains only the existing TanStack Table compiler warning.
+# Task: Reorder reports navigation
+
+- [x] Move “Hesabatlar” directly below “Lövhə” in the sidebar.
+- [x] Run focused lint and diff verification.
+
+## Review
+
+“Hesabatlar” now appears immediately after “Lövhə” in the sidebar order. Focused
+ESLint and `git diff --check` pass.
+
+# Task: Integrate board dashboard statistics
+
+- [x] Read the dashboard guide and inspect the existing statistics and chart structure.
+- [x] Add typed dashboard statistics API/query support with date and year filters.
+- [x] Replace donut, breakdown, yearly chart, and summary mock data with API data.
+- [x] Add filter, year navigation, loading, error, and empty-result behavior.
+- [x] Run focused checks, full operator lint/build, and review the final diff.
+
+## Review
+
+The board now consumes `GET /admin/statistics/dashboard` with independently applied
+date filters and an eight-year navigation window. Permit-service counts and backend
+percentages populate the donut and breakdown grid, yearly issued/application values
+populate the bar chart, and the four summary cards use the selected year range. Empty,
+loading, and request-error states are handled, while export controls remain disabled
+because the guide states that no backend export exists yet. Focused ESLint, TypeScript,
+full operator lint, Vite production build, and `git diff --check` pass; full lint retains
+only the existing TanStack Table compiler warning and Vite retains its chunk-size advisory.
+# Task: Ödəniş → imza → PDF zəncirini operator və web tətbiqlərinə inteqrasiya et
+
+- [x] Bələdçidəki 7 mərhələni mövcud operator/web API, hook, route və UI axınları ilə müqayisə et.
+- [x] Operator tətbiqində çatışmayan ödəniş təsdiqi, imzalanmamış müraciətlər və imza əməliyyatlarını tamamla.
+- [x] Web tətbiqində ödəniş gözləyən və tamamlanmış müraciətlər, “Ödədim” və PDF endirmə axınlarını tamamla.
+- [x] Status mətnləri, rol/görünürlük, bildiriş keçidləri və binary endirmə davranışını yoxla.
+- [x] React keyfiyyət yoxlaması, lint, build və diff yoxlamalarını icra et.
+- [x] Nəticələri Review bölməsində sənədləşdir.
+
+## Review
+
+Operator tətbiqində mövcud ödəniş təsdiqi və yekun imza endpoint-lərinin bələdçiyə
+uyğunluğu yoxlanıldı; ödənişi qəbul etmə əməliyyatı yalnız müraciətin təyin olunmuş
+icraçısına (və super adminə) məhdudlaşdırıldı. Web tətbiqində hesab-faktura detalı,
+`POST /pay`, ödənişin yoxlanılması statusu, tamamlanmış müraciət siyahısından birbaşa
+PDF endirməsi və `document_id` daşıyan bildirişdən endirmə əlavə edildi. Dəyişdirilən
+fayllar fokuslanmış ESLint və TypeScript yoxlamalarından, hər iki tətbiq production
+build-dən keçdi. Operator tam lintində yalnız mövcud TanStack Table xəbərdarlığı qalır;
+web tam lintində dəyişiklikdən kənar `login` effect-i və Navbar `<a>` istifadəsi ilə
+bağlı iki əvvəlki xəta qalır. Ümumi `git diff --check` istifadəçinin mövcud
+`Permissions.tsx` dəyişikliklərindəki trailing whitespace səbəbilə dayanır.
+# Task: Hesab-faktura detalını ayrıca apply step-ə ayır
+
+- [x] Mövcud apply step komponentlərinin strukturuna uyğun payment step yarat.
+- [x] Awaiting-payment detalını yeni step ilə əvəz et və API davranışını qoru.
+- [x] Fokuslanmış lint, TypeScript, build və diff yoxlamalarını icra et.
+
+## Review
+
+Hesab-faktura görünüşü `apply/steps/payment-step.tsx` daxilində ayrıca workflow
+komponentinə çıxarıldı. Step müraciət nömrəsi, icazə növü, hesab-faktura nömrəsi və
+məbləği göstərir; sınaq rejimi qeydi, geri naviqasiyası, submit loading/error
+və “Ödədim” əməliyyatını özündə saxlayır. Awaiting-payment detal səhifəsi yalnız bu
+step-i compose edir, mövcud React Query/API davranışı dəyişməyib. Fokuslanmış ESLint,
+TypeScript, Next.js production build və dəyişikliklər üzrə `git diff --check` keçdi.
+
+# Task: Mövcud müraciətdə tamamlanmış step-ləri keç
+
+- [x] Mövcud müraciətin doldurulmuş məlumatlarına görə ilk natamam step-i hesabla.
+- [x] Müraciəti ilk natamam step-dən aç və tamamlanmış step-lərə geri keçidi blokla.
+- [x] Progress stepper-i indikator kimi dəyişmədən saxla.
+- [x] React keyfiyyət yoxlaması, lint, TypeScript və production build işlət.
+- [x] Nəticəni Review bölməsində sənədləşdir.
+
+## Review
+
+Mövcud müraciət yüklənəndə şəxsi məlumat, əlaqə məlumatı, yalnız uyğun xidmət üçün
+əməliyyat məlumatı və tələb olunan sənədlər ardıcıl yoxlanılır. Səhifə ilk natamam
+mərhələdən açılır; həmin mərhələdə “Geri” düyməsi deaktiv olduğuna görə avtomatik
+doldurulmuş mərhələlərə qayıtmaq olmur. Progress stepper yalnız indikator olaraq
+dəyişdirilməyib. Fokuslanmış ESLint, TypeScript və production build keçdi. Tam web
+lintində dəyişikliklərdən kənar login effect-i və Navbar `<a>` istifadəsi ilə bağlı
+əvvəldən mövcud iki xəta qalır.
+
+# Task: Dəyişdirilmiş fayllarla müraciəti yenidən göndər
+
+- [x] Vətəndaş API qatına `resubmit` endpoint-i əlavə et.
+- [x] Uğurlu fayl əvəzlənməsini izləyib yekun submit əməliyyatını `resubmit`-ə yönləndir.
+- [x] Yekun düymənin mətnini yenidən göndərmə axınına uyğunlaşdır.
+- [x] Fokuslanmış lint, TypeScript və production build ilə yoxla.
+- [x] Nəticəni Review bölməsində sənədləşdir.
+
+## Review
+
+`POST /permit-applications/{id}/resubmit` API funksiyası əlavə edildi. Mövcud
+müraciətdə rədd edilmiş fayl yalnız uğurla əvəzləndikdən sonra resubmit vəziyyəti
+aktivləşir. Yekun mərhələdə düymə “Yenidən göndər” göstərir və adi `submit` əvəzinə
+body-siz `resubmit` sorğusu göndərir; yeni müraciət axını dəyişməyib. Fokuslanmış
+ESLint, TypeScript, production build və diff yoxlamaları keçdi.

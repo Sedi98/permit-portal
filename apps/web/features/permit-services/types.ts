@@ -7,6 +7,7 @@ export interface PermitService {
   category_label: string;
   is_active: boolean;
   icon_url: string | null;
+  review_duration_days: number;
 }
 
 export interface DocumentType {

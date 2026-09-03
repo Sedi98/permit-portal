@@ -30,7 +30,7 @@ export function PermissionCard({
           <h3 className="w-full text-base font-semibold leading-6 text-[#1f1f1f]">{title}</h3>
         </div>
 
-        <div className="flex w-full items-center justify-between border-t border-[#dfdfdf] pt-[9px]">
+        <div className="flex w-full items-center justify-between border-t mt-2 border-[#dfdfdf] pt-[9px]">
           <span className="flex items-center gap-2 rounded-lg bg-[#f9fafc] p-2 text-sm font-semibold leading-5 text-[#286aa6]">
             <Image src="/icons/permissions/clock.svg" alt="" width={20} height={20} sizes="20px" />
             {duration}

@@ -14,36 +14,22 @@ import { cn } from "@/lib/utils"
 type DonutData = {
   category: string
   value: number
+  percentage: number
   fill: string
 }
 
-const defaultData: DonutData[] = [
-  { category: "Elektrik enerjisi istehsalı", value: 282, fill: "#3A7EC8" },
-  { category: "Günəş enerjisi", value: 215, fill: "#58A55C" },
-  { category: "Külək enerjisi", value: 180, fill: "#F5A623" },
-  { category: "Bioqaz", value: 130, fill: "#9B59B6" },
-  { category: "Digər", value: 114, fill: "#E87676" },
-]
-
-const chartConfig = {
-  "Elektrik enerjisi istehsalı": { label: "Elektrik enerjisi istehsalı", color: "#3A7EC8" },
-  "Günəş enerjisi": { label: "Günəş enerjisi", color: "#58A55C" },
-  "Külək enerjisi": { label: "Külək enerjisi", color: "#F5A623" },
-  "Bioqaz": { label: "Bioqaz", color: "#9B59B6" },
-  "Digər": { label: "Digər", color: "#E87676" },
-} satisfies ChartConfig
+const chartConfig = {} satisfies ChartConfig
 
 type DonutTooltipProps = {
   active?: boolean
   payload?: { payload: DonutData }[]
-  total: number
 }
 
-function DonutTooltip({ active, payload, total }: DonutTooltipProps) {
+function DonutTooltip({ active, payload }: DonutTooltipProps) {
   if (!active || !payload?.length) return null
 
   const item = payload[0].payload
-  const pct = ((item.value / total) * 100).toFixed(1)
+  const pct = item.percentage.toFixed(1)
 
   return (
     <div className="bg-white border z-50 border-[#dfdfdf] rounded-lg px-[17px] py-[13px] shadow-[0px_0px_16px_rgba(0,0,0,0.1)] flex flex-col gap-[10px] min-w-[200px]">
@@ -71,7 +57,7 @@ type ApplicationDonutChartProps = {
 }
 
 export default function ApplicationDonutChart({
-  data = defaultData,
+  data = [],
   totalLabel = "müraciət",
   className,
 }: ApplicationDonutChartProps) {
@@ -83,11 +69,16 @@ export default function ApplicationDonutChart({
   return (
     <Card className={cn("rounded-xl border-[0.8px] border-none bg-white p-5 shadow-none", className)}>
       <div className="relative">
+        {data.length === 0 ? (
+          <div className="flex h-[380px] items-center justify-center text-sm text-[#797979]">
+            Seçilmiş dövr üzrə məlumat yoxdur
+          </div>
+        ) : (
         <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[380px]">
           <PieChart>
             <ChartTooltip
               cursor={false}
-              content={<DonutTooltip total={total} />}
+              content={<DonutTooltip />}
             />
             <Pie
               data={data}
@@ -99,8 +90,9 @@ export default function ApplicationDonutChart({
             />
           </PieChart>
         </ChartContainer>
+        )}
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-[5.5px] pointer-events-none z-0">
+        {data.length > 0 ? <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-[5.5px] pointer-events-none z-0">
           <span className="text-xl font-medium leading-7 text-[#797979]">
             Cəmi
           </span>
@@ -110,7 +102,7 @@ export default function ApplicationDonutChart({
           <span className="text-xl font-normal leading-7 text-[#797979]">
             {totalLabel}
           </span>
-        </div>
+        </div> : null}
       </div>
     </Card>
   )

@@ -26,6 +26,7 @@ type CheckoutStepProps = {
   operationInformation?: OperationInformationValues;
   onBack?: () => void;
   onNext?: () => void;
+  isBackDisabled?: boolean;
 };
 
 const DEFAULT_CHECKOUT_DOCUMENTS: readonly CheckoutDocument[] = Array.from(
@@ -86,6 +87,7 @@ const CheckoutStep = ({
   operationInformation,
   onBack,
   onNext,
+  isBackDisabled = false,
 }: CheckoutStepProps) => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4">
@@ -174,6 +176,7 @@ const CheckoutStep = ({
             type="button"
             variant="outline"
             onClick={onBack}
+            disabled={isBackDisabled}
             className="h-12 w-[100px] gap-2 border-[#dfdfdf] bg-white px-4 py-3 text-base font-semibold text-[#286aa6] hover:bg-white hover:text-[#286aa6]"
           >
             <OperationArrow direction="left" />

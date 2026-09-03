@@ -16,6 +16,7 @@ import {
   createPhysicalApplication,
   getApplication,
   replaceApplicationFile,
+  resubmitApplication,
   submitApplication,
   submitServiceRating,
   updateApplicationContact,
@@ -23,7 +24,6 @@ import {
   uploadApplicationFile,
   type ApplicationDetails,
   type ApplicationFile,
-  type PhysicalApplicant,
 } from "@/features/apply/api";
 import ContactInformation, {
   type ContactInformationValues,
@@ -159,6 +159,47 @@ function getSelectedApplicationDocuments(
   return [...documentsByType.values()];
 }
 
+function getFirstIncompleteStep(
+  application: ApplicationDetails,
+  permitServiceId: number | undefined,
+  documentTypes: DocumentType[],
+  documents: SelectedApplicationDocument[],
+): ApplyStep {
+  const hasPersonalInformation = Boolean(
+    application.fin?.trim() &&
+      application.first_name?.trim() &&
+      application.last_name?.trim(),
+  );
+  if (!hasPersonalInformation) return 1;
+
+  const hasContactInformation = Boolean(
+    application.email?.trim() &&
+      application.phones?.some(({ phone }) => phone.trim()),
+  );
+  if (!hasContactInformation) return 2;
+
+  if (
+    permitServiceId === 1 &&
+    (!application.trade_detail?.operation_type ||
+      !application.trade_detail.goods_category?.trim() ||
+      !application.trade_detail.goods_name_volume?.trim())
+  ) {
+    return 3;
+  }
+
+  const documentsByType = new Map(
+    documents.map((document) => [document.documentTypeId, document]),
+  );
+  const hasAllDocuments =
+    documentTypes.length > 0 &&
+    documentTypes.every((documentType) => {
+      const document = documentsByType.get(documentType.id);
+      return document && document.reviewStatus !== "rejected";
+    });
+
+  return hasAllDocuments ? 5 : 4;
+}
+
 const ApplyPermissionPage = ({
   id,
   isExistingApplication = false,
@@ -173,7 +214,7 @@ const ApplyPermissionPage = ({
   );
   const isValidRouteId = Number.isInteger(routeId) && routeId > 0;
   const creationKey = useRef<string | null>(null);
-  const [application, setApplication] = useState<PhysicalApplicant | null>(
+  const [application, setApplication] = useState<ApplicationDetails | null>(
     null,
   );
   const [personalInformation, setPersonalInformation] =
@@ -195,12 +236,15 @@ const ApplyPermissionPage = ({
   );
   const [submission, setSubmission] = useState<SubmissionResult | null>(null);
   const [step, setStep] = useState<ApplyView>(1);
+  const [firstAvailableStep, setFirstAvailableStep] = useState<ApplyStep>(1);
   const [isCreating, setIsCreating] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRatingSubmitting, setIsRatingSubmitting] = useState(false);
   const [ratingError, setRatingError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showCreationError, setShowCreationError] = useState(false);
+  const isRevisionApplication =
+    isExistingApplication && application?.status === "awaiting_revision";
 
   useEffect(() => {
     if (loading || creationKey.current === id) {
@@ -226,19 +270,27 @@ const ApplyPermissionPage = ({
       setShowCreationError(false);
 
       const handleApplication = (
-        response: { data: PhysicalApplicant | ApplicationDetails },
+        response: { data: ApplicationDetails },
         permitService?: PermitServiceDetail,
       ) => {
         const data = response.data as ApplicationDetails;
 
         if (cancelled) return;
 
+        const resolvedPermitServiceId =
+          data.permit_service?.id ?? permitService?.id;
+        const configuredDocumentTypes = getConfiguredDocumentTypes(
+          data,
+          permitService,
+        );
+        const selectedDocuments = getSelectedApplicationDocuments(data.files);
+
         setApplication(response.data);
-        if (data.permit_service?.id) {
-          setPermitServiceId(data.permit_service.id);
+        if (resolvedPermitServiceId) {
+          setPermitServiceId(resolvedPermitServiceId);
         }
-        setDocumentTypes(getConfiguredDocumentTypes(data, permitService));
-        setDocuments(getSelectedApplicationDocuments(data.files));
+        setDocumentTypes(configuredDocumentTypes);
+        setDocuments(selectedDocuments);
         setPermitServiceCode(
           data.permit_service?.code ?? permitService?.code ?? null,
         );
@@ -260,17 +312,36 @@ const ApplyPermissionPage = ({
               goodsNameVolume: data.trade_detail.goods_name_volume ?? "",
             });
           }
+
+          const initialStep = getFirstIncompleteStep(
+            data,
+            resolvedPermitServiceId,
+            configuredDocumentTypes,
+            selectedDocuments,
+          );
+          setFirstAvailableStep(initialStep);
+          setStep(initialStep);
         }
       };
 
       void (async () => {
         if (!isExistingApplication) {
-          const response = await createPhysicalApplication(routeId);
+          const creationResponse = await createPhysicalApplication(routeId);
+
+          console.log("POST /permit-applications", creationResponse);
+
+          const response = await getApplication(creationResponse.data.id);
+
+          console.log(
+            `GET /permit-applications/${creationResponse.data.id}`,
+            response,
+          );
           handleApplication(response, initialPermitService);
           return;
         }
 
         const response = await getApplication(routeId);
+
         const serviceId = response.data.permit_service?.id;
         const applicationDocumentTypes = getConfiguredDocumentTypes(
           response.data,
@@ -394,8 +465,16 @@ const ApplyPermissionPage = ({
     setError(null);
 
     try {
-      const response = await submitApplication(application.id);
-      setSubmission(response.data);
+      if (isRevisionApplication) {
+        const response = await resubmitApplication(application.id);
+        setSubmission({
+          application_no: application.application_no ?? "",
+          status: response.data.status,
+        });
+      } else {
+        const response = await submitApplication(application.id);
+        setSubmission(response.data);
+      }
       setStep(7);
     } catch (requestError: unknown) {
       setError(getErrorMessage(requestError));
@@ -504,6 +583,7 @@ const ApplyPermissionPage = ({
           onBack={() => setStep(1)}
           onNext={handleContactNext}
           isSubmitting={isSubmitting}
+          isBackDisabled={firstAvailableStep === 2}
         />
       ) : null}
 
@@ -513,6 +593,7 @@ const ApplyPermissionPage = ({
           onBack={() => setStep(2)}
           onNext={handleOperationNext}
           isSubmitting={isSubmitting}
+          isBackDisabled={firstAvailableStep === 3}
         />
       ) : null}
 
@@ -524,6 +605,7 @@ const ApplyPermissionPage = ({
           onBack={() => setStep(permitServiceId === 1 ? 3 : 2)}
           onUpload={handleDocumentUpload}
           onReplace={handleDocumentReplace}
+          isBackDisabled={firstAvailableStep === 4}
           onNext={(selectedDocuments) => {
             setDocuments(selectedDocuments);
             setStep(5);
@@ -539,6 +621,7 @@ const ApplyPermissionPage = ({
           operationInformation={operationInformation}
           onBack={() => setStep(4)}
           onNext={() => setStep(6)}
+          isBackDisabled={firstAvailableStep === 5}
         />
       ) : null}
 
@@ -550,6 +633,10 @@ const ApplyPermissionPage = ({
           onSaveDraft={() => setStep(7)}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
+          isBackDisabled={firstAvailableStep === 6}
+          submitLabel={
+            isRevisionApplication ? "Yenidən göndər" : "Göndər"
+          }
         />
       ) : null}
 

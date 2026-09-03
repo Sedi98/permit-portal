@@ -35,6 +35,16 @@ export type CitizenApplicationListItem = {
     id: number;
     name: string;
   } | null;
+  invoice_no?: string | null;
+  payment_amount?: number | string | null;
+  paid_at?: string | null;
+  documents?: CitizenApplicationDocument[];
+};
+
+export type CitizenApplicationDocument = {
+  id: number;
+  document_number: string | null;
+  generated_at: string;
 };
 
 export type DraftProgress = {

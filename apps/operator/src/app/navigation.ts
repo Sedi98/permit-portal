@@ -6,6 +6,7 @@ import {
   CreditCard,
   FileText,
   Home,
+  ListTree,
   Package,
   SignatureIcon,
   Star,
@@ -44,6 +45,7 @@ const allRoles: Role[] = [
 export const sidebarItems: SidebarItem[] = [
   { label: "Əsas səhifə", path: "/", icon: Home, roles: allRoles },
   { label: "Lövhə", path: "/board", icon: ChartLine, roles: allRoles },
+  { label: "Hesabatlar", path: "/reports", icon: ListTree, roles: allRoles },
   {
     label: "Müraciətlər",
     path: "/applications",

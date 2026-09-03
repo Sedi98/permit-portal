@@ -189,6 +189,11 @@ export default function ApplicationDetailPage() {
   }
 
   const fields = getApplicationFields(detail);
+  const routingNote = detail.status_histories.findLast(
+    (history) =>
+      (history.new_status === "assigned" || history.to_status === "assigned") &&
+      history.note?.trim(),
+  )?.note;
   const confirmationSequences =
     detail.confirmationSequences ?? detail.confirmation_sequences ?? [];
   const hasCompletedReport = confirmationSequences.some(
@@ -249,6 +254,7 @@ export default function ApplicationDetailPage() {
             date: format(new Date(detail.updated_at), "dd.MM.yyyy"),
             assignment: assignmentLabels[assignee.assignment_role],
           }))}
+          note={routingNote}
         />
 
         {canRoute ? (
@@ -315,7 +321,7 @@ export default function ApplicationDetailPage() {
         />
 
         {!isReadOnly && detail.status === "payment_review" &&
-        (me?.role === "executor" || isSuperAdmin) ? (
+        (isCurrentAssignee || isSuperAdmin) ? (
           <section className="mt-8 space-y-4" aria-labelledby="payment-review-title">
             <h2 id="payment-review-title" className="text-xl font-bold text-[#1F1F1F]">
               Ödənişin yoxlanılması

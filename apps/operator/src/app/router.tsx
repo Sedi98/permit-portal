@@ -30,6 +30,7 @@ import SignQueueManagePage from "@/pages/(dashboard)/sign-queue/manage";
 import UserManagePage from "@/pages/(dashboard)/users/manage";
 import NotificationsPage from "@/pages/(dashboard)/notifications";
 import FaqsPage from "@/pages/(dashboard)/faqs";
+import ReportsPage from "@/pages/(dashboard)/reports";
 
 export default function AppRouter() {
   return (
@@ -65,6 +66,7 @@ export default function AppRouter() {
           <Route path="/awaiting_payment" element={<AwaitingPaymentPage />} />
           <Route path="/awaiting_payment/manage/:id" element={<ApplicationDetailPage />} />
           <Route path="/confirmations/history" element={<ConfirmationHistoryPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
 
           <Route
             path="/confirmations/deficiency/visa"

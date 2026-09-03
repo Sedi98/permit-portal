@@ -38,6 +38,7 @@ type OperationStepProps = {
   onBack?: () => void;
   onNext?: (values: OperationInformationValues) => void | Promise<void>;
   isSubmitting?: boolean;
+  isBackDisabled?: boolean;
 };
 
 const OperationStep = ({
@@ -45,6 +46,7 @@ const OperationStep = ({
   onBack,
   onNext,
   isSubmitting = false,
+  isBackDisabled = false,
 }: OperationStepProps) => {
   const [operationType, setOperationType] = useState<OperationInformationValues["operationType"]>(
     initialValues?.operationType ?? "import",
@@ -150,6 +152,7 @@ const OperationStep = ({
           type="button"
           variant="outline"
           onClick={onBack}
+          disabled={isBackDisabled}
           className="h-12 w-[100px] gap-2 border-[#dfdfdf] bg-white px-4 py-3 text-base font-semibold text-[#286aa6] hover:bg-white hover:text-[#286aa6]"
         >
           <Image

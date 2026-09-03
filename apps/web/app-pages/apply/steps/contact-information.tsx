@@ -57,6 +57,7 @@ type ContactInformationProps = {
   onBack?: () => void;
   onNext?: (values: ContactInformationValues) => void | Promise<void>;
   isSubmitting?: boolean;
+  isBackDisabled?: boolean;
 };
 
 export default function ContactInformation({
@@ -64,6 +65,7 @@ export default function ContactInformation({
   onBack,
   onNext,
   isSubmitting = false,
+  isBackDisabled = false,
 }: ContactInformationProps) {
   const [phoneFields, setPhoneFields] = useState(() =>
     (initialValues?.phones?.length ? initialValues.phones : [""]).map(
@@ -163,6 +165,7 @@ export default function ContactInformation({
           type="button"
           variant="outline"
           onClick={onBack}
+          disabled={isBackDisabled}
           className="h-12 w-[100px] gap-2 border-[#dfdfdf] bg-white px-4 py-3 text-base font-semibold text-[#286aa6] hover:bg-white hover:text-[#286aa6]"
         >
           <Image

@@ -1,5 +1,6 @@
 # Lessons
 
+- When the user specifies a sidebar position, place the new item at that exact point in the existing navigation order rather than appending it near other administrative pages.
 - When adding a history page for an existing document workflow, place it under the explicitly requested existing sidebar group instead of creating a new top-level navigation group.
 - When adding shadcn components in this monorepo, run the CLI from `apps/web` unless the user explicitly targets another app.
 - When an Axios instance defaults to `Content-Type: application/json`, explicitly override FormData requests to `multipart/form-data`; otherwise Axios can serialize the FormData to JSON before adapter-level boundary handling.
@@ -23,3 +24,10 @@
 - For toggled inline content, keep the container mounted and animate its height so opening and closing are both visible; keep the control icon separate from the content decoration.
 - When replacing a conventional file control with an icon picker, start from a compact 4rem click target and scale the preview icon proportionally; enlarge only when the design explicitly requires it.
 - When a page combines shared textarea labels with shadcn labels, explicitly align both to the established dashboard label token instead of relying on their differing component defaults.
+- When a workflow view is conceptually a distinct application step, implement it as a dedicated component under the established `apply/steps` structure instead of embedding its full UI in a generic detail page.
+- When a UI request names a specific container (for example, the document `article` card), apply state styling to that exact structural element rather than its nested upload control.
+- When refining rejected-document cards, keep only the metadata explicitly requested by the user; do not retain redundant status or file-action rows.
+- Treat the progress stepper as a passive indicator unless the user explicitly requests changing it; enforce skipped-step rules in workflow state and navigation controls.
+- For revision workflows, a successful rejected-file replacement must switch the final action from initial submit to the dedicated resubmit endpoint; do not reuse the creation submit action.
+- Workflow decisions that must survive refresh must derive from backend-persisted state (such as `awaiting_revision`), not transient React state set during the current session.
+- When the user asks to compare consecutive API responses in the console, log every named request separately before changing how either response is consumed.

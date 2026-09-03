@@ -1,26 +1,19 @@
 import { cn } from "@/lib/utils"
 
-type StatItem = {
+export type SummaryStatItem = {
   label: string
   value: string
   valueColor: string
   subtitle: string
 }
 
-const defaultItems: StatItem[] = [
-  { label: "Ümumi icazə (2017–2024)", value: "2,044", valueColor: "#286AA6", subtitle: "8 il ərzində" },
-  { label: "Ümumi müraciət", value: "2,292", valueColor: "#4A8EC0", subtitle: "8 il ərzində" },
-  { label: "İcra faizi", value: "89%", valueColor: "#2EAD7A", subtitle: "ortalama" },
-  { label: "Ən yüksək il", value: "2024", valueColor: "#E0923A", subtitle: "401 icazə" },
-]
-
 type ApplicationSummaryStatsProps = {
-  items?: StatItem[]
+  items: SummaryStatItem[]
   className?: string
 }
 
 export default function ApplicationSummaryStats({
-  items = defaultItems,
+  items,
   className,
 }: ApplicationSummaryStatsProps) {
   return (
