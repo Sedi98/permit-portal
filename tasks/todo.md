@@ -8,6 +8,36 @@
 
 Padding now lives inside the hidden message content rather than on the animated grid item, allowing the closed state to collapse fully without a visible half-height gap. Focused ESLint, TypeScript, and `git diff --check` pass.
 
+# Task: Use full-quality WebP Hero artwork
+
+- [ ] Switch the Hero image source to the WebP asset.
+- [ ] Preserve full image quality through `next/image`.
+- [ ] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+In progress.
+
+# Task: Optimize Hero background with Next Image
+
+- [x] Replace the WebP CSS background with the Hero PNG asset.
+- [x] Render the artwork through optimized `next/image` fill behavior.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+The Hero now uses `/images/hero/permit-hero.png` through `next/image` with `fill`, `priority`, responsive `sizes`, and a content layer above the artwork. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Add hero background artwork
+
+- [x] Apply the existing permit hero image as the home hero background.
+- [x] Preserve responsive hero content and verify the result.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+The existing `/images/hero/permit-hero.webp` artwork is applied to the Hero section as a centered, cover-sized, non-repeating background. Focused ESLint, TypeScript, and `git diff --check` pass.
+
 # Task: Animate application system-message expansion
 
 - [x] Animate the system message when toggled from the eye button.

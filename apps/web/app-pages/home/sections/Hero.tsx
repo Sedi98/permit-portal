@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const highlights = [
   { value: "15", label: "İcazə növü" },
   { value: "24/7", label: "Onlayn xidmət" },
@@ -7,8 +9,21 @@ const highlights = [
 
 export function Hero() {
   return (
-    <section className="bg-white" aria-labelledby="hero-title">
-      <div className="mx-auto flex min-h-[556px] max-w-7xl flex-col items-start justify-center gap-12 px-6 py-12 lg:px-0 lg:py-20">
+    <section
+      className="relative overflow-hidden bg-white"
+      aria-labelledby="hero-title"
+    >
+      <Image
+        src="/images/hero/permit-hero.webp"
+        alt=""
+        fill
+        priority
+        quality={100}
+        sizes="100vw"
+        className="object-cover object-center"
+        aria-hidden="true"
+      />
+      <div className="relative z-10 mx-auto flex min-h-[556px] max-w-7xl flex-col items-start justify-center gap-12 px-6 py-12 lg:px-0 lg:py-20">
         <div className="flex max-w-[601px] flex-col items-start gap-6">
           <p className="flex items-center justify-center gap-3 rounded-xl border border-[#dfdfdf] bg-white/50 px-5 py-2 text-base font-bold leading-6 text-[#1f1f1f]">
             <span className="size-2 rounded-full bg-[#286aa6]" aria-hidden="true" />
