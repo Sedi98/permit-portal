@@ -1,3 +1,72 @@
+# Task: Add Figma contact section to notification dialog
+
+- [x] Add the supplied Ministry contact card below notification details.
+- [x] Verify focused lint, TypeScript, and diff checks.
+
+## Review
+
+The notification dialog now includes the Figma contact card below its detail content. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Implement Figma notification detail dialog
+
+- [x] Match the supplied Figma dialog information hierarchy and spacing.
+- [x] Render only the selected notification's list-response fields; no application-detail request.
+- [x] Restore notification-row full-width interaction.
+- [x] Run focused lint and type verification.
+- [ ] Run build verification (blocked by unavailable Google Fonts).
+
+## Review
+
+The dialog follows the supplied Figma information hierarchy using only the `useNotifications` list response. The row is a full-width button again. Focused ESLint, TypeScript, and `git diff --check` pass; the production build is blocked only because this environment cannot fetch DM Sans from Google Fonts.
+
+# Task: Replace notification mail assets with Lucide icons
+
+- [x] Replace mail-open and mail-close SVG image usage with Lucide icons.
+- [x] Delete the unreferenced public SVG assets and run focused verification.
+
+## Review
+
+Focused ESLint passes, and source search confirms no mail-open or mail-close SVG reference remains.
+
+# Task: Show notification details in a dialog
+
+- [x] Reuse the list response as the notification detail data source.
+- [x] Open the existing notification dialog on row click instead of navigating away.
+- [x] Render notification body, timestamp, and related application identifier.
+- [x] Run focused lint and TypeScript verification.
+
+## Review
+
+Focused ESLint and TypeScript checks pass. No extra API request is made because the notification list response already supplies the notification detail fields used by the dialog.
+
+# Task: Replace rejected application files in the document step
+
+- [x] Model the application-detail file metadata returned by the API.
+- [x] Match each existing file to its required document by `document_type_id`.
+- [x] Show the stored file, review status, review note, and file link in the document flow.
+- [x] Restrict replacement controls to rejected files and prevent progressing while any remain rejected.
+- [x] Replace a rejected file through the documented multipart method-override endpoint.
+- [x] Run focused lint and TypeScript verification.
+- [ ] Run web build verification (blocked by unavailable Google Fonts).
+
+## Review
+
+Focused ESLint and TypeScript checks pass. `git diff --check` is blocked only by a pre-existing trailing whitespace change in `app-pages/notifications/index.tsx`. The production build remains blocked by the environment being unable to fetch DM Sans from Google Fonts.
+
+# Task: Move citizen application route and preserve existing-application loading
+
+- [x] Replace the legacy `draft=1` flag with `status=draft`.
+- [x] Move `/apply/:id` to `/applications/:id`.
+- [x] Update every citizen navigation to the new route and correct application IDs for existing application actions.
+- [x] Preserve GET application-detail hydration for draft, deficiency, payment, download, and view actions.
+- [x] Mark notification application links as existing-application views.
+- [x] Run focused lint verification.
+- [ ] Run web build verification (blocked by unavailable Google Fonts).
+
+## Review
+
+Focused ESLint passes for the relocated route and every updated navigation component. A final scan confirms no `/apply/:id` links or `draft=1` flags remain. The Next production build reaches compilation but cannot fetch DM Sans from Google Fonts in this environment, so it cannot complete independently of the code changes.
+
 # Task: Fix operator production build
 
 - [x] Run the operator production build and identify the TypeScript failure.
@@ -558,3 +627,14 @@ fetch the DM Sans Google Font.
 `POST /permit-applications/{id}/submit` now sends an empty `FormData` body with
 the multipart content type instead of inheriting the HTTP client's JSON default.
 Focused ESLint, TypeScript, and `git diff --check` pass.
+# Task: Refine operator permit service controls
+
+- [x] Replace permit-service table action labels with accessible icon buttons.
+- [x] Reorder the management form and make the icon picker a visual click target.
+- [x] Move new document-type creation into a dialog beside the selector.
+- [x] Run focused lint, type/build verification, and review the diff.
+
+## Review
+
+
+Permit service actions now use labelled edit/deactivate icons. The form places the requested name fields first, keeps applicant type and category together, and opens the native file picker from a current-icon/placeholder tile while retaining the validated hidden file input. New document types are created in a dialog and selected automatically. Focused ESLint, TypeScript, Vite build, and `git diff --check` pass; the build retains Vite's existing large-chunk advisory. The `pnpm` launcher stalled in this shell, so local installed binaries were used for the equivalent checks.

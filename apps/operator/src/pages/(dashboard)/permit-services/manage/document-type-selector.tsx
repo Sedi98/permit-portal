@@ -10,6 +10,15 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import MultipleSelector, {
@@ -56,6 +65,7 @@ export default function DocumentTypeSelector({
   const documentTypes = useDocumentTypes();
   const createDocumentType = useCreateDocumentType();
   const [newName, setNewName] = useState("");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const fetchedItems = documentTypes.data?.data ?? EMPTY_DOCUMENT_TYPES;
   const items = useMemo(() => {
     const itemsById = new Map(
@@ -130,6 +140,7 @@ export default function DocumentTypeSelector({
         onChange([...selectedIds, existing.id]);
       }
       setNewName("");
+      setIsCreateDialogOpen(false);
       return;
     }
 
@@ -141,6 +152,7 @@ export default function DocumentTypeSelector({
             onChange([...selectedIds, response.data.id]);
           }
           setNewName("");
+          setIsCreateDialogOpen(false);
           toast.success("Yeni sənəd növü yaradıldı.");
         },
         onError: (createError) => toast.error(getCreateError(createError)),
@@ -155,26 +167,85 @@ export default function DocumentTypeSelector({
 
   return (
     <div className="space-y-3">
-      <Label htmlFor="permit-document-types">Tələb olunan sənəd növləri</Label>
-      <MultipleSelector
-        value={selectedOptions}
-        options={options}
-        onChange={handleSelectionChange}
-        placeholder="Sənəd növlərini axtarın və seçin"
-        emptyIndicator={
-          <span className="text-sm text-muted-foreground">
-            Uyğun sənəd növü tapılmadı.
-          </span>
-        }
-        disabled={disabled}
-        className="min-h-12 rounded-lg"
-        commandProps={{ filter: filterByName }}
-        inputProps={{
-          id: "permit-document-types",
-          "aria-invalid": !!error,
-          "aria-describedby": error ? "permit-document-types-error" : undefined,
-        }}
-      />
+      <Label htmlFor="permit-document-types" className="text-[#797979]">
+        Tələb olunan sənəd növləri
+      </Label>
+      <div className="flex items-start gap-2">
+        <MultipleSelector
+          value={selectedOptions}
+          options={options}
+          onChange={handleSelectionChange}
+          placeholder="Sənəd növlərini axtarın və seçin"
+          emptyIndicator={
+            <span className="text-sm text-muted-foreground">
+              Uyğun sənəd növü tapılmadı.
+            </span>
+          }
+          disabled={disabled}
+          className="min-h-12 flex-1 rounded-lg"
+          commandProps={{ filter: filterByName }}
+          inputProps={{
+            id: "permit-document-types",
+            "aria-invalid": !!error,
+            "aria-describedby": error ? "permit-document-types-error" : undefined,
+          }}
+        />
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              className="shrink-0"
+              disabled={disabled}
+            >
+              <Plus className="size-4" />
+              Yeni sənəd tipi
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Yeni sənəd tipi</DialogTitle>
+              <DialogDescription>
+                Sənəd tipini yaradın və onu bu icazəyə əlavə edin.
+              </DialogDescription>
+            </DialogHeader>
+            <form
+              className="space-y-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                addDocumentType();
+              }}
+            >
+              <div className="space-y-2">
+                <Label htmlFor="new-document-type-name" className="text-[#797979]">
+                  Sənəd tipi
+                </Label>
+                <Input
+                  id="new-document-type-name"
+                  value={newName}
+                  onChange={(event) => setNewName(event.target.value)}
+                  placeholder="Sənəd tipinin adını yazın"
+                  disabled={disabled}
+                  autoFocus
+                />
+              </div>
+              <DialogFooter>
+                <Button
+                  type="submit"
+                  disabled={disabled || !newName.trim()}
+                >
+                  {createDocumentType.isPending ? (
+                    <LoaderCircle className="size-4 animate-spin" />
+                  ) : (
+                    <Plus className="size-4" />
+                  )}
+                  Əlavə et
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
       {documentTypes.isLoading ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <LoaderCircle className="size-4 animate-spin" />
@@ -200,36 +271,6 @@ export default function DocumentTypeSelector({
           {error}
         </p>
       ) : null}
-
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <Input
-          value={newName}
-          onChange={(event) => setNewName(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key !== "Enter") return;
-            event.preventDefault();
-            addDocumentType();
-          }}
-          placeholder="Siyahıda yoxdursa, yeni sənəd adı yazın"
-          disabled={disabled}
-          aria-label="Yeni sənəd növünün adı"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          className="shrink-0"
-          disabled={disabled || !newName.trim()}
-          onClick={addDocumentType}
-        >
-          {createDocumentType.isPending ? (
-            <LoaderCircle className="size-4 animate-spin" />
-          ) : (
-            <Plus className="size-4" />
-          )}
-          Yeni sənəd əlavə et
-        </Button>
-      </div>
-
       {selectedIds.length > 0 ? (
         <div className="space-y-2 rounded-lg border border-[#DFDFDF] p-3">
           <p className="text-sm font-medium text-[#1F1F1F]">

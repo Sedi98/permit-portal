@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
+
 import NotificationHeader from "@/app-pages/notifications/sections/NotificationHeader";
 import NotificationContainer from "@/app-pages/notifications/sections/NotificationContainer";
+import NotificationDialog from "@/app-pages/notifications/sections/NotificationDialog";
 import {
   useMarkAllNotificationsRead,
   useNotifications,
   useUnreadNotificationsCount,
 } from "@/features/notifications/hooks";
+import type { Notification } from "@/features/notifications/types";
 
 function formatNotificationDate(value: string) {
   const date = new Date(value);
@@ -30,8 +34,14 @@ export default function NotificationsPage() {
   const notificationsQuery = useNotifications();
   const unreadCountQuery = useUnreadNotificationsCount();
   const markAllRead = useMarkAllNotificationsRead();
+  const [selectedNotification, setSelectedNotification] =
+    useState<Notification | null>(null);
   const notifications = notificationsQuery.data?.data.data ?? [];
   const unreadCount = unreadCountQuery.data?.data.count ?? 0;
+
+  function closeDialog() {
+    setSelectedNotification(null);
+  }
 
   return (
     <main>
@@ -58,7 +68,7 @@ export default function NotificationsPage() {
               message={notification.body}
               date={formatNotificationDate(notification.created_at)}
               read={notification.is_read}
-              applicationId={notification.data.permit_application_id}
+              onClick={() => setSelectedNotification(notification)}
             />
           ))
         )}
@@ -68,6 +78,18 @@ export default function NotificationsPage() {
           </p>
         ) : null}
       </section>
+      {selectedNotification ? (
+        <NotificationDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) closeDialog();
+          }}
+          title={selectedNotification.title}
+          date={formatNotificationDate(selectedNotification.created_at)}
+          message={selectedNotification.body}
+          applicationId={selectedNotification.data.permit_application_id}
+        />
+      ) : null}
     </main>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { isAxiosError } from "axios";
 import { ArrowLeft, LoaderCircle, Package } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
@@ -170,6 +170,7 @@ function PermitServiceForm({
   const update = useUpdateManagedPermitService(id ?? 0);
   const [values, setValues] = useState(() => getInitialValues(service));
   const [errors, setErrors] = useState<FormErrors>({});
+  const iconInputRef = useRef<HTMLInputElement>(null);
   const isEdit = id !== undefined;
   const mutation = isEdit ? update : create;
 
@@ -232,6 +233,22 @@ function PermitServiceForm({
     <form onSubmit={submit} className="space-y-6">
       <div className="grid gap-5 md:grid-cols-2">
         <div className="space-y-2 md:col-span-2">
+          <Label htmlFor="permit-short-name" className="text-[#797979]">Qısa ad</Label>
+          <Input
+            id="permit-short-name"
+            value={values.short_name}
+            onChange={(event) => setField("short_name", event.target.value)}
+            aria-invalid={!!errors.short_name}
+            aria-describedby={errors.short_name ? "permit-short-name-error" : undefined}
+            required
+          />
+          {errors.short_name ? (
+            <p id="permit-short-name-error" className="text-sm text-destructive">
+              {errors.short_name}
+            </p>
+          ) : null}
+        </div>
+        <div className="space-y-2 md:col-span-2">
           <NoteTextarea
             id="permit-name"
             label="Tam ad"
@@ -248,49 +265,7 @@ function PermitServiceForm({
           ) : null}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="permit-short-name">Qısa ad</Label>
-          <Input
-            id="permit-short-name"
-            value={values.short_name}
-            onChange={(event) => setField("short_name", event.target.value)}
-            aria-invalid={!!errors.short_name}
-            aria-describedby={errors.short_name ? "permit-short-name-error" : undefined}
-            required
-          />
-          {errors.short_name ? (
-            <p id="permit-short-name-error" className="text-sm text-destructive">
-              {errors.short_name}
-            </p>
-          ) : null}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="permit-category">Kateqoriya</Label>
-          <Select
-            value={values.category}
-            onValueChange={(value) =>
-              setField("category", value as PermitServiceCategory)
-            }
-          >
-            <SelectTrigger
-              id="permit-category"
-              aria-invalid={!!errors.category}
-              aria-describedby={errors.category ? "permit-category-error" : undefined}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="permit">İcazə</SelectItem>
-              <SelectItem value="certificate">Şəhadətnamə</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.category ? (
-            <p id="permit-category-error" className="text-sm text-destructive">
-              {errors.category}
-            </p>
-          ) : null}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="permit-allowed-applicant-types">
+          <Label htmlFor="permit-allowed-applicant-types" className="text-[#797979]">
             Müraciətçi tipi
           </Label>
           <Select
@@ -331,6 +306,32 @@ function PermitServiceForm({
             </p>
           ) : null}
         </div>
+        <div className="space-y-2">
+          <Label htmlFor="permit-category" className="text-[#797979]">Kateqoriya</Label>
+          <Select
+            value={values.category}
+            onValueChange={(value) =>
+              setField("category", value as PermitServiceCategory)
+            }
+          >
+            <SelectTrigger
+              id="permit-category"
+              aria-invalid={!!errors.category}
+              aria-describedby={errors.category ? "permit-category-error" : undefined}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="permit">İcazə</SelectItem>
+              <SelectItem value="certificate">Şəhadətnamə</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.category ? (
+            <p id="permit-category-error" className="text-sm text-destructive">
+              {errors.category}
+            </p>
+          ) : null}
+        </div>
         <div className="md:col-span-2">
           <DocumentTypeSelector
             selectedIds={values.document_type_ids}
@@ -340,39 +341,36 @@ function PermitServiceForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="permit-icon">İkon</Label>
-          {service ? (
-            <div className="flex items-center gap-3 rounded-lg border border-[#DFDFDF] p-3">
-              {service.icon_url ? (
-                <div className="flex size-12 items-center justify-center rounded-lg bg-[#EEF4FB] text-primary">
-                  <img
-                    src={service.icon_url}
-                    alt="Cari icazə ikonu"
-                    className="size-12 object-contain"
-                  />
-                </div>
-              ) : (
-                <div className="flex size-12 items-center justify-center rounded-lg bg-[#EEF4FB] text-primary">
-                  <Package className="size-6" />
-                </div>
-              )}
-              <div>
-                <p className="text-sm text-[#797979]">Cari ikon</p>
-                <p className="font-medium">Kod: {service.code}</p>
-              </div>
-            </div>
-          ) : null}
-          <Input
-            id="permit-icon"
-            type="file"
-            accept="image/jpeg,image/png,image/svg+xml"
-            onChange={handleIconChange}
-            aria-invalid={!!errors.icon}
+          <Label htmlFor="permit-icon" className="text-[#797979]">İkon</Label>
+          <button
+            type="button"
+            className="flex size-16 items-center justify-center rounded-lg border border-dashed border-[#DFDFDF] bg-[#EEF4FB] text-primary transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onClick={() => iconInputRef.current?.click()}
+            aria-label="İkon faylı seç"
             aria-describedby={
               errors.icon
                 ? "permit-icon-help permit-icon-error"
                 : "permit-icon-help"
             }
+          >
+            {service?.icon_url ? (
+              <img
+                src={service.icon_url}
+                alt="Cari icazə ikonu"
+                className="size-10 object-contain"
+              />
+            ) : (
+              <Package className="size-5" aria-hidden="true" />
+            )}
+          </button>
+          <Input
+            id="permit-icon"
+            ref={iconInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/svg+xml"
+            onChange={handleIconChange}
+            className="sr-only"
+            tabIndex={-1}
           />
           <p id="permit-icon-help" className="text-xs text-[#797979]">
             JPG, PNG və ya SVG · maksimum 2 MB
@@ -383,7 +381,7 @@ function PermitServiceForm({
             </p>
           ) : null}
         </div>
-        <label className="flex items-center gap-3 self-end rounded-lg border border-[#DFDFDF] p-3">
+        <label className="flex items-center gap-3 self-end rounded-lg border border-[#DFDFDF] p-3 text-[#797979]">
           <input
             type="checkbox"
             checked={values.is_active}
@@ -401,7 +399,7 @@ function PermitServiceForm({
           const error = errors[typedField];
           return (
             <div key={field} className="space-y-2">
-              <Label htmlFor={`permit-${field}`}>{label}</Label>
+              <Label htmlFor={`permit-${field}`} className="text-[#797979]">{label}</Label>
               <Input
                 id={`permit-${field}`}
                 type={type}

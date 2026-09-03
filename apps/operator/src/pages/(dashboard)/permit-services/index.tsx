@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { LoaderCircle, Package, Pencil, Plus } from "lucide-react";
+import { LoaderCircle, Package, Pencil, Plus, Power } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -55,17 +55,21 @@ function PermitServiceActions({ service }: { service: ManagedPermitService }) {
     <div className="flex min-w-max items-center gap-2">
       <Button
         variant="outline"
-        className="gap-2"
+        size="icon-sm"
         onClick={() => navigate(`/permit-services/${service.id}`)}
+        aria-label="Redaktə et"
+        title="Redaktə et"
       >
         <Pencil className="size-4" />
-        Redaktə et
       </Button>
       {service.is_active ? (
         <Button
           variant="outline"
+          size="icon-sm"
           className="text-destructive"
           disabled={deactivate.isPending}
+          aria-label="Deaktiv et"
+          title="Deaktiv et"
           onClick={() =>
             deactivate.mutate(service.id, {
               onSuccess: () => toast.success("İcazə deaktiv edildi"),
@@ -74,7 +78,7 @@ function PermitServiceActions({ service }: { service: ManagedPermitService }) {
             })
           }
         >
-          Deaktiv et
+          <Power className="size-4" />
         </Button>
       ) : null}
     </div>

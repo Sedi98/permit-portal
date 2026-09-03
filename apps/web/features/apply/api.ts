@@ -13,8 +13,24 @@ export type PhysicalApplicant = {
   father_name: string | null;
 };
 
+export type ApplicationFile = {
+  id: number;
+  document_type_id: number;
+  document_type?: string;
+  mime_type?: string;
+  original_name: string;
+  path: string;
+  review_note?: string | null;
+  review_status?: string;
+  review_status_label?: string;
+  size: number;
+};
+
 export type ApplicationDetails = PhysicalApplicant & {
+  application_no?: string;
+  applicant_full_name?: string | null;
   email?: string | null;
+  legal_entity_name?: string | null;
   phones?: Array<{ phone: string }>;
   permit_service?: {
     id: number;
@@ -24,6 +40,8 @@ export type ApplicationDetails = PhysicalApplicant & {
     document_types?: ConfiguredDocumentType[];
   };
   documentTypes?: DocumentType[];
+  files?: ApplicationFile[];
+  voen?: string | null;
   trade_detail?: {
     operation_type?: TradeDetailPayload["trade_detail"]["operation_type"];
     goods_category?: string;
@@ -99,6 +117,22 @@ export async function uploadApplicationFile(
 
   return PostApi<ApiResponse<unknown>, FormData>(
     `/permit-applications/${applicationId}/files`,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } },
+  );
+}
+
+export async function replaceApplicationFile(
+  applicationId: number,
+  fileId: number,
+  file: File,
+) {
+  const formData = new FormData();
+  formData.append("_method", "PUT");
+  formData.append("file", file);
+
+  return PostApi<ApiResponse<ApplicationFile>, FormData>(
+    `/permit-applications/${applicationId}/files/${fileId}`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } },
   );

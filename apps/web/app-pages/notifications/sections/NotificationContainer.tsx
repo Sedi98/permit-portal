@@ -1,14 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import { Mail, MailOpen } from "lucide-react";
 
 export type NotificationContainerProps = {
   title: string;
   message: string;
   date: string;
   read: boolean;
-  applicationId: number;
+  onClick: () => void;
 };
 
 export default function NotificationContainer({
@@ -16,12 +15,13 @@ export default function NotificationContainer({
   message,
   date,
   read,
-  applicationId,
+  onClick,
 }: NotificationContainerProps) {
   return (
-    <Link
-      href={`/applications/${encodeURIComponent(String(applicationId))}`}
-      className={`flex cursor-pointer flex-col items-start border-b border-[#dfdfdf] p-6 transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#286aa6] focus-visible:outline-none ${
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex w-full cursor-pointer flex-col items-start border-b border-[#dfdfdf] p-6 text-left transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#286aa6] focus-visible:outline-none ${
         read ? "bg-white" : "rounded-t-xl bg-[#f9fafc]"
       }`}
     >
@@ -31,18 +31,11 @@ export default function NotificationContainer({
             read ? "bg-[#f5f5f5]" : "bg-white"
           }`}
         >
-          <Image
-            src={
-              read
-                ? "/icons/notifications/mail-open.svg"
-                : "/icons/notifications/mail-close.svg"
-            }
-            alt=""
-            aria-hidden="true"
-            width={24}
-            height={24}
-            className="size-6"
-          />
+          {read ? (
+            <MailOpen className="size-6" strokeWidth={1.5} aria-hidden="true" />
+          ) : (
+            <Mail className="size-6" strokeWidth={1.5} aria-hidden="true" />
+          )}
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
@@ -66,6 +59,6 @@ export default function NotificationContainer({
           <p className="w-full text-sm leading-5 text-[#797979]">{message}</p>
         </div>
       </div>
-    </Link>
+    </button>
   );
 }

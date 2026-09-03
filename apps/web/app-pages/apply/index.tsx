@@ -15,12 +15,14 @@ import type {
 import {
   createPhysicalApplication,
   getApplication,
+  replaceApplicationFile,
   submitApplication,
   submitServiceRating,
   updateApplicationContact,
   updateApplicationTradeDetail,
   uploadApplicationFile,
   type ApplicationDetails,
+  type ApplicationFile,
   type PhysicalApplicant,
 } from "@/features/apply/api";
 import ContactInformation, {
@@ -46,7 +48,7 @@ import ToDraftStep from "@/app-pages/apply/steps/to-draft-step";
 
 type ApplyPermissionPageProps = {
   id: string;
-  isDraft?: boolean;
+  isExistingApplication?: boolean;
   initialPermitService?: PermitServiceDetail;
 };
 
@@ -135,9 +137,31 @@ function getConfiguredDocumentTypes(
     .map(({ id, name }) => ({ id, name }));
 }
 
+function getSelectedApplicationDocuments(
+  files: ApplicationFile[] | undefined,
+): SelectedApplicationDocument[] {
+  const documentsByType = new Map<number, SelectedApplicationDocument>();
+
+  for (const file of files ?? []) {
+    documentsByType.set(file.document_type_id, {
+      documentTypeId: file.document_type_id,
+      documentTypeName: file.document_type ?? "Sənəd",
+      fileId: file.id,
+      name: file.original_name,
+      size: file.size,
+      path: file.path,
+      reviewNote: file.review_note,
+      reviewStatus: file.review_status,
+      reviewStatusLabel: file.review_status_label,
+    });
+  }
+
+  return [...documentsByType.values()];
+}
+
 const ApplyPermissionPage = ({
   id,
-  isDraft = false,
+  isExistingApplication = false,
   initialPermitService,
 }: ApplyPermissionPageProps) => {
   const { user, loading } = useAuth();
@@ -145,7 +169,7 @@ const ApplyPermissionPage = ({
   const isAuthenticated = Boolean(user);
   const routeId = Number(id);
   const [permitServiceId, setPermitServiceId] = useState<number | null>(
-    isDraft ? null : routeId,
+    isExistingApplication ? null : routeId,
   );
   const isValidRouteId = Number.isInteger(routeId) && routeId > 0;
   const creationKey = useRef<string | null>(null);
@@ -214,6 +238,7 @@ const ApplyPermissionPage = ({
           setPermitServiceId(data.permit_service.id);
         }
         setDocumentTypes(getConfiguredDocumentTypes(data, permitService));
+        setDocuments(getSelectedApplicationDocuments(data.files));
         setPermitServiceCode(
           data.permit_service?.code ?? permitService?.code ?? null,
         );
@@ -223,7 +248,7 @@ const ApplyPermissionPage = ({
           lastName: data.last_name,
           fatherName: data.father_name,
         });
-        if (isDraft) {
+        if (isExistingApplication) {
           setContactInformation({
             email: data.email ?? "",
             phones: data.phones?.map(({ phone }) => phone) ?? [""],
@@ -239,15 +264,13 @@ const ApplyPermissionPage = ({
       };
 
       void (async () => {
-        if (!isDraft) {
+        if (!isExistingApplication) {
           const response = await createPhysicalApplication(routeId);
           handleApplication(response, initialPermitService);
           return;
         }
 
         const response = await getApplication(routeId);
-        console.log(response);
-        
         const serviceId = response.data.permit_service?.id;
         const applicationDocumentTypes = getConfiguredDocumentTypes(
           response.data,
@@ -269,7 +292,7 @@ const ApplyPermissionPage = ({
           creationKey.current = null;
           setError(getErrorMessage(requestError));
           setShowCreationError(
-            !isDraft && getErrorStatus(requestError) === 422,
+            !isExistingApplication && getErrorStatus(requestError) === 422,
           );
         })
         .finally(() => {
@@ -285,7 +308,7 @@ const ApplyPermissionPage = ({
     id,
     initialPermitService,
     isAuthenticated,
-    isDraft,
+    isExistingApplication,
     isValidRouteId,
     loading,
     routeId,
@@ -341,6 +364,23 @@ const ApplyPermissionPage = ({
     setError(null);
     try {
       await uploadApplicationFile(application.id, documentTypeId, file);
+    } catch (requestError: unknown) {
+      setError(getErrorMessage(requestError));
+      throw requestError;
+    }
+  };
+
+  const handleDocumentReplace = async (
+    document: SelectedApplicationDocument,
+    file: File,
+  ) => {
+    if (!application || !document.fileId) {
+      throw new Error("Sənədin identifikatoru tapılmadı.");
+    }
+
+    setError(null);
+    try {
+      await replaceApplicationFile(application.id, document.fileId, file);
     } catch (requestError: unknown) {
       setError(getErrorMessage(requestError));
       throw requestError;
@@ -483,6 +523,7 @@ const ApplyPermissionPage = ({
           maxFileSizeMb={maxFileSizeMb}
           onBack={() => setStep(permitServiceId === 1 ? 3 : 2)}
           onUpload={handleDocumentUpload}
+          onReplace={handleDocumentReplace}
           onNext={(selectedDocuments) => {
             setDocuments(selectedDocuments);
             setStep(5);

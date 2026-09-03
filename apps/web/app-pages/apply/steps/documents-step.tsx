@@ -6,12 +6,18 @@ import { useState } from "react";
 import { DocumentUploadItem } from "@/components/document-upload-item";
 import { Button } from "@/components/ui/button";
 import type { DocumentType } from "@/features/permit-services/types";
+import { backendAssetUrl } from "@/lib/api";
 
 export type SelectedApplicationDocument = {
   documentTypeId: number;
   documentTypeName: string;
+  fileId?: number;
   name: string;
   size: number;
+  path?: string;
+  reviewNote?: string | null;
+  reviewStatus?: string;
+  reviewStatusLabel?: string;
 };
 
 const EMPTY_SELECTED_DOCUMENTS: SelectedApplicationDocument[] = [];
@@ -23,6 +29,10 @@ type DocumentsStepProps = {
   onBack?: () => void;
   onNext?: (documents: SelectedApplicationDocument[]) => void;
   onUpload?: (documentTypeId: number, file: File) => void | Promise<void>;
+  onReplace?: (
+    document: SelectedApplicationDocument,
+    file: File,
+  ) => void | Promise<void>;
 };
 
 type RequiredDocumentCardProps = {
@@ -31,6 +41,7 @@ type RequiredDocumentCardProps = {
   number: number;
   maxFileSizeMb: number;
   onUpload?: (file: File) => void | Promise<void>;
+  onReplace?: (file: File) => void | Promise<void>;
 };
 
 function RequiredDocumentCard({
@@ -39,6 +50,7 @@ function RequiredDocumentCard({
   number,
   maxFileSizeMb,
   onUpload,
+  onReplace,
 }: RequiredDocumentCardProps) {
   return (
     <article className="flex w-full flex-col items-center gap-2 overflow-hidden rounded-2xl border border-[#dfdfdf] bg-white px-px pb-5">
@@ -57,9 +69,36 @@ function RequiredDocumentCard({
           initialFileName={selectedDocument?.name}
           initialFileSize={selectedDocument?.size}
           maxFileSizeMb={maxFileSizeMb}
+          canReplace={selectedDocument?.reviewStatus === "rejected"}
           canRemove={false}
-          onFileSelected={onUpload}
+          onFileSelected={
+            selectedDocument?.reviewStatus === "rejected" ? onReplace : onUpload
+          }
         />
+        {selectedDocument ? (
+          <div className="mt-3 flex w-full flex-col gap-1 rounded-lg bg-[#f9fafc] p-3 text-sm leading-5">
+            {selectedDocument.reviewStatusLabel ? (
+              <p className="font-medium text-[#1f1f1f]">
+                Yoxlama statusu: {selectedDocument.reviewStatusLabel}
+              </p>
+            ) : null}
+            {selectedDocument.reviewNote ? (
+              <p className="text-[#797979]">
+                Qeyd: {selectedDocument.reviewNote}
+              </p>
+            ) : null}
+            {selectedDocument.path ? (
+              <a
+                href={backendAssetUrl(selectedDocument.path)}
+                target="_blank"
+                rel="noreferrer"
+                className="w-fit font-medium text-[#286aa6] underline"
+              >
+                Fayla bax
+              </a>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </article>
   );
@@ -82,6 +121,7 @@ const DocumentsStep = ({
   onBack,
   onNext,
   onUpload,
+  onReplace,
 }: DocumentsStepProps) => {
   const [selectedByType, setSelectedByType] = useState<
     Record<number, SelectedApplicationDocument>
@@ -104,13 +144,34 @@ const DocumentsStep = ({
     }));
   };
 
+  const handleReplace = async (
+    documentType: DocumentType,
+    document: SelectedApplicationDocument,
+    file: File,
+  ) => {
+    await onReplace?.(document, file);
+    setSelectedByType((current) => ({
+      ...current,
+      [documentType.id]: {
+        ...document,
+        name: file.name,
+        size: file.size,
+        path: undefined,
+        reviewNote: null,
+        reviewStatus: "pending",
+        reviewStatusLabel: "Yoxlanılır",
+      },
+    }));
+  };
+
   const selectedDocuments = documentTypes.flatMap((documentType) => {
     const selected = selectedByType[documentType.id];
     return selected ? [selected] : [];
   });
   const allDocumentsUploaded =
     documentTypes.length > 0 &&
-    selectedDocuments.length === documentTypes.length;
+    selectedDocuments.length === documentTypes.length &&
+    selectedDocuments.every((document) => document.reviewStatus !== "rejected");
 
   return (
     <section className="flex w-full max-w-[770px] flex-col gap-7 rounded-xl border border-[#dfdfdf] p-4 sm:p-8">
@@ -133,6 +194,12 @@ const DocumentsStep = ({
               number={index + 1}
               maxFileSizeMb={maxFileSizeMb}
               onUpload={(file) => handleUpload(documentType, file)}
+              onReplace={(file) => {
+                const document = selectedByType[documentType.id];
+                return document
+                  ? handleReplace(documentType, document, file)
+                  : undefined;
+              }}
             />
           ))
         ) : (

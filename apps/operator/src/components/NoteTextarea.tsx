@@ -17,7 +17,7 @@ export default function NoteTextarea({
     <div className="flex w-full flex-col gap-2">
       <label
         htmlFor={props.id}
-        className="text-sm font-medium leading-5 text-[#a5a5a5]"
+        className="text-sm font-medium leading-5 text-[#797979]"
       >
         {label}
       </label>

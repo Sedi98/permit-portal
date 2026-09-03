@@ -48,18 +48,18 @@ function getStatusConfig(status: string): StatusConfig {
 
 function StatusAction({ application, action }: { application: CitizenApplicationListItem; action: StatusAction }) {
   if (action === "continue") {
-    return <Button asChild className={actionClassName}><Link href={`/apply/${application.permit_service.id}?draft=1`}>Davam et</Link></Button>;
+    return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?status=draft`}>Davam et</Link></Button>;
   }
   if (action === "pay") {
-    return <Button asChild className={actionClassName}><Link href={`/apply/${application.permit_service.id}?action=payment`}><CreditCard className="size-4" aria-hidden="true" />Ödə</Link></Button>;
+    return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?action=payment`}><CreditCard className="size-4" aria-hidden="true" />Ödə</Link></Button>;
   }
   if (action === "download") {
-    return <Button asChild className={actionClassName}><Link href={`/apply/${application.permit_service.id}?action=download`}><Download className="size-4" aria-hidden="true" />Yüklə</Link></Button>;
+    return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?action=download`}><Download className="size-4" aria-hidden="true" />Yüklə</Link></Button>;
   }
   if (action === "revision") {
-    return <Button asChild className={actionClassName}><Link href={`/apply/${application.permit_service.id}?section=deficiency`}>Bax</Link></Button>;
+    return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?section=deficiency`}>Bax</Link></Button>;
   }
-  return <Link href={`/apply/${application.permit_service.id}?draft=1`} className={iconButtonClassName} aria-label="Müraciətə bax"><Eye className="size-5" strokeWidth={1.5} aria-hidden="true" /></Link>;
+  return <Link href={`/applications/${application.id}?status=${application.status}`} className={iconButtonClassName} aria-label="Müraciətə bax"><Eye className="size-5" strokeWidth={1.5} aria-hidden="true" /></Link>;
 }
 
 function StatusIndicator({ status }: { status: string }) {

@@ -19,6 +19,7 @@ type DocumentUploadItemProps = {
   refreshIconSrc?: string;
   trashIconSrc?: string;
   maxFileSizeMb?: number;
+  canReplace?: boolean;
   canRemove?: boolean;
   onFileSelected?: (file: File) => void | Promise<void>;
   onRemove?: () => void;
@@ -57,6 +58,7 @@ function DocumentUploadItem({
   refreshIconSrc = DEFAULT_REFRESH_ICON,
   trashIconSrc = DEFAULT_TRASH_ICON,
   maxFileSizeMb = 10,
+  canReplace = true,
   canRemove = true,
   onFileSelected,
   onRemove,
@@ -186,21 +188,23 @@ function DocumentUploadItem({
         </div>
 
         <div className="flex shrink-0 gap-3 self-end sm:self-auto">
-          <Button
-            type="button"
-            variant="outline"
-            aria-label={`${file.name} faylını dəyişdir`}
-            onClick={openFilePicker}
-            className="size-10 rounded-lg border-[#dfdfdf] bg-white p-2 text-[#286aa6] hover:bg-white hover:text-[#286aa6]"
-          >
-            <Image
-              src={refreshIconSrc}
-              alt=""
-              width={24}
-              height={24}
-              aria-hidden="true"
-            />
-          </Button>
+          {canReplace ? (
+            <Button
+              type="button"
+              variant="outline"
+              aria-label={`${file.name} faylını dəyişdir`}
+              onClick={openFilePicker}
+              className="size-10 rounded-lg border-[#dfdfdf] bg-white p-2 text-[#286aa6] hover:bg-white hover:text-[#286aa6]"
+            >
+              <Image
+                src={refreshIconSrc}
+                alt=""
+                width={24}
+                height={24}
+                aria-hidden="true"
+              />
+            </Button>
+          ) : null}
           {canRemove ? (
             <Button
               type="button"
