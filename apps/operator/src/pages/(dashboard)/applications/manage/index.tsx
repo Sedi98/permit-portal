@@ -26,7 +26,6 @@ import type {
 } from "@/features/applications/types";
 
 import ApplicationAssignSection from "@/features/applications/components/ApplicationAssignSection";
-import ApplicationFileReviewSection from "@/features/applications/components/ApplicationFileReviewSection";
 import ConfirmationHistorySection from "@/features/applications/components/ConfirmationHistorySection";
 import ConfirmationSequenceForm from "@/features/applications/components/ConfirmationSequenceForm";
 
@@ -299,13 +298,6 @@ export default function ApplicationDetailPage() {
           </section>
         ) : null}
 
-        {canReviewFiles ? (
-          <ApplicationFileReviewSection
-            applicationId={applicationId}
-            files={detail.files}
-          />
-        ) : null}
-
         {canReviewFiles && nextSequenceType ? (
           <ConfirmationSequenceForm
             applicationId={applicationId}
@@ -365,6 +357,7 @@ export default function ApplicationDetailPage() {
           subtitle={detail.permit_service.name}
           applicationId={detail.id}
           documents={detail.files}
+          canReview={canReviewFiles}
         />
       </TableLayout>
 

@@ -638,3 +638,18 @@ Focused ESLint, TypeScript, and `git diff --check` pass.
 
 
 Permit service actions now use labelled edit/deactivate icons. The form places the requested name fields first, keeps applicant type and category together, and opens the native file picker from a current-icon/placeholder tile while retaining the validated hidden file input. New document types are created in a dialog and selected automatically. Focused ESLint, TypeScript, Vite build, and `git diff --check` pass; the build retains Vite's existing large-chunk advisory. The `pnpm` launcher stalled in this shell, so local installed binaries were used for the equivalent checks.
+# Task: Move file review controls into required documents
+
+- [x] Inspect the existing file-review API, permissions, and required-document UI.
+- [x] Move per-file accept/reject actions into `RequiredDocumentsSection`.
+- [x] Add a required rejection-reason dialog and one-time review disabling.
+- [x] Remove the standalone file-review section from the application page.
+- [x] Run operator lint/build verification and review the diff.
+
+## Review
+
+The standalone “Faylların yoxlanılması” section was removed. Authorized reviewers now
+accept or reject each uploaded file directly from “Tələb olunan sənədlər”; rejection
+uses a required-reason dialog, and both review actions lock after the first successful
+decision. Focused and full operator lint pass (apart from the existing TanStack Table
+compiler warning), the operator production build passes, and `git diff --check` passes.
