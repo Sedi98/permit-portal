@@ -10,13 +10,13 @@ Padding now lives inside the hidden message content rather than on the animated 
 
 # Task: Use full-quality WebP Hero artwork
 
-- [ ] Switch the Hero image source to the WebP asset.
-- [ ] Preserve full image quality through `next/image`.
-- [ ] Run focused lint, TypeScript, and diff verification.
+- [x] Switch the Hero image source to the WebP asset.
+- [x] Preserve full image quality through `next/image`.
+- [x] Run focused lint, TypeScript, and diff verification.
 
 ## Review
 
-In progress.
+The Hero now uses `/images/hero/permit-hero.webp` with `next/image` and `quality={100}`. Focused ESLint, TypeScript, and `git diff --check` pass.
 
 # Task: Optimize Hero background with Next Image
 
