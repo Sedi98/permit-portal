@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { CreditCard, Download, Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +25,16 @@ const statusConfig: Record<string, StatusConfig> = {
   awaiting_signature: { tone: "blue", message: "Müraciət rəsmiləşdirilir.", action: "view" },
   completed: { tone: "green", message: "İcazə verildi. Sənədi yükləyə bilərsiniz.", action: "download" },
 };
+
+const nonNavigableStatuses = new Set([
+  "registered",
+  "assigned",
+  "deficiency_confirmation",
+  "report_confirmation",
+  "payment_confirmation",
+  "payment_review",
+  "awaiting_signature",
+]);
 
 const toneClasses: Record<StatusTone, { dot: string; text: string }> = {
   orange: { dot: "bg-[#e97000]", text: "text-[#e97000]" },
@@ -47,6 +60,10 @@ function getStatusConfig(status: string): StatusConfig {
 }
 
 function StatusAction({ application, action }: { application: CitizenApplicationListItem; action: StatusAction }) {
+  if (nonNavigableStatuses.has(application.status)) {
+    return null;
+  }
+
   if (action === "continue") {
     return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?status=draft`}>Davam et</Link></Button>;
   }
@@ -59,7 +76,7 @@ function StatusAction({ application, action }: { application: CitizenApplication
   if (action === "revision") {
     return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?section=deficiency`}>Bax</Link></Button>;
   }
-  return <Link href={`/applications/${application.id}?status=${application.status}`} className={iconButtonClassName} aria-label="Müraciətə bax"><Eye className="size-5" strokeWidth={1.5} aria-hidden="true" /></Link>;
+  return <Button asChild className={actionClassName}><Link href={`/applications/${application.id}?status=${application.status}`}>Bax</Link></Button>;
 }
 
 function StatusIndicator({ status }: { status: string }) {
@@ -69,6 +86,24 @@ function StatusIndicator({ status }: { status: string }) {
 }
 
 export default function ApplicationsList({ applications, errorMessage }: ApplicationsListProps) {
+  const [visibleMessageIds, setVisibleMessageIds] = useState<Set<number>>(
+    () => new Set(),
+  );
+
+  function toggleSystemMessage(applicationId: number) {
+    setVisibleMessageIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+
+      if (nextIds.has(applicationId)) {
+        nextIds.delete(applicationId);
+      } else {
+        nextIds.add(applicationId);
+      }
+
+      return nextIds;
+    });
+  }
+
   if (errorMessage) return <div role="alert" className="rounded-xl border border-[#dfdfdf] bg-white p-6 text-sm text-[#797979]">{errorMessage}</div>;
   if (applications.length === 0) return <div className="rounded-xl border border-[#dfdfdf] bg-white p-8 text-center text-sm text-[#797979]">Müraciət tapılmadı.</div>;
 
@@ -80,6 +115,8 @@ export default function ApplicationsList({ applications, errorMessage }: Applica
         </div>
         {applications.map((application) => {
           const config = getStatusConfig(application.status);
+          const isMessageVisible = visibleMessageIds.has(application.id);
+          const messageId = `system-message-${application.id}`;
           return (
             <div key={application.id} className="border-t border-[#dfdfdf] bg-[#f5f5f5]">
               <div className="grid grid-cols-[200px_1fr_200px_200px_160px] items-center gap-2 px-8 py-4">
@@ -87,9 +124,40 @@ export default function ApplicationsList({ applications, errorMessage }: Applica
                 <Link href={`/permissions/${application.permit_service.id}`} className="min-w-0 truncate pr-3 text-sm leading-5 text-[#1f1f1f] hover:text-[#286aa6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#286aa6]">{application.permit_service.name}</Link>
                 <time className="text-sm leading-5 font-medium text-[#797979]">{formatDate(application.submitted_at)}</time>
                 <StatusIndicator status={application.status} />
-                <div className="flex justify-end"><StatusAction application={application} action={config.action} /></div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    aria-label={isMessageVisible ? "Sistem mesajını gizlət" : "Sistem mesajını göstər"}
+                    aria-controls={messageId}
+                    aria-expanded={isMessageVisible}
+                    className={iconButtonClassName}
+                    onClick={() => toggleSystemMessage(application.id)}
+                  >
+                    {isMessageVisible ? (
+                      <EyeOff className="size-5" strokeWidth={1.5} aria-hidden="true" />
+                    ) : (
+                      <Eye className="size-5" strokeWidth={1.5} aria-hidden="true" />
+                    )}
+                  </button>
+                  <StatusAction application={application} action={config.action} />
+                </div>
               </div>
-              <div className="px-8 pb-4"><div className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-sm leading-5"><EyeOff className="size-4 text-[#286aa6]" strokeWidth={1.5} aria-hidden="true" /><span className="text-[#797979]">Sistem mesajı</span><span className="text-[#1f1f1f]">· {config.message}</span></div></div>
+              <div
+                id={messageId}
+                aria-hidden={!isMessageVisible}
+                className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+                  isMessageVisible ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                }`}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <div className="px-8 pb-4">
+                    <div className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-sm leading-5">
+                      <span className="text-[#797979]">Sistem mesajı</span>
+                      <span className="text-[#1f1f1f]">· {config.message}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           );
         })}

@@ -53,7 +53,9 @@ export default function FilterSection({ selectedStatus, search = "" }: FilterSec
           <Link href="/applications">Hamısı</Link>
         </Button>
 
-        {applicationStatusOptions.map(([status, label]) => (
+        {applicationStatusOptions
+          .filter(([status]) => status !== "draft")
+          .map(([status, label]) => (
           <Button
             key={status}
             asChild
@@ -65,7 +67,7 @@ export default function FilterSection({ selectedStatus, search = "" }: FilterSec
           >
             <Link href={`/applications?status=${status}`}>{label}</Link>
           </Button>
-        ))}
+          ))}
       </form>
     </section>
   );

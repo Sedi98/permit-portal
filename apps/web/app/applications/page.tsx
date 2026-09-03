@@ -28,7 +28,10 @@ const Applications = async ({ searchParams }: ApplicationsProps) => {
   const rawStatus = firstSearchParam(params.status);
   const rawStatusGroup = firstSearchParam(params.status_group);
   const search = firstSearchParam(params.search)?.trim() || undefined;
-  const selectedStatus = rawStatus && isApplicationStatus(rawStatus) ? rawStatus : undefined;
+  const selectedStatus =
+    rawStatus && isApplicationStatus(rawStatus) && rawStatus !== "draft"
+      ? rawStatus
+      : undefined;
   const selectedStatusGroup =
     rawStatusGroup && isApplicationStatusGroup(rawStatusGroup) ? rawStatusGroup : undefined;
 
@@ -44,13 +47,18 @@ const Applications = async ({ searchParams }: ApplicationsProps) => {
 
   try {
     const response = await getApplications(query, token);
-    applications = search
-      ? response.data.filter((application) =>
-          (application.application_no ?? "")
-            .toLocaleLowerCase("az-AZ")
-            .includes(search.toLocaleLowerCase("az-AZ")),
-        )
-      : response.data;
+    applications = response.data.filter((application) => {
+      if (application.status === "draft") {
+        return false;
+      }
+
+      return (
+        !search ||
+        (application.application_no ?? "")
+          .toLocaleLowerCase("az-AZ")
+          .includes(search.toLocaleLowerCase("az-AZ"))
+      );
+    });
   } catch (error) {
     console.error("Applications load error:", error);
     errorMessage = "Müraciətlər yüklənərkən xəta baş verdi.";

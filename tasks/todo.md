@@ -1,12 +1,71 @@
-# Task: Handle nullable application numbers in search
+# Task: Fix collapsed system-message animation height
 
-- [ ] Model nullable application numbers from the applications API.
-- [ ] Keep search filtering safe for records without an application number.
-- [ ] Run focused lint, TypeScript, and diff verification.
+- [x] Remove persistent padding from the collapsible animation row.
+- [x] Keep the message fully hidden at the collapsed height.
+- [x] Run focused lint, TypeScript, and diff verification.
 
 ## Review
 
-In progress.
+Padding now lives inside the hidden message content rather than on the animated grid item, allowing the closed state to collapse fully without a visible half-height gap. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Animate application system-message expansion
+
+- [x] Animate the system message when toggled from the eye button.
+- [x] Remove the EyeOff icon from inside the expanded message.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+System messages now expand and collapse with a 200ms height transition. The inner `EyeOff` decoration was removed; only the eye toggle carries the icon state. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Remove unnecessary application-detail navigation for settled statuses
+
+- [x] Disable application-detail actions for the seven supplied statuses.
+- [x] Ensure only draft and explicit action/section/view queries trigger existing-application hydration.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+Registered, assigned, deficiency confirmation, report confirmation, payment confirmation, payment review, and awaiting signature rows no longer navigate to `/applications/:id`; only their eye toggle remains. The route now treats only `status=draft` and explicit action/section/view queries as existing-application flows. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Toggle application system messages with an eye button
+
+- [x] Render a non-navigating eye toggle in every application row.
+- [x] Keep status-specific application navigation as a separate action.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+Each application row now has a local eye toggle for its system message. Navigation remains a separate `Bax`, `Davam et`, `Ödə`, or `Yüklə` action according to status. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Exclude draft applications from results
+
+- [x] Ignore the legacy draft status URL filter.
+- [x] Remove draft records from the rendered application results.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+Draft results are removed after the application list is loaded. The legacy `?status=draft` URL is treated as no status filter, so it cannot expose draft records. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Hide the draft application filter
+
+- [x] Exclude the draft status from the applications filter buttons.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+The `/applications?status=draft` filter button is hidden; all other application status filters remain available. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Handle nullable application numbers in search
+
+- [x] Model nullable application numbers from the applications API.
+- [x] Keep search filtering safe for records without an application number.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+The applications response type now matches nullable `application_no` values, and the local search safely treats missing numbers as an empty string. Focused ESLint, TypeScript, and `git diff --check` pass.
 
 # Task: Fix citizen applications search
 

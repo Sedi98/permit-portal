@@ -15,7 +15,7 @@ const ApplyPermission = async ({ params, searchParams }: ApplyPermissionProps) =
   const { id } = await params;
   const { action, section, status, view } = await searchParams;
   const isExistingApplication =
-    status !== undefined ||
+    status === "draft" ||
     section === "deficiency" ||
     action !== undefined ||
     view === "1";
