@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ArrowLeft, Download, RefreshCw } from "lucide-react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { toast } from "sonner";
 
 import TableLayout from "@/app/layouts/TableLayout";
@@ -100,6 +100,8 @@ function getApplicationFields(detail: ApplicationDetail): A4PreviewField[] {
 export default function ApplicationDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const isReadOnly = searchParams.get("readonly") === "1";
   const applicationId = id ? Number(id) : undefined;
   const applicationQuery = useApplicationById(applicationId);
   const meQuery = useMe();
@@ -109,11 +111,13 @@ export default function ApplicationDetailPage() {
   const isCurrentAssignee =
     detail?.assignees.some((assignee) => assignee.user_id === me?.id) ?? false;
   const canRoute =
+    !isReadOnly &&
     !!detail &&
     ((detail.status === "registered" &&
       (me?.role === "deputy_minister" || isSuperAdmin)) ||
       (detail.status === "assigned" && (isCurrentAssignee || isSuperAdmin)));
   const canReviewFiles =
+    !isReadOnly &&
     !!detail &&
     detail.status === "assigned" &&
     (isCurrentAssignee || isSuperAdmin);
@@ -307,10 +311,10 @@ export default function ApplicationDetailPage() {
 
         <ConfirmationHistorySection
           sequences={confirmationSequences}
-          canApproveAny={isSuperAdmin}
+          canApproveAny={!isReadOnly && isSuperAdmin}
         />
 
-        {detail.status === "payment_review" &&
+        {!isReadOnly && detail.status === "payment_review" &&
         (me?.role === "executor" || isSuperAdmin) ? (
           <section className="mt-8 space-y-4" aria-labelledby="payment-review-title">
             <h2 id="payment-review-title" className="text-xl font-bold text-[#1F1F1F]">

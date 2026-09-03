@@ -48,3 +48,25 @@ export interface ConfirmationQueueResponse {
 export interface ApproveConfirmationPayload {
   note?: string;
 }
+
+export interface ConfirmationHistoryItem {
+  id: number;
+  permit_application_id: number;
+  application_no: string;
+  permit_service_name: string;
+  document_type: string;
+  document_type_label: string;
+  role: ConfirmationRole;
+  role_label: string;
+  approved_at: string;
+  current_status: string;
+}
+
+export interface ConfirmationHistoryResponse {
+  status: string;
+  data: {
+    data: ConfirmationHistoryItem[];
+    total: number;
+    current_page: number;
+  };
+}

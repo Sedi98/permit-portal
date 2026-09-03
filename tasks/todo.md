@@ -811,3 +811,58 @@ accept or reject each uploaded file directly from “Tələb olunan sənədlər�
 uses a required-reason dialog, and both review actions lock after the first successful
 decision. Focused and full operator lint pass (apart from the existing TanStack Table
 compiler warning), the operator production build passes, and `git diff --check` passes.
+
+# Task: Implement operator signature/visa history
+
+- [x] Inspect the history guide, confirmation feature, table conventions, routing, and navigation.
+- [x] Add typed `GET /service-reports/history` API and query integration.
+- [x] Build the operator history table with every guide-required column and loading/error states.
+- [x] Link application numbers to the existing detail page in enforced read-only mode.
+- [x] Add the history route/navigation entry for every admin role.
+- [x] Run focused checks, full operator lint/build, and review the final diff.
+
+## Review
+
+Added an all-admin “İmza/Viza tarixçəsi” route backed by the documented history
+endpoint and rendered its six required fields in the shared operator data table.
+Application numbers open the existing detail request with an enforced read-only UI
+that suppresses routing, file review, confirmation approval, and payment actions.
+Focused ESLint, full operator lint, the operator production build, and
+`git diff --check` pass; full lint retains only the existing TanStack Table compiler
+warning.
+
+# Task: Nest confirmation history in the sidebar
+
+- [x] Replace the standalone history navigation item with a confirmations group.
+- [x] Add the existing history route as the “Tarixçə” subpage.
+- [x] Run focused lint and diff verification.
+
+## Review
+
+The sidebar now shows “Təsdiqlər” as an expandable group and exposes the history
+screen beneath it as “Tarixçə”; the existing `/confirmations/history` route is
+unchanged. Focused ESLint and `git diff --check` pass.
+
+# Task: Move confirmation history under service reports
+
+- [x] Remove the newly introduced confirmations sidebar group.
+- [x] Add “Tarixçə” beneath the existing “Xidməti məruzə” group.
+- [x] Run focused lint and diff verification.
+
+## Review
+
+No new sidebar group remains. “Tarixçə” now appears directly under the existing
+“Xidməti məruzə” group and continues to open `/confirmations/history`. Focused
+ESLint and `git diff --check` pass.
+# Task: Clean up removed home-page status change
+
+- [x] Inspect the commented status-change flow and identify newly unused symbols.
+- [x] Remove dead status-change imports, variables, props, and commented code.
+- [x] Run focused lint and operator build verification.
+
+## Review
+
+Removed the obsolete status-change mutation, auth lookup, toast import, status prop,
+and commented branch from the home-page action cell. The remaining action navigates
+directly to the application detail page. Focused ESLint, the operator production
+build, and `git diff --check` pass.

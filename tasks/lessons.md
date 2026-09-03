@@ -1,5 +1,6 @@
 # Lessons
 
+- When adding a history page for an existing document workflow, place it under the explicitly requested existing sidebar group instead of creating a new top-level navigation group.
 - When adding shadcn components in this monorepo, run the CLI from `apps/web` unless the user explicitly targets another app.
 - When an Axios instance defaults to `Content-Type: application/json`, explicitly override FormData requests to `multipart/form-data`; otherwise Axios can serialize the FormData to JSON before adapter-level boundary handling.
 - When applying a Figma form-control design, audit every related shared shadcn primitive—including textarea resize behavior—and reuse the existing field composition for labels and counters instead of styling only the page-level instance.

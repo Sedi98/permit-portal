@@ -1,7 +1,6 @@
 import * as React from "react"
 import { useNavigate } from "react-router";
 import { format } from "date-fns"
-import { toast } from "sonner";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { DateRange } from "react-day-picker";
 import TableLayout from "@/app/layouts/TableLayout";
@@ -12,8 +11,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { EyeIcon } from "@/components/icons";
 import { DatePickerWithRange } from "@/components/ui/range-picker";
 import { PaginationContainer } from "@/components/PaginationContainer";
-import { useApplications, useChangeStatus } from "@/features/applications/hooks";
-import { useMe } from "@/features/auth/hooks";
+import { useApplications } from "@/features/applications/hooks";
 import type { ApplicationListItem, ApplicationStatus } from "@/features/applications/types";
 import SearchSection from "./sections/SearchSection";
 
@@ -55,25 +53,13 @@ const statusBadgeVariants: Record<ApplicationStatus, React.ComponentProps<typeof
   suspended: "suspended",
 };
 
-function ActionCell({ id, status: itemStatus }: { id: number; status: ApplicationStatus }) {
+function ActionCell({ id }: { id: number }) {
   const navigate = useNavigate();
-  const me = useMe();
-  const role = me.data?.data?.role;
-  const statusMutation = useChangeStatus(id);
 
   return (
     <button
       type="button"
-      onClick={() => {
-        if (role === "executor" && itemStatus === "assigned") {
-          statusMutation.mutate(
-            { status: "under_review" },
-            { onSuccess: () => { toast.success("Müraciət icraya qəbul edildi"); navigate(`/applications/assigned/manage/${id}`); }, onError: () => { toast.error("Status dəyişdirilərkən xəta baş verdi"); } },
-          );
-        } else {
-          navigate(`/applications/assigned/manage/${id}`);
-        }
-      }}
+      onClick={() => navigate(`/applications/assigned/manage/${id}`)}
       className="inline-flex size-12 items-center justify-center rounded-lg border border-[#dfdfdf] bg-white text-[#286aa6] transition-colors hover:bg-[#f7f9fc]"
     >
       <EyeIcon className="size-9" />
@@ -153,7 +139,7 @@ const columns: ColumnDef<ApplicationListItem>[] = [
   {
     header: "Ətraflı",
     id: "etrafli",
-    cell: ({ row }) => <ActionCell id={row.original.id} status={row.original.status} />,
+    cell: ({ row }) => <ActionCell id={row.original.id} />,
   },
 ];
 

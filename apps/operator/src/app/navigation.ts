@@ -89,6 +89,7 @@ export const sidebarItems: SidebarItem[] = [
       { label: "Viza üçün", path: "/confirmations/report/visa", roles: allRoles },
       { label: "İmza üçün", path: "/confirmations/report/sign", roles: allRoles },
       { label: "Təsdiqləyən", path: "/confirmations/report/approve", roles: allRoles },
+      { label: "Tarixçə", path: "/confirmations/history", roles: allRoles },
     ],
   },
   {

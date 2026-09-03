@@ -20,6 +20,7 @@ import SignQueuePage from "@/pages/(dashboard)/sign-queue";
 import AwaitingPaymentPage from "@/pages/(dashboard)/awaiting_payment";
 import ApplicationDetailPage from "@/pages/(dashboard)/applications/manage";
 import ConfirmationQueuePage from "@/pages/(dashboard)/confirmations/queue";
+import ConfirmationHistoryPage from "@/pages/(dashboard)/confirmations";
 import PermitServiceManagePage from "@/pages/(dashboard)/permit-services/manage";
 import PermitServicesPage from "@/pages/(dashboard)/permit-services";
 import ServiceRatingsPage from "@/pages/(dashboard)/service-ratings";
@@ -63,6 +64,7 @@ export default function AppRouter() {
           <Route path="/sign-queue/manage/:id" element={<SignQueueManagePage />} />
           <Route path="/awaiting_payment" element={<AwaitingPaymentPage />} />
           <Route path="/awaiting_payment/manage/:id" element={<ApplicationDetailPage />} />
+          <Route path="/confirmations/history" element={<ConfirmationHistoryPage />} />
 
           <Route
             path="/confirmations/deficiency/visa"
