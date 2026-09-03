@@ -22,6 +22,7 @@ export interface ConfiguredDocumentType extends DocumentType {
 
 export interface PermitServiceDetail extends PermitService {
   short_name: string;
+  document_count: number;
   allowed_applicant_types: string;
   icon_path: string | null;
   created_at: string;

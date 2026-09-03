@@ -1,3 +1,13 @@
+# Task: Render permit-service bullet content as lists
+
+- [x] Split bullet-prefixed permit-service detail text into individual list items.
+- [x] Preserve unmarked content as a single item.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+Lines prefixed with `•` now become separate semantic list items in all permit detail sections. Unmarked text remains a single entry, and nullable API values render safely without content. Focused ESLint, TypeScript, and `git diff --check` pass.
+
 # Task: Remove notification dialog application identifier
 
 - [x] Remove the application identifier row from the notification dialog.
@@ -6,9 +16,8 @@
 ## Review
 
 The raw application identifier row was removed. The dialog now shows meaningful
-application details returned by the related-resource request instead. Focused ESLint
-and `git diff --check` pass; the production build is blocked only because this
-environment cannot fetch DM Sans from Google Fonts.
+application details returned by the related-resource request instead. Focused ESLint,
+TypeScript, and `git diff --check` pass.
 
 # Task: Localize application status in notification dialog
 
