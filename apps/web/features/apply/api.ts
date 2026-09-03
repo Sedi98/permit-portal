@@ -118,8 +118,8 @@ export async function submitApplication(applicationId: number) {
 }
 
 export async function submitServiceRating(applicationId: number, rating: number, comment?: string) {
-  const payload: { application_id: number; rating: number; comment?: string } = {
-    application_id: applicationId,
+  const payload: { permit_application_id: number; rating: number; comment?: string } = {
+    permit_application_id: applicationId,
     rating,
   };
 

@@ -246,6 +246,8 @@ const ApplyPermissionPage = ({
         }
 
         const response = await getApplication(routeId);
+        console.log(response);
+        
         const serviceId = response.data.permit_service?.id;
         const applicationDocumentTypes = getConfiguredDocumentTypes(
           response.data,
