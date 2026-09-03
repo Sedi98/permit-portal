@@ -1,3 +1,43 @@
+# Task: Remove notification dialog application identifier
+
+- [x] Remove the application identifier row from the notification dialog.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+The raw application identifier row was removed. The dialog now shows meaningful
+application details returned by the related-resource request instead. Focused ESLint
+and `git diff --check` pass; the production build is blocked only because this
+environment cannot fetch DM Sans from Google Fonts.
+
+# Task: Localize application status in notification dialog
+
+- [x] Map application status API keys to the supplied Azerbaijani labels.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+All ten supplied backend status keys now render their Azerbaijani display labels in the dialog; unexpected future keys retain their raw value. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Add notification application loading spinner
+
+- [x] Show a spinner while notification application details are loading.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+A centered Lucide spinner now appears while the dialog waits for application details, with screen-reader loading text. Focused ESLint, TypeScript, and `git diff --check` pass.
+
+# Task: Restore application data in notification dialog
+
+- [x] Fetch the related application with GET `/permit-applications/:id` when its notification dialog opens.
+- [x] Render returned application details with loading and error states.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+The dialog now uses a TanStack Query keyed by the related application ID to retrieve application details only while it is open. It shows the application number, permit type, applicant, legal entity, and status when returned, with explicit loading and request-error states. Focused ESLint, TypeScript, and `git diff --check` pass.
+
 # Task: Add Figma contact section to notification dialog
 
 - [x] Add the supplied Ministry contact card below notification details.

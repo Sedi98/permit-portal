@@ -14,5 +14,7 @@
 - When an existing-application detail response includes uploaded files, hydrate them by `document_type_id` into the required-document UI, preserve review metadata, and use the documented file-specific replacement endpoint for rejected files rather than posting a second document.
 - When changing a navigational notification row from a link to a button, explicitly preserve `w-full` so the interactive hit area does not shrink to its content width.
 - When a list endpoint is the declared notification detail source, render only its typed fields and do not add a related-resource request to fill visual placeholders.
+- When a user explicitly restores a related-resource request, retain the list payload for notification content and fetch the related entity only for its application-specific details.
+- For an in-dialog request that can visibly take time, use an accessible spinner rather than text alone when the user asks for loading feedback.
 - When replacing a conventional file control with an icon picker, start from a compact 4rem click target and scale the preview icon proportionally; enlarge only when the design explicitly requires it.
 - When a page combines shared textarea labels with shadcn labels, explicitly align both to the established dashboard label token instead of relying on their differing component defaults.

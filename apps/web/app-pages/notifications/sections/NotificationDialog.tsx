@@ -1,6 +1,7 @@
 "use client";
 
-import { X } from "lucide-react";
+import { LoaderCircle, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import {
   Dialog,
@@ -9,6 +10,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { getApplication } from "@/features/apply/api";
 
 type NotificationDialogProps = {
   open: boolean;
@@ -17,6 +19,19 @@ type NotificationDialogProps = {
   date: string;
   message: string;
   applicationId: number;
+};
+
+const applicationStatusLabels: Record<string, string> = {
+  registered: "Qeydiyyata alındı",
+  assigned: "İcraçıya həvalə edilib",
+  deficiency_confirmation: "Çatışmazlıq bildirişi hazırlanır",
+  awaiting_revision: "Düzəliş gözlənilir",
+  report_confirmation: "Baxılır",
+  payment_confirmation: "Ödəniş tapşırığı hazırlanır",
+  awaiting_payment: "Ödəniş gözlənilir",
+  payment_review: "Ödəniş yoxlanılır",
+  awaiting_signature: "Rəsmiləşdirilir",
+  completed: "İcazə verildi",
 };
 
 function InfoRow({
@@ -50,6 +65,20 @@ export default function NotificationDialog({
   message,
   applicationId,
 }: NotificationDialogProps) {
+  const applicationQuery = useQuery({
+    queryKey: ["permit-application", applicationId],
+    queryFn: () => getApplication(applicationId),
+    enabled: open,
+  });
+  const application = applicationQuery.data?.data;
+  const applicantName = application?.applicant_full_name?.trim() || [
+    application?.last_name,
+    application?.first_name,
+    application?.father_name,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -84,11 +113,53 @@ export default function NotificationDialog({
               Müraciət məlumatları
             </h2>
             <dl className="flex flex-col gap-3 rounded-xl bg-[#f9fafc] p-5">
-              <InfoRow
-                label="Müraciət identifikatoru:"
-                value={String(applicationId)}
-                accent
-              />
+              {applicationQuery.isPending ? (
+                <div
+                  className="flex items-center justify-center py-2 text-[#286aa6]"
+                  role="status"
+                >
+                  <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
+                  <span className="sr-only">Müraciət məlumatları yüklənir...</span>
+                </div>
+              ) : applicationQuery.isError ? (
+                <p className="text-sm leading-5 text-[#d90b0b]" role="alert">
+                  Müraciət məlumatlarını yükləmək mümkün olmadı.
+                </p>
+              ) : application ? (
+                <>
+                  {application.application_no ? (
+                    <InfoRow
+                      label="Müraciət nömrəsi:"
+                      value={application.application_no}
+                      accent
+                    />
+                  ) : null}
+                  {application.permit_service?.name ? (
+                    <InfoRow
+                      label="İcazə növü:"
+                      value={application.permit_service.name}
+                    />
+                  ) : null}
+                  {applicantName ? (
+                    <InfoRow label="Müraciət edən:" value={applicantName} />
+                  ) : null}
+                  {application.legal_entity_name ? (
+                    <InfoRow
+                      label="Hüquqi şəxs:"
+                      value={application.legal_entity_name}
+                    />
+                  ) : null}
+                  {application.status ? (
+                    <InfoRow
+                      label="Status:"
+                      value={
+                        applicationStatusLabels[application.status] ??
+                        application.status
+                      }
+                    />
+                  ) : null}
+                </>
+              ) : null}
             </dl>
           </section>
 
