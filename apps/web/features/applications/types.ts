@@ -24,7 +24,7 @@ export type ApplicationsQueryParams = {
 
 export type CitizenApplicationListItem = {
   id: number;
-  application_no: string;
+  application_no: string | null;
   status: ApplicationStatus | string;
   submitted_at: string;
   permit_service: {

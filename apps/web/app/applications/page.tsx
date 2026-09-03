@@ -24,7 +24,6 @@ const firstSearchParam = (value: string | string[] | undefined) =>
 
 const Applications = async ({ searchParams }: ApplicationsProps) => {
   const params = await searchParams;
-  console.log("Applications search params:", params);
 
   const rawStatus = firstSearchParam(params.status);
   const rawStatusGroup = firstSearchParam(params.status_group);
@@ -45,8 +44,13 @@ const Applications = async ({ searchParams }: ApplicationsProps) => {
 
   try {
     const response = await getApplications(query, token);
-    applications = response.data;
-    console.log(applications);
+    applications = search
+      ? response.data.filter((application) =>
+          (application.application_no ?? "")
+            .toLocaleLowerCase("az-AZ")
+            .includes(search.toLocaleLowerCase("az-AZ")),
+        )
+      : response.data;
   } catch (error) {
     console.error("Applications load error:", error);
     errorMessage = "Müraciətlər yüklənərkən xəta baş verdi.";

@@ -16,5 +16,7 @@
 - When a list endpoint is the declared notification detail source, render only its typed fields and do not add a related-resource request to fill visual placeholders.
 - When a user explicitly restores a related-resource request, retain the list payload for notification content and fetch the related entity only for its application-specific details.
 - For an in-dialog request that can visibly take time, use an accessible spinner rather than text alone when the user asks for loading feedback.
+- When a search input presents a search icon, make that icon an accessible submit control and preserve a local result filter when backend search behavior is uncertain.
+- When a backend list response can contain nullable display fields despite its declared type, correct the boundary type and guard client-side string operations before filtering.
 - When replacing a conventional file control with an icon picker, start from a compact 4rem click target and scale the preview icon proportionally; enlarge only when the design explicitly requires it.
 - When a page combines shared textarea labels with shadcn labels, explicitly align both to the established dashboard label token instead of relying on their differing component defaults.

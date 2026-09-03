@@ -1,3 +1,23 @@
+# Task: Handle nullable application numbers in search
+
+- [ ] Model nullable application numbers from the applications API.
+- [ ] Keep search filtering safe for records without an application number.
+- [ ] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+In progress.
+
+# Task: Fix citizen applications search
+
+- [x] Make the applications search control submit its query.
+- [x] Filter returned applications by application number when a search query is present.
+- [x] Run focused lint, TypeScript, and diff verification.
+
+## Review
+
+The search icon is now an accessible submit button. Search queries are sent to the API and application numbers are also filtered locally as a reliable fallback, using Azerbaijani-aware case normalization. Focused ESLint, TypeScript, and `git diff --check` pass.
+
 # Task: Render permit-service bullet content as lists
 
 - [x] Split bullet-prefixed permit-service detail text into individual list items.
