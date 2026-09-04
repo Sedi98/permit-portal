@@ -104,6 +104,8 @@ export default function ApplicationDetailPage() {
   const isReadOnly = searchParams.get("readonly") === "1";
   const applicationId = id ? Number(id) : undefined;
   const applicationQuery = useApplicationById(applicationId);
+  console.log(applicationQuery.data);
+
   const meQuery = useMe();
   const detail = applicationQuery.data?.data;
   const me = meQuery.data?.data;
@@ -189,11 +191,15 @@ export default function ApplicationDetailPage() {
   }
 
   const fields = getApplicationFields(detail);
-  const routingNote = detail.status_histories.findLast(
-    (history) =>
-      (history.new_status === "assigned" || history.to_status === "assigned") &&
-      history.note?.trim(),
-  )?.note;
+  const routingHistory = detail.status_histories.findLast(
+    (history) => history.old_status === "registered",
+  );
+  const routingNote = routingHistory?.note;
+  const routingChangedByName =
+    routingHistory?.changed_by?.name ?? routingHistory?.changed_by_user?.name;
+  const routingCreatedAt = routingHistory?.created_at
+    ? format(new Date(routingHistory.created_at), "dd.MM.yyyy")
+    : null;
   const confirmationSequences =
     detail.confirmationSequences ?? detail.confirmation_sequences ?? [];
   const hasCompletedReport = confirmationSequences.some(
@@ -255,6 +261,8 @@ export default function ApplicationDetailPage() {
             assignment: assignmentLabels[assignee.assignment_role],
           }))}
           note={routingNote}
+          changedByName={routingChangedByName}
+          createdAt={routingCreatedAt}
         />
 
         {canRoute ? (

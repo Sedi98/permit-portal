@@ -1,3 +1,42 @@
+# Task: Show routing-history creation date
+
+- [x] Pass the selected registered history entry's `created_at` value to the executors container.
+- [x] Display the formatted date alongside the changer name and note.
+- [x] Run focused lint and diff verification.
+
+## Review
+
+The history entry's creation timestamp is formatted as `dd.MM.yyyy` in the detail
+page, passed as `createdAt`, and rendered between the changer name and note in the
+existing information grid. Focused ESLint and diff verification pass.
+
+# Task: Select routing metadata by registered old status
+
+- [x] Preserve the user's `ApplicationExecutorsContainer` styling unchanged.
+- [x] Select the note and changer name from the history entry whose `old_status` is `registered`.
+- [x] Run focused operator lint and diff verification.
+
+## Review
+
+The detail page now selects the latest history entry whose `old_status` is
+`registered`, then passes that entry's note and changer name to the existing
+executors container without modifying its styling. Focused operator ESLint and
+targeted diff verification pass.
+
+# Task: Show routing-note author with executors
+
+- [x] Select the routing note and its author from the same status-history entry.
+- [x] Pass the author name to `ApplicationExecutorsContainer` and render author/note in a grid.
+- [x] Run operator lint, build, and diff verification.
+
+## Review
+
+The application detail page now retains the latest assigned status-history entry and
+derives both its note and changer name from that same record. The executors container
+renders the changer as “Yönləndirən” and the note as labeled rows in a two-column grid.
+Operator lint and build pass; lint reports only the existing TanStack Table React
+Compiler warning.
+
 # Task: Fetch application details after initial creation
 
 - [x] Call `GET /permit-applications/{id}` after the initial application POST.
