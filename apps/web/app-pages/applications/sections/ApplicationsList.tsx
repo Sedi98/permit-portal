@@ -5,7 +5,7 @@ import { useState } from "react";
 import { CreditCard, Download, Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { getApplicationDocumentDownloadUrl } from "@/features/applications/api";
+import { downloadApplicationDocument } from "@/features/applications/api";
 import { applicationStatusOptions, type CitizenApplicationListItem } from "@/features/applications/types";
 
 const statusLabels = Object.fromEntries(applicationStatusOptions) as Record<string, string>;
@@ -60,6 +60,23 @@ function getStatusConfig(status: string): StatusConfig {
   return statusConfig[status] ?? { tone: "red", message: "Müraciətin statusu yenilənir.", action: "view" };
 }
 
+async function downloadDocument(applicationId: number, documentId: number) {
+  try {
+    const blob = await downloadApplicationDocument(applicationId, documentId);
+    const objectUrl = window.URL.createObjectURL(blob);
+    const downloadLink = document.createElement("a");
+
+    downloadLink.href = objectUrl;
+    downloadLink.download = "icaze.pdf";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+    window.URL.revokeObjectURL(objectUrl);
+  } catch (error) {
+    console.error("PDF endirilərkən xəta baş verdi:", error);
+  }
+}
+
 function StatusAction({ application, action }: { application: CitizenApplicationListItem; action: StatusAction }) {
   if (nonNavigableStatuses.has(application.status)) {
     return null;
@@ -81,12 +98,7 @@ function StatusAction({ application, action }: { application: CitizenApplication
     return (
       <Button
         className={actionClassName}
-        onClick={() => {
-          window.location.href = getApplicationDocumentDownloadUrl(
-            application.id,
-            document.id,
-          );
-        }}
+        onClick={() => void downloadDocument(application.id, document.id)}
       >
         <Download className="size-4" aria-hidden="true" />
         Endir

@@ -1,3 +1,37 @@
+# Task: Add safe diagnostics to MyGov authentication
+
+- [x] Trace the MyGov redirect, callback, token persistence, and auth-state hydration flow.
+- [x] Add structured browser-console diagnostics without logging tokens or personal data.
+- [x] Preserve the current user-facing login behavior and expose actionable request errors.
+- [x] Run focused lint, TypeScript, and diff verification; attempt full web lint and build.
+
+## Review
+
+The browser console now traces each MyGov auth phase under the `[MyGov Auth]`
+prefix: redirect URL request/result, callback token/error shape, cookie persistence,
+auth-change event handling, and `/api/me` hydration. Axios failures include their
+message, code, HTTP status, and backend response while tokens and user details remain
+excluded. The touched files pass focused ESLint, TypeScript, and `git diff --check`.
+Full lint is blocked only by the pre-existing raw applications anchor in `Navbar.tsx`;
+the production build is blocked by unavailable Google Fonts network access.
+
+# Task: Download application PDF with authenticated Axios request
+
+- [x] Add an authenticated blob download request for generated application documents.
+- [x] Download the returned blob from the applications list without changing page location.
+- [x] Correct the inaccurate `window.location.href` guidance in the PDF-chain documentation.
+- [x] Run focused lint, TypeScript, and diff verification; attempt full web lint and build.
+
+## Review
+
+The applications-list download action now requests the generated PDF through the
+shared authenticated Axios client with `responseType: "blob"`, creates a temporary
+object URL and anchor, downloads `icaze.pdf`, and cleans both up without navigating
+away. The PDF-chain guide documents the same authenticated blob flow. Focused ESLint,
+TypeScript, and `git diff --check` pass. Full lint still reports the two pre-existing
+login-effect and Navbar-link errors; the production build reaches Next.js compilation
+but cannot fetch DM Sans from Google Fonts in the restricted network environment.
+
 # Task: Show routing-history creation date
 
 - [x] Pass the selected registered history entry's `created_at` value to the executors container.
@@ -1061,3 +1095,8 @@ müraciətdə rədd edilmiş fayl yalnız uğurla əvəzləndikdən sonra resubm
 aktivləşir. Yekun mərhələdə düymə “Yenidən göndər” göstərir və adi `submit` əvəzinə
 body-siz `resubmit` sorğusu göndərir; yeni müraciət axını dəyişməyib. Fokuslanmış
 ESLint, TypeScript, production build və diff yoxlamaları keçdi.
+# Task: Download reports export with authenticated Axios
+
+- [ ] Replace direct report-export navigation with an authenticated blob request.
+- [ ] Trigger the Excel download client-side while preserving the current filters and UI.
+- [ ] Run focused lint, operator build, and diff verification.

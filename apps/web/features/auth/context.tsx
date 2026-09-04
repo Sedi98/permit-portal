@@ -12,6 +12,7 @@ import {
 
 import { getMe } from "./api";
 import { getAuthToken, hasAuthCookie } from "./cookies";
+import { getAuthErrorDetails } from "./debug";
 import type { MeUser } from "./types";
 
 type AuthContextValue = {
@@ -28,7 +29,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refreshUser = useCallback(async () => {
-    if (!hasAuthCookie()) {
+    const hasAuthStateCookie = hasAuthCookie();
+    console.info("[MyGov Auth] Refreshing auth state", { hasAuthStateCookie });
+
+    if (!hasAuthStateCookie) {
+      console.info("[MyGov Auth] No authentication state cookie found");
       setUser(null);
       setLoading(false);
       return;
@@ -37,6 +42,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = getAuthToken();
 
     if (!token) {
+      console.error(
+        "[MyGov Auth] Authentication state cookie exists, but token cookie is missing",
+      );
       setUser(null);
       setLoading(false);
       return;
@@ -45,12 +53,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
 
     try {
+      console.info("[MyGov Auth] Requesting current user", {
+        endpoint: "/api/me",
+        hasToken: true,
+      });
       const response = await getMe(token);
       setUser(response.data);
-      console.log("/api/me response:", response);
+      console.info("[MyGov Auth] Current user loaded", {
+        authenticated: true,
+      });
     } catch (error: unknown) {
       setUser(null);
-      console.error("/api/me error:", error);
+      console.error(
+        "[MyGov Auth] Current user request failed",
+        getAuthErrorDetails(error),
+      );
     } finally {
       setLoading(false);
     }
@@ -62,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, 0);
 
     const handleAuthChange = () => {
+      console.info("[MyGov Auth] Authentication change event received");
       void refreshUser();
     };
 

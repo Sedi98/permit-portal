@@ -38,3 +38,14 @@ export function getApplicationDocumentDownloadUrl(
     `/permit-applications/${applicationId}/documents/${documentId}/download`,
   );
 }
+
+export function downloadApplicationDocument(
+  applicationId: number,
+  documentId: number,
+) {
+  return GetApi<Blob>(
+    `/permit-applications/${applicationId}/documents/${documentId}/download`,
+    undefined,
+    { responseType: "blob" },
+  );
+}

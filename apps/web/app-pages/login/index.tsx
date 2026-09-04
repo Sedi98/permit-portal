@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { useMyGovLogin } from "@/features/auth/hooks";
-import { setAuthCookies } from "@/features/auth/cookies";
+import {
+  getAuthToken,
+  hasAuthCookie,
+  setAuthCookies,
+} from "@/features/auth/cookies";
+import { getAuthErrorDetails } from "@/features/auth/debug";
 
 const errorMessages: Record<string, string> = {
   invalid_state: "Giriş sessiyası etibarsızdır, yenidən cəhd edin.",
@@ -22,11 +27,22 @@ const LoginPage = () => {
   useEffect(() => {
     let cancelled = false;
     let redirectTimer: number | undefined;
+    let successTimer: number | undefined;
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
     const authError = params.get("error");
 
+    console.info("[MyGov Auth] Callback inspected", {
+      hasTokenParameter: params.has("token"),
+      hasTokenValue: Boolean(token),
+      errorCode: authError,
+    });
+
     if (authError) {
+      console.error("[MyGov Auth] Callback returned an error", {
+        errorCode: authError,
+        errorMessage: errorMessages[authError],
+      });
       const errorTimer = window.setTimeout(() => {
         setError(errorMessages[authError] ?? "Giriş zamanı xəta baş verdi, yenidən cəhd edin.");
       }, 0);
@@ -35,6 +51,7 @@ const LoginPage = () => {
     }
 
     if (params.has("token") && !token) {
+      console.error("[MyGov Auth] Callback token parameter is empty");
       window.setTimeout(() => {
         setError("Giriş tokeni tapılmadı, yenidən cəhd edin.");
       }, 0);
@@ -47,14 +64,27 @@ const LoginPage = () => {
     window.history.replaceState({}, "", "/login");
 
     setAuthCookies(token);
+    const authState = {
+      hasAuthStateCookie: hasAuthCookie(),
+      hasTokenCookie: Boolean(getAuthToken()),
+    };
+    console.info("[MyGov Auth] Callback token stored", authState);
+
+    if (!authState.hasAuthStateCookie || !authState.hasTokenCookie) {
+      console.error("[MyGov Auth] Authentication cookies were not persisted", authState);
+    }
+
     if (!cancelled) {
-      setSuccess("Giriş uğurla tamamlandı. 5 saniyə sonra ana səhifəyə yönləndiriləcəksiniz.");
+      successTimer = window.setTimeout(() => {
+        setSuccess("Giriş uğurla tamamlandı. 5 saniyə sonra ana səhifəyə yönləndiriləcəksiniz.");
+      }, 0);
       window.dispatchEvent(new Event("portal-auth-change"));
       redirectTimer = window.setTimeout(() => router.replace("/"), 5000);
     }
 
     return () => {
       cancelled = true;
+      if (successTimer) window.clearTimeout(successTimer);
       if (redirectTimer) window.clearTimeout(redirectTimer);
     };
   }, [router]);
@@ -62,9 +92,33 @@ const LoginPage = () => {
   async function handleLogin() {
     setError(undefined);
     setSuccess(undefined);
+    console.info("[MyGov Auth] Requesting redirect URL", {
+      redirectBase: new URL("/login", window.location.origin).toString(),
+    });
     requestMyGovLogin(undefined, {
-      onSuccess: (payload) => window.location.assign(payload.data.url),
-      onError: () => setError("Giriş zamanı xəta baş verdi, yenidən cəhd edin."),
+      onSuccess: (payload) => {
+        try {
+          const redirectUrl = new URL(payload.data.url);
+          console.info("[MyGov Auth] Redirect URL received", {
+            destinationOrigin: redirectUrl.origin,
+            destinationPath: redirectUrl.pathname,
+          });
+          window.location.assign(payload.data.url);
+        } catch (redirectError) {
+          console.error(
+            "[MyGov Auth] Redirect URL response is invalid",
+            getAuthErrorDetails(redirectError),
+          );
+          setError("Giriş ünvanı yanlışdır, yenidən cəhd edin.");
+        }
+      },
+      onError: (requestError) => {
+        console.error(
+          "[MyGov Auth] Redirect URL request failed",
+          getAuthErrorDetails(requestError),
+        );
+        setError("Giriş zamanı xəta baş verdi, yenidən cəhd edin.");
+      },
     });
   }
 

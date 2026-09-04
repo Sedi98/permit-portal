@@ -161,7 +161,22 @@ Frontend, hər sətirdə, **"Detal" əvəzinə (ya, ona əlavə), birbaşa, "End
 GET /api/permit-applications/{permit_application_id}/documents/{document_id}/download
 ```
 
-Bu, birbaşa, PDF faylını, brauzerə, qaytarır (JSON deyil) — bu sorğunu, adi, `fetch`/`axios` ilə YOX, birbaşa, `window.location.href` (ya, oxşar, "faylı, birbaşa aç" üsulu) ilə çağırmaq lazımdır.
+Bu endpoint JSON deyil, birbaşa PDF faylı qaytarır. Sorğu `fetch`/`axios` ilə `Authorization` header-i göndərilərək edilməli, cavab `blob` kimi alınmalı və klient tərəfdə müvəqqəti endirmə linki yaradılmalıdır. `window.location.href` istifadə edilməməlidir, çünki bu üsulla tələb olunan `Authorization` header-i göndərilmir.
+
+```ts
+const response = await axios.get(downloadUrl, {
+  responseType: "blob",
+  headers: { Authorization: `Bearer ${token}` },
+});
+const url = window.URL.createObjectURL(response.data);
+const link = document.createElement("a");
+link.href = url;
+link.download = "icaze.pdf";
+document.body.appendChild(link);
+link.click();
+link.remove();
+window.URL.revokeObjectURL(url);
+```
 
 ---
 

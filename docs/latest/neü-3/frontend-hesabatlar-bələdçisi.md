@@ -85,7 +85,23 @@ GET /api/admin/permit-applications/export-excel
 GET /admin/permit-applications/export-excel?permit_service_id=3&date_from=2026-01-01&date_to=2026-08-30
 ```
 
-**Diqqət — bu, JSON qaytarmır** — sorğu, birbaşa, brauzerin, `.xlsx` faylını, endirməsinə səbəb olur. Frontend, bunu, adi, `fetch`/`axios` ilə YOX, birbaşa, `window.location.href` (ya, oxşar, "faylı, birbaşa aç" üsulu) ilə çağırmalıdır.
+Bu endpoint JSON deyil, birbaşa PDF faylı qaytarır. Sorğu `fetch`/`axios` ilə `Authorization` header-i göndərilərək edilməli, cavab `blob` kimi alınmalı və klient tərəfdə müvəqqəti endirmə linki yaradılmalıdır. `window.location.href` istifadə edilməməlidir, çünki bu üsulla tələb olunan `Authorization` header-i göndərilmir.
+
+```ts
+const response = await axios.get(downloadUrl, {
+  responseType: "blob",
+  headers: { Authorization: `Bearer ${token}` },
+});
+const url = window.URL.createObjectURL(response.data);
+const link = document.createElement("a");
+link.href = url;
+link.download = "icaze.pdf";
+document.body.appendChild(link);
+link.click();
+link.remove();
+window.URL.revokeObjectURL(url);
+```
+
 
 ---
 

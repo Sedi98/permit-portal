@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useManagedPermitServices } from "@/features/permit-services/hooks";
-import { getReportsExportUrl } from "@/features/reports/api";
+import { downloadReportsExport } from "@/features/reports/api";
 import { useReports } from "@/features/reports/hooks";
 import type {
   ReportItem,
@@ -98,6 +98,7 @@ export default function ReportsPage() {
   const [dateTo, setDateTo] = useState<Date>();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState<ReportParams["per_page"]>(20);
+  const [isExporting, setIsExporting] = useState(false);
 
   const params = useMemo<ReportParams>(
     () => ({
@@ -118,12 +119,29 @@ export default function ReportsPage() {
   const response = reportsQuery.data?.data;
   const items = response?.data ?? [];
 
-  const exportToExcel = () => {
-    window.location.href = getReportsExportUrl({
-      permit_service_id: params.permit_service_id,
-      date_from: params.date_from,
-      date_to: params.date_to,
-    });
+  const exportToExcel = async () => {
+    setIsExporting(true);
+
+    try {
+      const blob = await downloadReportsExport({
+        permit_service_id: params.permit_service_id,
+        date_from: params.date_from,
+        date_to: params.date_to,
+      });
+      const objectUrl = window.URL.createObjectURL(blob);
+      const downloadLink = document.createElement("a");
+
+      downloadLink.href = objectUrl;
+      downloadLink.download = "hesabatlar.xlsx";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      window.URL.revokeObjectURL(objectUrl);
+    } catch (error) {
+      console.error("Hesabat faylını endirmək mümkün olmadı:", error);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -138,9 +156,18 @@ export default function ReportsPage() {
             title="Hesabatlar"
             text={`Cəmi ${response?.total ?? 0} hesabat tapıldı`}
           />
-          <Button type="button" className="h-12 gap-2 px-4" onClick={exportToExcel}>
-            <Download className="size-5" />
-            Excel-ə yüklə
+          <Button
+            type="button"
+            className="h-12 gap-2 px-4"
+            onClick={() => void exportToExcel()}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              <LoaderCircle className="size-5 animate-spin" />
+            ) : (
+              <Download className="size-5" />
+            )}
+            {isExporting ? "Yüklənir..." : "Excel-ə yüklə"}
           </Button>
         </div>
 
