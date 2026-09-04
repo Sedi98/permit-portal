@@ -86,20 +86,21 @@ export default function PersonalInformation({
 
       <div className="flex w-full flex-col gap-5">
         <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2">
-          <PersonalInformationField
+          {/* <PersonalInformationField
             id="personal-id-series"
             label="Şəxsiyyət vəsiqəsinin seriyası"
             value={idSeries}
-          />
-          <PersonalInformationField
+          /> */}
+         
+        </div>
+
+        <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2">
+           <PersonalInformationField
             id="personal-id-number"
             label="Şəxsiyyət vəsiqəsinin nömrəsi (FİN kod)"
             value={fin}
             locked={Boolean(fin)}
           />
-        </div>
-
-        <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2">
           <PersonalInformationField
             id="personal-first-name"
             label="Ad"
