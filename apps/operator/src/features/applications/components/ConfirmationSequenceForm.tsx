@@ -54,6 +54,7 @@ export default function ConfirmationSequenceForm({
   const [participants, setParticipants] = useState<
     Partial<Record<ConfirmationParticipantRole, string>>
   >({});
+  const selectedParticipantIds = new Set(Object.values(participants));
 
   const submit = () => {
     if (!body.trim()) {
@@ -134,11 +135,19 @@ export default function ConfirmationSequenceForm({
                 <SelectValue placeholder="İştirakçı seçin" />
               </SelectTrigger>
               <SelectContent>
-                {(candidates.data?.data ?? []).map((candidate) => (
-                  <SelectItem key={candidate.id} value={String(candidate.id)}>
-                    {candidate.name}
-                  </SelectItem>
-                ))}
+                {(candidates.data?.data ?? [])
+                  .filter((candidate) => {
+                    const candidateId = String(candidate.id);
+                    return (
+                      participants[role] === candidateId ||
+                      !selectedParticipantIds.has(candidateId)
+                    );
+                  })
+                  .map((candidate) => (
+                    <SelectItem key={candidate.id} value={String(candidate.id)}>
+                      {candidate.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

@@ -1126,3 +1126,15 @@ service-specific hardcoded fallback and introduces no step-level loading state.
 Focused ESLint, TypeScript, and `git diff --check` pass. Full lint remains blocked by
 the pre-existing raw applications anchor in `Navbar.tsx`; the production build is
 blocked only by restricted access to the Google Fonts DM Sans endpoint.
+# Task: Prevent duplicate confirmation participants
+
+- [x] Exclude users selected for other confirmation roles from each participant dropdown.
+- [x] Preserve the current role's selected user in its own dropdown.
+- [x] Run focused lint, operator build, and diff verification.
+
+## Review
+
+Each confirmation-role dropdown now excludes candidates already selected in another
+role while retaining its own current selection. Focused ESLint, full operator lint,
+the operator production build, and `git diff --check` pass; full lint reports only
+the existing TanStack Table React Compiler compatibility warning.
