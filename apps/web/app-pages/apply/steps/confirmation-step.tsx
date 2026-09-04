@@ -14,6 +14,8 @@ const ARROW_LEFT_ICON = "/icons/apply/confirmation/arrow-left.svg";
 const SEND_DISABLED_ICON = "/icons/apply/confirmation/send-disabled.svg";
 
 type ConfirmationStepProps = {
+  permitServiceName?: string;
+  reviewDurationDays?: number;
   applicantName?: string;
   documentCount?: number;
   onBack?: () => void;
@@ -40,6 +42,8 @@ const SummaryRow = ({
 );
 
 const ConfirmationStep = ({
+  permitServiceName = "—",
+  reviewDurationDays,
   applicantName = "—",
   documentCount = 0,
   onBack,
@@ -68,13 +72,13 @@ const ConfirmationStep = ({
               Müraciəti göndərməyə razısınız?
             </h1>
             <p className="w-full text-base font-normal leading-6 text-[#797979]">
-              Müraciətiniz <strong className="font-semibold text-[#286aa6]">7 iş günü</strong> ərzində baxılacaq. Nəticə haqqında bildiriş alacaqsınız.
+              Müraciətiniz <strong className="font-semibold text-[#286aa6]">{reviewDurationDays ?? "—"} iş günü</strong> ərzində baxılacaq. Nəticə haqqında bildiriş alacaqsınız.
             </p>
           </div>
 
           <div className="flex w-full flex-col gap-3 rounded-2xl bg-[#f9fafc] p-5 text-left">
-            <SummaryRow label="İcazə növü:">
-              İxrac nəzarəti haqqında” Azərbaycan Respublikasının Qanununa əsasən ixrac nəzarətinə düşən malların (işlərin, xidmətlərin, əqli fəaliyyətin nəticələrinin) ixracı, təkrar ixracı, idxalı, təkrar idxalı və tranziti üçün icazə
+            <SummaryRow label="İcazə adı:">
+              {permitServiceName}
             </SummaryRow>
             <SummaryRow label="Müraciətçi:">{applicantName}</SummaryRow>
             <SummaryRow label="Yüklənmiş sənəd:">{documentCount} fayl</SummaryRow>

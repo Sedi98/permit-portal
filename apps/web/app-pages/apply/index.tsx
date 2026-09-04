@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { ProgressStepper } from "@/components/progress-stepper";
 import { useAuth } from "@/features/auth/context";
 import { getPermitService } from "@/features/permit-services/api";
+import { usePermitService } from "@/features/permit-services/hooks";
 import type {
   ConfiguredDocumentType,
   DocumentType,
@@ -245,6 +246,9 @@ const ApplyPermissionPage = ({
   const [showCreationError, setShowCreationError] = useState(false);
   const isRevisionApplication =
     isExistingApplication && application?.status === "awaiting_revision";
+  const permitServiceQuery = usePermitService(permitServiceId);
+  const selectedPermitService =
+    permitServiceQuery.data?.data ?? initialPermitService;
 
   useEffect(() => {
     if (loading || creationKey.current === id) {
@@ -627,6 +631,8 @@ const ApplyPermissionPage = ({
 
       {step === 6 ? (
         <ConfirmationStep
+          permitServiceName={selectedPermitService?.name}
+          reviewDurationDays={selectedPermitService?.review_duration_days}
           applicantName={applicantName || "—"}
           documentCount={documents.length}
           onBack={() => setStep(5)}

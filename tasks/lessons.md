@@ -1,5 +1,6 @@
 # Lessons
 
+- When a confirmation screen repeats permit-service metadata, source its name and review duration from the selected service response instead of embedding values from one example service; start the query at the parent page so later steps render without a loading transition.
 - When a user identifies a workflow-history record by a specific transition field, select that exact field/value and derive all displayed metadata from the same record; do not substitute a broader destination-status heuristic.
 - When the user specifies a sidebar position, place the new item at that exact point in the existing navigation order rather than appending it near other administrative pages.
 - When adding a history page for an existing document workflow, place it under the explicitly requested existing sidebar group instead of creating a new top-level navigation group.

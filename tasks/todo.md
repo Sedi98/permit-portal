@@ -1097,6 +1097,32 @@ body-siz `resubmit` sorğusu göndərir; yeni müraciət axını dəyişməyib. 
 ESLint, TypeScript, production build və diff yoxlamaları keçdi.
 # Task: Download reports export with authenticated Axios
 
-- [ ] Replace direct report-export navigation with an authenticated blob request.
-- [ ] Trigger the Excel download client-side while preserving the current filters and UI.
-- [ ] Run focused lint, operator build, and diff verification.
+- [x] Replace direct report-export navigation with an authenticated blob request.
+- [x] Trigger the Excel download client-side while preserving the current filters and UI.
+- [x] Run focused lint, operator build, and diff verification.
+
+## Review
+
+The reports export now uses the shared authenticated Axios client with
+`responseType: "blob"`, retains the permit-service and date filters, and downloads
+the response as `hesabatlar.xlsx` through a temporary object URL without navigating
+away. The export button prevents duplicate requests and shows its loading state.
+Focused ESLint, full operator lint, the operator production build, and
+`git diff --check` pass; full lint reports only the existing TanStack Table React
+Compiler compatibility warning.
+# Task: Make application confirmation service details dynamic
+
+- [x] Add a cached TanStack Query hook for a single permit service.
+- [x] Prefetch the selected permit service when the apply page loads.
+- [x] Render the service name and review duration dynamically in confirmation.
+- [x] Run focused lint, TypeScript, build, and diff verification.
+
+## Review
+
+The apply page now starts a cached single-service TanStack Query as soon as its
+permit service ID is available and passes the returned `name` and
+`review_duration_days` into the confirmation step. The confirmation UI contains no
+service-specific hardcoded fallback and introduces no step-level loading state.
+Focused ESLint, TypeScript, and `git diff --check` pass. Full lint remains blocked by
+the pre-existing raw applications anchor in `Navbar.tsx`; the production build is
+blocked only by restricted access to the Google Fonts DM Sans endpoint.
