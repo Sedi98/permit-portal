@@ -10,6 +10,7 @@ export async function Permissions() {
 
   try {
     const response = await getPermitServices();
+
     permitServices = response.data.filter((service) => service.is_active);
     console.log(permitServices, 'services');
 
@@ -42,7 +43,7 @@ export async function Permissions() {
             {permitServices.map((service) => (
               <PermissionCard
                 key={service.id}
-                title={service.name}
+                title={service.short_name}
                 href={`/permissions/${service.id}`}
                 duration={`${service.review_duration_days || 7} iş günü`}
                 icon={

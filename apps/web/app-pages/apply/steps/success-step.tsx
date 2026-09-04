@@ -7,10 +7,8 @@ import { Button } from "@/components/ui/button";
 
 const TICK_ICON = "/icons/apply/success/tick-circle.svg";
 
-const PERMIT_TYPE =
-  "İxrac nəzarəti haqqında” Azərbaycan Respublikasının Qanununa əsasən ixrac nəzarətinə düşən malların (işlərin, xidmətlərin, əqli fəaliyyətin nəticələrinin) ixracı, təkrar ixracı, idxalı, təkrar idxalı və tranziti üçün icazə";
-
 export type SuccessStepProps = {
+  permitServiceName?: string;
   applicationNumber?: string;
   applicationDate?: string;
   onApplications?: () => void;
@@ -33,6 +31,7 @@ const SummaryRow = ({
 );
 
 const SuccessStep = ({
+  permitServiceName,
   applicationNumber = "ENR-2025-2026",
   applicationDate = "25.11.2026",
   onApplications,
@@ -61,7 +60,7 @@ const SuccessStep = ({
         </div>
 
         <div className="flex w-full flex-col gap-3 rounded-2xl bg-[#f9fafc] p-5">
-          <SummaryRow label="İcazə növü:">{PERMIT_TYPE}</SummaryRow>
+          <SummaryRow label="İcazə növü:">{permitServiceName ?? "—"}</SummaryRow>
           <SummaryRow label="Müraciət nömrəsi:">
             <span className="text-[#286aa6]">{applicationNumber}</span>
           </SummaryRow>

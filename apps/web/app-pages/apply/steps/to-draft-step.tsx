@@ -7,10 +7,8 @@ import { Button } from "@/components/ui/button";
 
 const BOOK_ICON = "/icons/apply/to-draft/book.svg";
 
-const PERMIT_TYPE =
-  "İxrac nəzarəti haqqında” Azərbaycan Respublikasının Qanununa əsasən ixrac nəzarətinə düşən malların (işlərin, xidmətlərin, əqli fəaliyyətin nəticələrinin) ixracı, təkrar ixracı, idxalı, təkrar idxalı və tranziti üçün icazə";
-
 export type ToDraftStepProps = {
+  permitServiceName?: string;
   completedSteps?: string;
   onContinue?: () => void;
   onDrafts?: () => void;
@@ -32,6 +30,7 @@ const SummaryRow = ({
 );
 
 const ToDraftStep = ({
+  permitServiceName,
   completedSteps = "5/6 tamamlandı",
   onContinue,
   onDrafts,
@@ -62,7 +61,7 @@ const ToDraftStep = ({
           <SummaryRow label="Addım:">
             <span className="font-semibold text-[#286aa6]">{completedSteps}</span>
           </SummaryRow>
-          <SummaryRow label="İcazə növü:">{PERMIT_TYPE}</SummaryRow>
+          <SummaryRow label="İcazə növü:">{permitServiceName ?? "—"}</SummaryRow>
           <SummaryRow label="Status:">
             <span className="font-semibold text-[#e97000]">Yarımçıq müraciət</span>
           </SummaryRow>

@@ -33,3 +33,6 @@
 - For revision workflows, a successful rejected-file replacement must switch the final action from initial submit to the dedicated resubmit endpoint; do not reuse the creation submit action.
 - Workflow decisions that must survive refresh must derive from backend-persisted state (such as `awaiting_revision`), not transient React state set during the current session.
 - When the user asks to compare consecutive API responses in the console, log every named request separately before changing how either response is consumed.
+- When permit-service metadata is shared across apply-flow summary screens, audit every terminal branch (including success and saved-draft views) and pass the already-loaded service data through props instead of leaving service-specific constants behind.
+- When an apply-flow error replaces the current step, render its message and recovery action inside the same card shell as the other steps instead of leaving them as uncontained page-level content.
+- When navigation must look like a design-system button, compose the existing `Button` with `asChild` around `Link`; preserve link semantics and use Button variants instead of duplicating button classes on anchors.

@@ -2,6 +2,7 @@ export interface PermitService {
   id: number;
   code: string;
   name: string;
+  short_name: string;
   slug: string;
   category: string;
   category_label: string;

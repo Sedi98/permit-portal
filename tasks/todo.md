@@ -1138,3 +1138,71 @@ Each confirmation-role dropdown now excludes candidates already selected in anot
 role while retaining its own current selection. Focused ESLint, full operator lint,
 the operator production build, and `git diff --check` pass; full lint reports only
 the existing TanStack Table React Compiler compatibility warning.
+
+# Task: Make success-step permit name dynamic
+
+- [x] Pass the already-loaded permit-service name into `SuccessStep`.
+- [x] Replace the hardcoded permit type with the dynamic service name.
+- [x] Run focused lint, web TypeScript/build, and diff verification.
+- [x] Document the result in this task's Review section.
+
+## Review
+
+`SuccessStep` now receives the already-loaded permit-service `name` from the apply
+page and renders it instead of the service-specific `PERMIT_TYPE` constant. Focused
+ESLint, TypeScript, and `git diff --check` pass. Full web lint remains blocked by the
+pre-existing raw applications anchor in `Navbar.tsx` (and reports the existing
+unused `idSeries` warning); the production build remains blocked only by restricted
+access to the Google Fonts DM Sans endpoint.
+
+# Task: Make draft-step permit name dynamic
+
+- [x] Pass the already-loaded permit-service name into `ToDraftStep`.
+- [x] Replace the hardcoded permit type with the dynamic service name.
+- [x] Run focused lint, web TypeScript/build, and diff verification.
+- [x] Document the result in this task's Review section.
+
+## Review
+
+`ToDraftStep` now receives the same already-loaded permit-service `name` used by the
+confirmation and success views, and its service-specific `PERMIT_TYPE` constant was
+removed. Focused ESLint, TypeScript, and `git diff --check` pass. Full web lint remains
+blocked by the pre-existing raw applications anchor in `Navbar.tsx` (and reports the
+existing unused `idSeries` warning); the production build remains blocked only by
+restricted access to the Google Fonts DM Sans endpoint.
+
+# Task: Compose creation-error links with buttons
+
+- [x] Wrap both recovery links with the shared `Button` using `asChild`.
+- [x] Render the drafts action as primary and applications as outline.
+- [x] Preserve the user's latest error-card layout and spacing.
+- [x] Run focused lint, web TypeScript/build, and diff verification.
+- [x] Document the result in this task's Review section.
+
+## Review
+
+Both creation-error navigation actions retain Next.js `Link` semantics and are now
+composed through the shared `Button` with `asChild`. “Qaralamalara bax” uses the
+primary style, while “Müraciətlər” uses the outline variant; the user's responsive
+grid and card spacing are preserved. Focused ESLint, TypeScript, and
+`git diff --check` pass. Full web lint remains blocked by the pre-existing raw
+applications anchor in `Navbar.tsx` (and reports the existing unused `idSeries`
+warning); the production build remains blocked only by restricted Google Fonts
+access for DM Sans.
+
+# Task: Show apply creation error inside a step card
+
+- [x] Match the creation-error layout to the existing apply-step containers.
+- [x] Keep the error message and drafts action together inside the card.
+- [x] Run focused lint, web TypeScript/build, and diff verification.
+- [x] Document the result in this task's Review section.
+
+## Review
+
+The application-creation error now uses the same centered, bordered white card shell
+as the other apply steps. Its accessible error message and full-width
+“Qaralamalara bax” recovery action are grouped inside that card. Focused ESLint,
+TypeScript, and `git diff --check` pass. Full web lint remains blocked by the
+pre-existing raw applications anchor in `Navbar.tsx` (and reports the existing
+unused `idSeries` warning); the production build remains blocked only by restricted
+access to the Google Fonts DM Sans endpoint.

@@ -46,6 +46,7 @@ import RatingStep from "@/app-pages/apply/steps/rating-step";
 import type { RatingStepValues } from "@/app-pages/apply/steps/rating-step";
 import SuccessStep from "@/app-pages/apply/steps/success-step";
 import ToDraftStep from "@/app-pages/apply/steps/to-draft-step";
+import { Button } from "@/components/ui/button";
 
 type ApplyPermissionPageProps = {
   id: string;
@@ -531,19 +532,29 @@ const ApplyPermissionPage = ({
 
   if (showCreationError) {
     return (
-      <main className="mx-auto flex min-h-[50vh] w-full max-w-7xl flex-col items-center justify-center gap-5 px-4 pb-10 text-center">
-        <p
-          className="max-w-xl text-base font-medium text-[#d90b0b]"
-          role="alert"
-        >
-          {error ?? "Müraciət yaratmaq mümkün olmadı."}
-        </p>
-        <Link
-          href="/drafts"
-          className="flex h-12 min-w-[150px] items-center justify-center rounded-lg bg-[#286aa6] px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-[#1f5688] focus-visible:ring-2 focus-visible:ring-[#286aa6] focus-visible:outline-none"
-        >
-          Qaralamalar
-        </Link>
+      <main className="flex w-full flex-col items-center py-10 md:py-25">
+        <div className="mx-auto w-full max-w-7xl px-4">
+          <section className="mx-auto flex w-full max-w-[550px] flex-col items-center gap-6 rounded-xl border border-[#dfdfdf] bg-white p-4 text-center sm:p-8">
+            <p className="w-full text-base font-medium text-[#d90b0b]" role="alert">
+              {error ?? "Müraciət yaratmaq mümkün olmadı."}
+            </p>
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+              <Button
+                asChild
+                className="h-12 w-full rounded-lg bg-[#286aa6] px-5 py-3 text-base font-semibold text-white hover:bg-[#1f5688]"
+              >
+                <Link href="/drafts">Qaralamalara bax</Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="h-12 w-full rounded-lg border-[#dfdfdf] bg-white px-5 py-3 text-base font-semibold text-[#286aa6] hover:bg-white hover:text-[#286aa6]"
+              >
+                <Link href="/applications">Müraciətlər</Link>
+              </Button>
+            </div>
+          </section>
+        </div>
       </main>
     );
   }
@@ -649,12 +660,14 @@ const ApplyPermissionPage = ({
       {step === 7 ? (
         submission ? (
           <SuccessStep
+            permitServiceName={selectedPermitService?.name}
             applicationNumber={submission.application_no}
             onApplications={() => window.location.assign("/applications")}
             onRate={() => setStep("rating")}
           />
         ) : (
           <ToDraftStep
+            permitServiceName={selectedPermitService?.name}
             completedSteps={`${permitServiceId === 1 ? 6 : 5}/6 tamamlandı`}
             onContinue={() => setStep(6)}
             onDrafts={() => window.location.assign("/applications")}
