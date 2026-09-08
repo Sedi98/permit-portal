@@ -1206,3 +1206,18 @@ TypeScript, and `git diff --check` pass. Full web lint remains blocked by the
 pre-existing raw applications anchor in `Navbar.tsx` (and reports the existing
 unused `idSeries` warning); the production build remains blocked only by restricted
 access to the Google Fonts DM Sans endpoint.
+# Task: myGov texniki-konseptual PDF
+
+- [x] Kod və rəsmi mənbələr əsasında təhlili tamamla.
+- [x] 15 tələb üzrə Azərbaycan dilində məzmun, cədvəl və diaqramlar hazırla.
+- [x] PDF ixracını və oxunaqlılığı yoxla.
+- [x] Nəticələri sənədləşdir.
+
+Ətraflı plan: `tasks/mygov-document-plan.md`.
+
+## Review — myGov PDF
+
+38 səhifəlik Azərbaycan dilli PDF, HTML mənbə və kod təhlili `docs/` daxilindədir.
+Səhifə daşması yoxlanıldı, 7 səhifəyə vizual baxış keçirildi, PDF səhifə/font/keçid
+strukturu təsdiqləndi. Mövcud imkanlar, rəsmi faktlar və nümunə API-lər ayrıldı.
+Tətbiq kodu dəyişdirilmədi.
