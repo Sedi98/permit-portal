@@ -58,6 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasToken: true,
       });
       const response = await getMe(token);
+      console.log("/api/me resp:", response);
+
       setUser(response.data);
       console.info("[MyGov Auth] Current user loaded", {
         authenticated: true,

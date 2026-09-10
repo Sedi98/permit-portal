@@ -1,5 +1,7 @@
 # Lessons
 
+- Before directly routing a single-type permit, verify that the authenticated profile has the matching applicant capability; block incompatible legal/physical combinations with user-visible feedback.
+- When an application action depends on authenticated profile metadata, handle the unauthenticated state at the initiating control and redirect directly to login before evaluating profile-derived routing.
 - When a confirmation screen repeats permit-service metadata, source its name and review duration from the selected service response instead of embedding values from one example service; start the query at the parent page so later steps render without a loading transition.
 - When a user identifies a workflow-history record by a specific transition field, select that exact field/value and derive all displayed metadata from the same record; do not substitute a broader destination-status heuristic.
 - When the user specifies a sidebar position, place the new item at that exact point in the existing navigation order rather than appending it near other administrative pages.
@@ -38,3 +40,10 @@
 - When navigation must look like a design-system button, compose the existing `Button` with `asChild` around `Link`; preserve link semantics and use Button variants instead of duplicating button classes on anchors.
 - When creating a document type from the permit-service selector, invalidate and refresh the document-type query only; do not automatically add the newly created type to the permit's selected IDs unless explicitly requested.
 - When a dialog form is rendered inside a page form, stop submit propagation on the inner form so dialog actions cannot submit the parent entity form.
+- When application history authors arrive under `status_histories[].changed_by`, read their role from that exact object; for executor-specific titles, match the author ID against `assignees[].user_id` and prefer `assignment_role_label`.
+- When an application detail must show both assignees and workflow notes, keep them as two distinct tables: map `assignees` into the upper executor table and `status_histories` into the lower notes table.
+# Application applicant-type support
+
+- When adding a new applicant type, audit every downstream review and confirmation
+  view, including values derived in the parent before props are passed. Generic child
+  props such as `applicantName` can still receive physical-only derived data.

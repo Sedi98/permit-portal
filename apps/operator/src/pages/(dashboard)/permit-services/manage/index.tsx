@@ -44,6 +44,7 @@ const emptyValues: PermitServiceFormValues = {
   review_duration_days: "",
   state_fee: "",
   document_type_ids: [],
+  document_type_applicant_types: {},
 };
 
 const MAX_ICON_SIZE = 2 * 1024 * 1024;
@@ -139,7 +140,9 @@ function getApiValidation(error: unknown) {
 
 function getInitialValues(service?: ManagedPermitService): PermitServiceFormValues {
   if (!service) return emptyValues;
-  const documentTypes = [...(service.document_types ?? [])].sort(
+  const documentTypes = [
+    ...(service.documentTypes ?? service.document_types ?? []),
+  ].sort(
     (first, second) => first.pivot.display_order - second.pivot.display_order,
   );
 
@@ -156,6 +159,12 @@ function getInitialValues(service?: ManagedPermitService): PermitServiceFormValu
     review_duration_days: service.review_duration_days?.toString() ?? "",
     state_fee: service.state_fee?.toString() ?? "",
     document_type_ids: documentTypes.map((item) => item.id),
+    document_type_applicant_types: Object.fromEntries(
+      documentTypes.map((item) => [
+        item.id.toString(),
+        item.pivot.applicant_type ?? null,
+      ]),
+    ),
   };
 }
 
@@ -199,6 +208,23 @@ function PermitServiceForm({
       return;
     }
     setField("icon", icon);
+  };
+
+  const handleDocumentTypesChange = (
+    ids: number[],
+    applicantTypes: PermitServiceFormValues["document_type_applicant_types"],
+  ) => {
+    setValues((current) => ({
+      ...current,
+      document_type_ids: ids,
+      document_type_applicant_types: applicantTypes,
+    }));
+    setErrors((current) => {
+      if (!current.document_type_ids) return current;
+      const next = { ...current };
+      delete next.document_type_ids;
+      return next;
+    });
   };
 
   const submit = (event: React.FormEvent) => {
@@ -336,8 +362,11 @@ function PermitServiceForm({
         <div className="md:col-span-2">
           <DocumentTypeSelector
             selectedIds={values.document_type_ids}
-            initialDocumentTypes={service?.document_types}
-            onChange={(ids) => setField("document_type_ids", ids)}
+            applicantTypes={values.document_type_applicant_types}
+            initialDocumentTypes={
+              service?.documentTypes ?? service?.document_types
+            }
+            onChange={handleDocumentTypesChange}
             error={errors.document_type_ids}
           />
         </div>

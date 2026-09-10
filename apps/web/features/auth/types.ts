@@ -14,7 +14,15 @@ export interface MeUser {
   birth_date: string | null;
   id_series: string | null;
   citizenship: string | null;
-  voens: string[];
+  voens: Voen[];
+}
+
+export interface Voen {
+  id: number;
+  voen: string;
+  company_name: string;
+  position: string;
+  is_legal_representative: 0 | 1;
 }
 
 export interface MeResponse {

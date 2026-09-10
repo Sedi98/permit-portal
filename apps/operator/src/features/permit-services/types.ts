@@ -2,6 +2,8 @@ import type { DocumentType } from "@/features/document-types/types";
 
 export type PermitServiceCategory = "permit" | "certificate";
 export type AllowedApplicantType = "physical" | "legal" | "both";
+export type DocumentApplicantType = "physical" | "legal" | null;
+export type DocumentTypeApplicantTypes = Record<string, DocumentApplicantType>;
 
 export interface ManagedPermitServiceDocumentType extends DocumentType {
   created_at: string;
@@ -10,6 +12,7 @@ export interface ManagedPermitServiceDocumentType extends DocumentType {
     permit_service_id: number;
     document_type_id: number;
     display_order: number;
+    applicant_type: DocumentApplicantType;
   };
 }
 
@@ -30,6 +33,7 @@ export interface ManagedPermitService {
   review_duration_days: number | null;
   state_fee: string | number | null;
   document_types?: ManagedPermitServiceDocumentType[];
+  documentTypes?: ManagedPermitServiceDocumentType[];
 }
 
 export interface PermitServicesResponse {
@@ -56,4 +60,5 @@ export interface PermitServiceFormValues {
   review_duration_days: string;
   state_fee: string;
   document_type_ids: number[];
+  document_type_applicant_types: DocumentTypeApplicantTypes;
 }

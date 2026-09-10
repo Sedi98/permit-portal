@@ -38,7 +38,14 @@ const APPLICATION_STEPS = [
   { label: "Müraciətin nəticəsi" },
 ];
 
-const assignmentLabels = {
+const userRoleLabels = {
+  super_admin: "Super admin",
+  executor: "İcraçı",
+  department_head: "Şöbə müdiri",
+  deputy_minister: "Nazir müavini",
+};
+
+const assignmentRoleLabels = {
   main: "Əsas icraçı",
   joint: "Müştərək icraçı",
   observer: "Nəzarətçi",
@@ -191,15 +198,27 @@ export default function ApplicationDetailPage() {
   }
 
   const fields = getApplicationFields(detail);
-  const routingHistory = detail.status_histories.findLast(
-    (history) => history.old_status === "registered",
-  );
-  const routingNote = routingHistory?.note;
-  const routingChangedByName =
-    routingHistory?.changed_by?.name ?? routingHistory?.changed_by_user?.name;
-  const routingCreatedAt = routingHistory?.created_at
-    ? format(new Date(routingHistory.created_at), "dd.MM.yyyy")
-    : null;
+  const historyNotes = detail.status_histories
+    .filter((history) => history.note?.trim())
+    .map((history) => {
+      const author = history.changed_by ?? history.changed_by_user;
+      const assignee = detail.assignees.find(
+        (item) => item.user_id === author?.id,
+      );
+      const assigneeRole = assignee
+        ? (assignee.assignment_role_label ??
+          assignmentRoleLabels[assignee.assignment_role])
+        : undefined;
+
+      return {
+        role:
+          assigneeRole ??
+          (author?.role ? userRoleLabels[author.role] : "—"),
+        name: author?.name ?? assignee?.user?.name ?? "—",
+        date: format(new Date(history.created_at), "dd.MM.yyyy"),
+        note: history.note?.trim() ?? "",
+      };
+    });
   const confirmationSequences =
     detail.confirmationSequences ?? detail.confirmation_sequences ?? [];
   const hasCompletedReport = confirmationSequences.some(
@@ -256,13 +275,15 @@ export default function ApplicationDetailPage() {
       <TableLayout>
         <ApplicationExecutorsContainer
           executors={detail.assignees.map((assignee) => ({
+            role:
+              assignee.assignment_role_label ??
+              assignmentRoleLabels[assignee.assignment_role],
             name: assignee.user?.name ?? `İstifadəçi #${assignee.user_id}`,
-            date: format(new Date(detail.updated_at), "dd.MM.yyyy"),
-            assignment: assignmentLabels[assignee.assignment_role],
+            date: assignee.created_at
+              ? format(new Date(assignee.created_at), "dd.MM.yyyy")
+              : "—",
           }))}
-          note={routingNote}
-          changedByName={routingChangedByName}
-          createdAt={routingCreatedAt}
+          notes={historyNotes}
         />
 
         {canRoute ? (

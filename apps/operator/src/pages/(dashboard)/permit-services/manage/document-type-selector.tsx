@@ -25,17 +25,29 @@ import MultipleSelector, {
   type Option,
 } from "@/components/ui/multi-select";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   useCreateDocumentType,
   useDocumentTypes,
 } from "@/features/document-types/hooks";
 import type { DocumentType } from "@/features/document-types/types";
+import type {
+  DocumentApplicantType,
+  DocumentTypeApplicantTypes,
+} from "@/features/permit-services/types";
 
 const EMPTY_DOCUMENT_TYPES: DocumentType[] = [];
 
 type DocumentTypeSelectorProps = {
   selectedIds: number[];
+  applicantTypes: DocumentTypeApplicantTypes;
   initialDocumentTypes?: DocumentType[];
-  onChange: (ids: number[]) => void;
+  onChange: (ids: number[], applicantTypes: DocumentTypeApplicantTypes) => void;
   error?: string;
 };
 
@@ -58,6 +70,7 @@ function getCreateError(error: unknown) {
 
 export default function DocumentTypeSelector({
   selectedIds,
+  applicantTypes,
   initialDocumentTypes = EMPTY_DOCUMENT_TYPES,
   onChange,
   error,
@@ -107,11 +120,16 @@ export default function DocumentTypeSelector({
   );
 
   function handleSelectionChange(nextOptions: Option[]) {
-    onChange(
-      nextOptions
-        .map((option) => Number(option.value))
-        .filter(Number.isSafeInteger),
+    const nextIds = nextOptions
+      .map((option) => Number(option.value))
+      .filter(Number.isSafeInteger);
+    const nextApplicantTypes = Object.fromEntries(
+      nextIds.map((id) => [
+        id.toString(),
+        applicantTypes[id.toString()] ?? null,
+      ]),
     );
+    onChange(nextIds, nextApplicantTypes);
   }
 
   function moveSelected(index: number, direction: -1 | 1) {
@@ -123,7 +141,14 @@ export default function DocumentTypeSelector({
       nextIds[targetIndex],
       nextIds[index],
     ];
-    onChange(nextIds);
+    onChange(nextIds, applicantTypes);
+  }
+
+  function changeApplicantType(id: number, value: string) {
+    onChange(selectedIds, {
+      ...applicantTypes,
+      [id.toString()]: value === "both" ? null : (value as DocumentApplicantType),
+    });
   }
 
   function addDocumentType() {
@@ -137,7 +162,10 @@ export default function DocumentTypeSelector({
       if (selectedIds.includes(existing.id)) {
         toast.info("Bu sənəd növü artıq seçilib.");
       } else {
-        onChange([...selectedIds, existing.id]);
+        onChange([...selectedIds, existing.id], {
+          ...applicantTypes,
+          [existing.id.toString()]: null,
+        });
       }
       setNewName("");
       setIsCreateDialogOpen(false);
@@ -286,6 +314,22 @@ export default function DocumentTypeSelector({
                 <span className="min-w-0 flex-1 text-sm">
                   {itemsById.get(id)?.name ?? `Sənəd #${id}`}
                 </span>
+                <Select
+                  value={applicantTypes[id.toString()] ?? "both"}
+                  onValueChange={(value) => changeApplicantType(id, value)}
+                >
+                  <SelectTrigger
+                    className="w-52 shrink-0"
+                    aria-label={`${itemsById.get(id)?.name ?? `Sənəd #${id}`} üçün müraciətçi tipi`}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="both">Hər ikisi</SelectItem>
+                    <SelectItem value="legal">Yalnız hüquqi şəxs</SelectItem>
+                    <SelectItem value="physical">Yalnız fiziki şəxs</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Button
                   type="button"
                   size="icon-sm"

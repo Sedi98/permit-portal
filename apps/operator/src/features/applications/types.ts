@@ -167,7 +167,7 @@ export interface StatusHistory {
   from_status?: string | null;
   to_status?: string;
   note?: string | null;
-  changed_by?: Pick<User, "id" | "name"> | null;
+  changed_by?: User | null;
   changed_by_user?: User | null;
   created_at: string;
 }
@@ -299,7 +299,11 @@ export interface StatusChangeResponse {
 }
 
 export interface ApplicationAssignee {
+  id?: number;
   user_id: number;
   assignment_role: AssignmentRole;
-  user?: Pick<User, "id" | "name">;
+  assignment_role_label?: string;
+  created_at?: string;
+  updated_at?: string;
+  user?: User;
 }

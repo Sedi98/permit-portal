@@ -8,13 +8,14 @@ type ApplyPermissionProps = {
     action?: string;
     section?: string;
     status?: string;
+    type?: string;
     view?: string;
   }>;
 };
 
 const ApplyPermission = async ({ params, searchParams }: ApplyPermissionProps) => {
   const { id } = await params;
-  const { action, section, status, view } = await searchParams;
+  const { action, section, status, type, view } = await searchParams;
   const applicationId = Number(id);
 
   if (
@@ -39,6 +40,7 @@ const ApplyPermission = async ({ params, searchParams }: ApplyPermissionProps) =
   return (
     <ApplyPermissionPage
       id={id}
+      applicantType={type === "legal" ? "legal" : "physical"}
       isExistingApplication={isExistingApplication}
       initialPermitService={permitService}
     />

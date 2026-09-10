@@ -1,3 +1,66 @@
+# Task: Block incompatible permit applicant types
+
+- [x] Detect the authenticated user's legal and physical applicant capabilities.
+- [x] Show a Sonner error instead of navigating when a single-type permit is incompatible.
+- [x] Mount the Sonner toaster and verify TypeScript, lint, build, and changed-file diffs.
+
+## Review
+
+Single-type permits now validate the authenticated user's representative flags before
+navigating. Missing legal or physical capability leaves the user on the detail page
+and shows an Azerbaijani Sonner error; compatible users continue through the existing
+typed route, while `both` retains the prior direct/dialog behavior. Sonner is mounted
+once in the web root layout. TypeScript, focused ESLint, and changed-file diff checks
+pass. Full lint reports only the pre-existing unused `idSeries` warning and raw
+applications anchor error; production build remains blocked by restricted Google
+Fonts DM Sans access.
+
+# Task: Respect permit applicant-type restrictions
+
+- [x] Pass the permit service's allowed applicant type into the application summary.
+- [x] Route single-type permits directly while preserving the existing auth-based `both` flow.
+- [x] Run focused lint, full lint, build, and diff verification.
+
+## Review
+
+The permission detail response now models the three supported applicant-type values
+and passes the restriction into the summary action. Legal-only and physical-only
+services route authenticated users directly to the matching application flow, while
+`both` preserves the existing VÖEN-based direct routing and mixed-authority dialog.
+TypeScript and changed-file diff checks pass. ESLint is blocked by the existing
+missing `eslint-plugin-import` installation, and the production build is blocked by
+restricted access to the Google Fonts DM Sans endpoint.
+
+# Task: Show legal applicant in confirmation
+
+- [x] Derive the confirmation applicant label from the effective applicant type.
+- [x] Keep the existing physical-person confirmation behavior unchanged.
+- [x] Run focused TypeScript and diff verification; attempt full lint and build.
+
+## Review
+
+The confirmation's existing generic `applicantName` prop now receives the legal
+entity name for legal applications and the existing surname/first-name value for
+physical applications. Focused TypeScript and changed-file diff checks pass. Full
+lint cannot start because `eslint-plugin-import` is missing from the current install,
+and the production build is blocked by restricted Google Fonts DM Sans access.
+
+# Task: Show legal-entity data in application checkout
+
+- [x] Pass applicant type and legal-entity values to the checkout step.
+- [x] Render legal-company and director fields instead of physical identity fields for legal applications.
+- [x] Run focused TypeScript and diff verification; attempt full lint and build.
+
+## Review
+
+The checkout step now receives the effective applicant type and legal-entity state.
+Legal applications render VÖEN, company name, legal address, and the director's first,
+last, and father names in place of the physical identity section; physical checkout
+behavior remains unchanged. Focused TypeScript and changed-file diff checks pass.
+Full lint cannot start because `eslint-plugin-import` is missing from the current
+install, and the production build is blocked by restricted Google Fonts DM Sans
+access.
+
 # Task: Add safe diagnostics to MyGov authentication
 
 - [x] Trace the MyGov redirect, callback, token persistence, and auth-state hydration flow.
@@ -1251,11 +1314,114 @@ updating the cache, so the selector refreshes from the backend. Focused lint,
 the operator TypeScript/Vite build, and `git diff --check` pass.
 # Task: Review project structure
 
-- [ ] Inspect repository boundaries, packages, and entry points.
-- [ ] Trace routing, layouts, feature modules, and API/data flow.
-- [ ] Review architectural consistency, maintainability, and React performance risks.
-- [ ] Run read-only verification and document prioritized findings.
+- [x] Inspect repository boundaries, packages, and entry points.
+- [x] Trace routing, layouts, feature modules, and API/data flow.
+- [x] Review architectural consistency, maintainability, and React performance risks.
+- [x] Run read-only verification and document prioritized findings.
 
 ## Review
 
-Pending.
+The repository is a two-application pnpm monorepo: a Vite-based operator panel and
+a Next.js citizen portal. Both apps have clear domain feature slices and centralized
+HTTP/React Query layers, but shared contracts and infrastructure are duplicated.
+The highest-priority findings are JS-readable bearer-token cookies, stale web auth
+cookies after 401 responses, an inconsistent Docker API base URL, render-time token
+cleanup in `ProtectedRoute`, and the 459-line/high-complexity citizen apply-flow
+orchestrator. The operator router also lacks a 404/error fallback and eagerly imports
+all pages. There are no automated tests or visible CI workflow. Static graph and
+configuration inspection completed; `pnpm lint` and `pnpm build` could not start
+because the local `pnpm` executable hung even for `pnpm --version`, so the processes
+were stopped without attributing that runner issue to the codebase.
+# Task: Choose applicant type before starting an application
+
+- [x] Model the `/api/me` VÖEN response shape in the auth types.
+- [x] Redirect unauthenticated applicants directly to login.
+- [x] Intercept the permission summary apply action and detect mixed representative types.
+- [x] Implement the Figma applicant-type dialog with existing shadcn primitives.
+- [x] Route physical applications normally and legal applications with `?type=legal`.
+- [x] Run focused lint, web build/type verification, and visual/diff verification.
+
+## Review
+
+The permission summary redirects unauthenticated users directly to `/login`, then
+reads the authenticated user's typed VÖEN records before
+starting an application. Uniform representative flags route directly (physical by
+default/flag `0`, legal for flag `1`); mixed flags open the Figma-matched shadcn
+dialog with legal selected initially. Continuing routes to `/applications/:id` for
+physical applicants and `/applications/:id?type=legal` for legal applicants. Web
+TypeScript and `git diff --check` pass. Focused ESLint is blocked by the existing
+missing `eslint-plugin-import` installation, while the production build is blocked
+only by restricted access to the Google Fonts DM Sans endpoint. Visual values were
+checked against the 500x445 Figma node; browser capture was unavailable because the
+local browser automation dependency is not installed.
+# Task: Add legal-entity application first step
+
+- [x] Pass `?type=legal` through the App Router boundary and create a legal draft.
+- [x] Add typed legal-entity fields and VÖEN/legal-address update API calls.
+- [x] Build the Figma-matched legal-entity step using eligible `/api/me` VÖEN records.
+- [x] Populate protected company/director fields after VÖEN selection and save the legal address.
+- [x] Integrate new/existing legal drafts into the current step flow.
+- [x] Run focused TypeScript, lint/build attempts, and diff verification.
+
+## Review
+
+`?type=legal` now creates the initial draft with `applicant_type: "legal"` and
+opens a dedicated legal-entity first step. The step filters the authenticated
+profile to `is_legal_representative === 1`, renders those companies through the
+existing shadcn radio-card pattern, and sends the selected VÖEN to the application
+PUT endpoint. The partial response is safely merged into application state and
+fills the protected company/VÖEN/director fields, including `director_father_name`.
+The legal address remains editable and is saved before advancing to the existing
+contact step. Existing legal drafts resume at this step when required data is
+incomplete. The unneeded alternative-VÖEN action and organizational-form field are
+not rendered. Focused TypeScript and `git diff --check` pass. ESLint cannot start
+because the current install lacks `eslint-plugin-import`; the production build is
+blocked only by restricted Google Fonts DM Sans access.
+# Task: Replace documents during the initial application
+
+- [x] Preserve the uploaded backend file record in the initial document-step state.
+- [x] Enable the replace action whenever an uploaded document has a backend file ID.
+- [x] Route initial replacements through the existing file-specific endpoint.
+- [x] Run focused TypeScript and diff verification; attempt full lint and build.
+
+## Review
+
+The initial upload now keeps the backend file ID and returned metadata in the
+document-step state. As soon as that ID exists, the upload card exposes its replace
+action and sends the new file through the existing file-specific replacement API.
+Focused TypeScript and changed-source diff checks pass. Full lint cannot start because
+the current install lacks `eslint-plugin-import`; the production build is blocked by
+restricted Google Fonts DM Sans access. The repository-wide diff check only reports
+pre-existing trailing whitespace in the edited legal-application guide.
+# Task: Show all application history notes in a table
+
+- [x] Replace the executors summary with a shadcn table for status-history notes.
+- [x] Show each note author's role, full name, date, and note from the same history entry.
+- [x] Run operator lint, build, and diff verification.
+
+## Review
+
+`ApplicationExecutorsContainer` now uses the existing shadcn table primitives and
+renders every non-empty status-history note with its author's full name, creation
+date, and note. The history author is matched to `assignees` so its specific
+`assignment_role_label` is preferred; other authors use the localized role from
+`status_histories[].changed_by.role`. Missing metadata uses a visible dash fallback,
+and an empty-state row is shown when the application has no notes. Focused ESLint,
+the operator TypeScript/Vite production build, and targeted diff checks pass. Full
+operator lint remains blocked by pre-existing Tiptap React Compiler errors.
+# Task: Scope permit-service documents by applicant type
+
+- [x] Model per-document applicant types in permit-service responses and form state.
+- [x] Add a shadcn applicant-type selector beside every selected document.
+- [x] Hydrate edit values from pivot metadata and serialize create/update payloads.
+- [x] Run focused lint, TypeScript/build, and targeted diff verification.
+
+## Review
+
+Every selected permit-service document now has a shadcn dropdown for both applicant
+types, legal-only, or physical-only. The form keeps the per-document map synchronized
+while selecting, removing, and reordering documents; edit mode hydrates it from
+`documentTypes[].pivot.applicant_type` (with snake-case response compatibility).
+Create and update FormData include matching `document_type_applicant_types[id]`
+entries. Focused ESLint, TypeScript, the operator production build, and targeted
+diff checks pass.

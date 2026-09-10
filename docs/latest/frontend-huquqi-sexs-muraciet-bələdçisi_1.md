@@ -16,6 +16,8 @@ POST /api/permit-applications
 }
 ```
 
+yuxarıda applicant_type: "legal"  göndərmək üçün layihədə url search parametrinə bax  ?type=legal  gəlirsə o zaman müraciət edən şəxs hüquqi şəxsdir yoxsa fiziki şəxs olacaq və onun müraciət üsülü ilə davam et 
+
 **Cavab (201):**
 ```json
 {

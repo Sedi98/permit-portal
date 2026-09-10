@@ -14,15 +14,17 @@ import type {
   PermitServiceDetail,
 } from "@/features/permit-services/types";
 import {
-  createPhysicalApplication,
+  createApplication,
   getApplication,
   replaceApplicationFile,
   resubmitApplication,
   submitApplication,
   submitServiceRating,
   updateApplicationContact,
+  updateApplicationLegalEntity,
   updateApplicationTradeDetail,
   uploadApplicationFile,
+  type ApplicantType,
   type ApplicationDetails,
   type ApplicationFile,
 } from "@/features/apply/api";
@@ -42,6 +44,9 @@ import OperationStep, {
 import PersonalInformation, {
   type PersonalInformationValues,
 } from "@/app-pages/apply/steps/personal-information";
+import LegalEntityInformation, {
+  type LegalEntityInformationValues,
+} from "@/app-pages/apply/steps/legal-entity-information";
 import RatingStep from "@/app-pages/apply/steps/rating-step";
 import type { RatingStepValues } from "@/app-pages/apply/steps/rating-step";
 import SuccessStep from "@/app-pages/apply/steps/success-step";
@@ -50,6 +55,7 @@ import { Button } from "@/components/ui/button";
 
 type ApplyPermissionPageProps = {
   id: string;
+  applicantType?: ApplicantType;
   isExistingApplication?: boolean;
   initialPermitService?: PermitServiceDetail;
 };
@@ -167,12 +173,26 @@ function getFirstIncompleteStep(
   documentTypes: DocumentType[],
   documents: SelectedApplicationDocument[],
 ): ApplyStep {
-  const hasPersonalInformation = Boolean(
-    application.fin?.trim() &&
-      application.first_name?.trim() &&
-      application.last_name?.trim(),
-  );
-  if (!hasPersonalInformation) return 1;
+  if (application.applicant_type === "legal") {
+    const hasLegalInformation = Boolean(
+      application.voen?.trim() &&
+        application.legal_entity_name?.trim() &&
+        application.legal_address?.trim() &&
+        application.director_first_name?.trim() &&
+        application.director_last_name?.trim() &&
+        application.director_father_name?.trim(),
+    );
+    if (!hasLegalInformation) return 1;
+  }
+
+  if (application.applicant_type !== "legal") {
+    const hasPersonalInformation = Boolean(
+      application.fin?.trim() &&
+        application.first_name?.trim() &&
+        application.last_name?.trim(),
+    );
+    if (!hasPersonalInformation) return 1;
+  }
 
   const hasContactInformation = Boolean(
     application.email?.trim() &&
@@ -204,6 +224,7 @@ function getFirstIncompleteStep(
 
 const ApplyPermissionPage = ({
   id,
+  applicantType = "physical",
   isExistingApplication = false,
   initialPermitService,
 }: ApplyPermissionPageProps) => {
@@ -221,6 +242,15 @@ const ApplyPermissionPage = ({
   );
   const [personalInformation, setPersonalInformation] =
     useState<PersonalInformationValues>({});
+  const [legalInformation, setLegalInformation] =
+    useState<LegalEntityInformationValues>({
+      voen: "",
+      legalEntityName: "",
+      legalAddress: "",
+      directorFirstName: "",
+      directorLastName: "",
+      directorFatherName: "",
+    });
   const [contactInformation, setContactInformation] =
     useState<ContactInformationValues>({
       email: "",
@@ -250,9 +280,10 @@ const ApplyPermissionPage = ({
   const permitServiceQuery = usePermitService(permitServiceId);
   const selectedPermitService =
     permitServiceQuery.data?.data ?? initialPermitService;
+  const creationRequestKey = `${id}:${applicantType}:${isExistingApplication}`;
 
   useEffect(() => {
-    if (loading || creationKey.current === id) {
+    if (loading || creationKey.current === creationRequestKey) {
       return;
     }
 
@@ -267,9 +298,9 @@ const ApplyPermissionPage = ({
 
     let cancelled = false;
     const creationTimer = window.setTimeout(() => {
-      if (cancelled || creationKey.current === id) return;
+      if (cancelled || creationKey.current === creationRequestKey) return;
 
-      creationKey.current = id;
+      creationKey.current = creationRequestKey;
       setIsCreating(true);
       setError(null);
       setShowCreationError(false);
@@ -305,6 +336,14 @@ const ApplyPermissionPage = ({
           lastName: data.last_name,
           fatherName: data.father_name,
         });
+        setLegalInformation({
+          voen: data.voen ?? "",
+          legalEntityName: data.legal_entity_name ?? "",
+          legalAddress: data.legal_address ?? "",
+          directorFirstName: data.director_first_name ?? "",
+          directorLastName: data.director_last_name ?? "",
+          directorFatherName: data.director_father_name ?? "",
+        });
         if (isExistingApplication) {
           setContactInformation({
             email: data.email ?? "",
@@ -331,7 +370,7 @@ const ApplyPermissionPage = ({
 
       void (async () => {
         if (!isExistingApplication) {
-          const creationResponse = await createPhysicalApplication(routeId);
+          const creationResponse = await createApplication(routeId, applicantType);
 
           console.log("POST /permit-applications", creationResponse);
 
@@ -382,6 +421,8 @@ const ApplyPermissionPage = ({
     };
   }, [
     id,
+    applicantType,
+    creationRequestKey,
     initialPermitService,
     isAuthenticated,
     isExistingApplication,
@@ -390,6 +431,69 @@ const ApplyPermissionPage = ({
     routeId,
     router,
   ]);
+
+  const handleLegalVoenSelect = async (voen: string) => {
+    if (!application) return;
+
+    const previousLegalInformation = legalInformation;
+    setLegalInformation({
+      voen,
+      legalEntityName: "",
+      legalAddress: "",
+      directorFirstName: "",
+      directorLastName: "",
+      directorFatherName: "",
+    });
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await updateApplicationLegalEntity(application.id, { voen });
+      const updatedApplication = { ...application, ...response.data };
+
+      setApplication(updatedApplication);
+      setLegalInformation({
+        voen: updatedApplication.voen ?? voen,
+        legalEntityName: updatedApplication.legal_entity_name ?? "",
+        legalAddress: updatedApplication.legal_address ?? "",
+        directorFirstName: updatedApplication.director_first_name ?? "",
+        directorLastName: updatedApplication.director_last_name ?? "",
+        directorFatherName: updatedApplication.director_father_name ?? "",
+      });
+    } catch (requestError: unknown) {
+      setLegalInformation(previousLegalInformation);
+      setError(getErrorMessage(requestError));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleLegalInformationNext = async () => {
+    if (!application || !legalInformation.voen || !legalInformation.legalAddress.trim()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await updateApplicationLegalEntity(application.id, {
+        legal_address: legalInformation.legalAddress.trim(),
+      });
+      setApplication((current) =>
+        current ? { ...current, ...response.data } : current,
+      );
+      setLegalInformation((current) => ({
+        ...current,
+        legalAddress: response.data.legal_address ?? current.legalAddress.trim(),
+      }));
+      setStep(2);
+    } catch (requestError: unknown) {
+      setError(getErrorMessage(requestError));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleContactNext = async (values: ContactInformationValues) => {
     if (!application) return;
@@ -439,7 +543,12 @@ const ApplyPermissionPage = ({
 
     setError(null);
     try {
-      await uploadApplicationFile(application.id, documentTypeId, file);
+      const response = await uploadApplicationFile(
+        application.id,
+        documentTypeId,
+        file,
+      );
+      return response.data;
     } catch (requestError: unknown) {
       setError(getErrorMessage(requestError));
       throw requestError;
@@ -511,14 +620,18 @@ const ApplyPermissionPage = ({
     type: "PDF",
   }));
 
-  const applicantName = [
-    personalInformation.lastName,
-    personalInformation.firstName,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const effectiveApplicantType = application?.applicant_type ?? applicantType;
+  const applicantName =
+    effectiveApplicantType === "legal"
+      ? legalInformation.legalEntityName
+      : [personalInformation.lastName, personalInformation.firstName]
+          .filter(Boolean)
+          .join(" ");
   const maxFileSizeMb =
     permitServiceCode === "PS-013" || permitServiceId === 13 ? 25 : 10;
+  const legalRepresentativeVoens = (user?.voens ?? []).filter(
+    ({ is_legal_representative }) => is_legal_representative === 1,
+  );
 
   if (isCreating) {
     return (
@@ -585,11 +698,25 @@ const ApplyPermissionPage = ({
       ) : null}
 
       {step === 1 ? (
-        <PersonalInformation
-          values={personalInformation}
-          onNext={() => setStep(2)}
-          isNextDisabled={!application}
-        />
+        effectiveApplicantType === "legal" ? (
+          <LegalEntityInformation
+            voens={legalRepresentativeVoens}
+            values={legalInformation}
+            onVoenSelect={(voen) => void handleLegalVoenSelect(voen)}
+            onLegalAddressChange={(legalAddress) =>
+              setLegalInformation((current) => ({ ...current, legalAddress }))
+            }
+            onBack={() => router.back()}
+            onNext={() => void handleLegalInformationNext()}
+            isSubmitting={isSubmitting}
+          />
+        ) : (
+          <PersonalInformation
+            values={personalInformation}
+            onNext={() => setStep(2)}
+            isNextDisabled={!application}
+          />
+        )
       ) : null}
 
       {step === 2 ? (
@@ -631,7 +758,9 @@ const ApplyPermissionPage = ({
       {step === 5 ? (
         <CheckoutStep
           documents={checkoutDocuments}
+          applicantType={effectiveApplicantType}
           personalInformation={personalInformation}
+          legalInformation={legalInformation}
           contactInformation={contactInformation}
           operationInformation={operationInformation}
           onBack={() => setStep(4)}

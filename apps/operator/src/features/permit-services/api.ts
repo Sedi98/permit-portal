@@ -25,6 +25,10 @@ function toFormData(values: PermitServiceFormValues, update: boolean) {
   if (values.icon) formData.append("icon", values.icon);
   for (const documentTypeId of values.document_type_ids) {
     formData.append("document_type_ids[]", documentTypeId.toString());
+    formData.append(
+      `document_type_applicant_types[${documentTypeId}]`,
+      values.document_type_applicant_types[documentTypeId.toString()] ?? "",
+    );
   }
 
   const optionalFields = [

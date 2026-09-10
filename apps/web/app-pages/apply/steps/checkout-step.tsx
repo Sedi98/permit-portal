@@ -6,8 +6,10 @@ import type { ReactNode } from "react";
 import { formatFileSize } from "@/components/document-upload-item";
 import { Button } from "@/components/ui/button";
 import type { ContactInformationValues } from "@/app-pages/apply/steps/contact-information";
+import type { LegalEntityInformationValues } from "@/app-pages/apply/steps/legal-entity-information";
 import type { OperationInformationValues } from "@/app-pages/apply/steps/operations-step";
 import type { PersonalInformationValues } from "@/app-pages/apply/steps/personal-information";
+import type { ApplicantType } from "@/features/apply/api";
 
 const DOCUMENT_ICON = "/icons/apply/checkout/document-text.svg";
 const INFO_ICON = "/icons/apply/checkout/info-circle.svg";
@@ -21,7 +23,9 @@ export type CheckoutDocument = {
 
 type CheckoutStepProps = {
   documents?: readonly CheckoutDocument[];
+  applicantType?: ApplicantType;
   personalInformation?: PersonalInformationValues;
+  legalInformation?: LegalEntityInformationValues;
   contactInformation?: ContactInformationValues;
   operationInformation?: OperationInformationValues;
   onBack?: () => void;
@@ -82,7 +86,9 @@ const OperationArrow = ({ direction }: { direction: "left" | "right" }) => (
 
 const CheckoutStep = ({
   documents = DEFAULT_CHECKOUT_DOCUMENTS,
+  applicantType = "physical",
   personalInformation,
+  legalInformation,
   contactInformation,
   operationInformation,
   onBack,
@@ -102,13 +108,51 @@ const CheckoutStep = ({
         </header>
 
         <div className="flex w-full flex-col gap-5">
-          <ReviewSection title="Şəxsiyyət məlumatları">
-            <ReviewRow label="Seriya / Nömrə" value={personalInformation?.idSeries || "—"} />
-            <ReviewRow label="FIN" value={personalInformation?.fin || "—"} />
-            <ReviewRow label="Ad" value={personalInformation?.firstName || "—"} />
-            <ReviewRow label="Soyad" value={personalInformation?.lastName || "—"} />
-            <ReviewRow label="Ata adı" value={personalInformation?.fatherName || "—"} />
-          </ReviewSection>
+          {applicantType === "legal" ? (
+            <ReviewSection title="Hüquqi şəxs məlumatları">
+              <ReviewRow label="VÖEN" value={legalInformation?.voen || "—"} />
+              <ReviewRow
+                label="Hüquqi şəxsin adı"
+                value={legalInformation?.legalEntityName || "—"}
+              />
+              <ReviewRow
+                label="Hüquqi ünvan"
+                value={legalInformation?.legalAddress || "—"}
+              />
+              <ReviewRow
+                label="Direktorun adı"
+                value={legalInformation?.directorFirstName || "—"}
+              />
+              <ReviewRow
+                label="Direktorun soyadı"
+                value={legalInformation?.directorLastName || "—"}
+              />
+              <ReviewRow
+                label="Direktorun ata adı"
+                value={legalInformation?.directorFatherName || "—"}
+              />
+            </ReviewSection>
+          ) : (
+            <ReviewSection title="Şəxsiyyət məlumatları">
+              <ReviewRow
+                label="Seriya / Nömrə"
+                value={personalInformation?.idSeries || "—"}
+              />
+              <ReviewRow label="FIN" value={personalInformation?.fin || "—"} />
+              <ReviewRow
+                label="Ad"
+                value={personalInformation?.firstName || "—"}
+              />
+              <ReviewRow
+                label="Soyad"
+                value={personalInformation?.lastName || "—"}
+              />
+              <ReviewRow
+                label="Ata adı"
+                value={personalInformation?.fatherName || "—"}
+              />
+            </ReviewSection>
+          )}
 
           <ReviewSection title="Əlaqə">
             {(contactInformation?.phones ?? []).map((phone, index) => (

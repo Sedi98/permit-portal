@@ -14,6 +14,16 @@ export type PhysicalApplicant = {
   father_name: string | null;
 };
 
+export type ApplicantType = "physical" | "legal";
+
+type CreatedApplication = {
+  id: number;
+  status: string;
+  applicant_type: ApplicantType;
+  voen?: string | null;
+  legal_entity_name?: string | null;
+};
+
 export type ApplicationFile = {
   id: number;
   document_type_id: number;
@@ -28,10 +38,15 @@ export type ApplicationFile = {
 };
 
 export type ApplicationDetails = PhysicalApplicant & {
+  applicant_type?: ApplicantType;
   application_no?: string;
   applicant_full_name?: string | null;
   email?: string | null;
   legal_entity_name?: string | null;
+  legal_address?: string | null;
+  director_first_name?: string | null;
+  director_last_name?: string | null;
+  director_father_name?: string | null;
   phones?: Array<{ phone: string }>;
   permit_service?: {
     id: number;
@@ -81,14 +96,32 @@ export type TradeDetailPayload = {
   };
 };
 
-export async function createPhysicalApplication(permitServiceId: number) {
-  return PostApi<ApiResponse<PhysicalApplicant>, {
+export async function createApplication(
+  permitServiceId: number,
+  applicantType: ApplicantType,
+) {
+  return PostApi<ApiResponse<CreatedApplication>, {
     permit_service_id: number;
-    applicant_type: "physical";
+    applicant_type: ApplicantType;
   }>("/permit-applications", {
     permit_service_id: permitServiceId,
-    applicant_type: "physical",
+    applicant_type: applicantType,
   });
+}
+
+export type LegalEntityPayload = {
+  voen?: string;
+  legal_address?: string;
+};
+
+export async function updateApplicationLegalEntity(
+  applicationId: number,
+  payload: LegalEntityPayload,
+) {
+  return PutApi<ApiResponse<ApplicationDetails>, LegalEntityPayload>(
+    `/permit-applications/${applicationId}`,
+    payload,
+  );
 }
 
 export async function updateApplicationContact(
@@ -120,7 +153,7 @@ export async function uploadApplicationFile(
   formData.append("document_type_id", documentTypeId.toString());
   formData.append("file", file);
 
-  return PostApi<ApiResponse<unknown>, FormData>(
+  return PostApi<ApiResponse<ApplicationFile>, FormData>(
     `/permit-applications/${applicationId}/files`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } },

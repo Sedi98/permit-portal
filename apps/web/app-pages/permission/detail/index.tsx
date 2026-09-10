@@ -56,6 +56,7 @@ export default function PermissionDetailPage({
         </div>
         <PermissionSummary
           id={permitService.id}
+          allowedApplicantTypes={permitService.allowed_applicant_types}
           type={permitService.category_label}
           reviewTime={`${permitService.review_duration_days} iş günü`}
           fee={`${permitService.state_fee == `0.00` ? "Pulsuz" : `${permitService.state_fee} AZN`} `}

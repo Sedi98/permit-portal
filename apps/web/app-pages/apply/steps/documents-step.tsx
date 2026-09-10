@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { DocumentUploadItem } from "@/components/document-upload-item";
 import { Button } from "@/components/ui/button";
+import type { ApplicationFile } from "@/features/apply/api";
 import type { DocumentType } from "@/features/permit-services/types";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +30,10 @@ type DocumentsStepProps = {
   onBack?: () => void;
   isBackDisabled?: boolean;
   onNext?: (documents: SelectedApplicationDocument[]) => void;
-  onUpload?: (documentTypeId: number, file: File) => void | Promise<void>;
+  onUpload?: (
+    documentTypeId: number,
+    file: File,
+  ) => ApplicationFile | void | Promise<ApplicationFile | void>;
   onReplace?: (
     document: SelectedApplicationDocument,
     file: File,
@@ -41,7 +45,7 @@ type RequiredDocumentCardProps = {
   selectedDocument?: SelectedApplicationDocument;
   number: number;
   maxFileSizeMb: number;
-  onUpload?: (file: File) => void | Promise<void>;
+  onUpload?: (file: File) => ApplicationFile | void | Promise<ApplicationFile | void>;
   onReplace?: (file: File) => void | Promise<void>;
 };
 
@@ -77,10 +81,16 @@ function RequiredDocumentCard({
           initialFileName={selectedDocument?.name}
           initialFileSize={selectedDocument?.size}
           maxFileSizeMb={maxFileSizeMb}
-          canReplace={selectedDocument?.reviewStatus === "rejected"}
+          canReplace={Boolean(selectedDocument?.fileId)}
           canRemove={false}
           onFileSelected={
-            selectedDocument?.reviewStatus === "rejected" ? onReplace : onUpload
+            selectedDocument?.fileId
+              ? onReplace
+              : onUpload
+                ? async (file) => {
+                    await onUpload(file);
+                  }
+                : undefined
           }
         />
         {selectedDocument?.reviewNote ? (
@@ -124,14 +134,19 @@ const DocumentsStep = ({
   );
 
   const handleUpload = async (documentType: DocumentType, file: File) => {
-    await onUpload?.(documentType.id, file);
+    const uploadedFile = await onUpload?.(documentType.id, file);
     setSelectedByType((current) => ({
       ...current,
       [documentType.id]: {
         documentTypeId: documentType.id,
         documentTypeName: documentType.name,
-        name: file.name,
-        size: file.size,
+        fileId: uploadedFile?.id,
+        name: uploadedFile?.original_name ?? file.name,
+        size: uploadedFile?.size ?? file.size,
+        path: uploadedFile?.path,
+        reviewNote: uploadedFile?.review_note,
+        reviewStatus: uploadedFile?.review_status,
+        reviewStatusLabel: uploadedFile?.review_status_label,
       },
     }));
   };

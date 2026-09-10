@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
+import { Toaster } from "sonner";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/Footer";
 import { Providers } from "./providers";
@@ -78,6 +79,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Footer />
+          <Toaster position="top-center" richColors />
         </Providers>
       </body>
     </html>
