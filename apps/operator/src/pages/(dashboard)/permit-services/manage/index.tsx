@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import TableLayout from "@/app/layouts/TableLayout";
 import NoteTextarea from "@/components/NoteTextarea";
+import TiptapNoteEditor from "@/components/tiptap-note-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -433,11 +434,11 @@ function PermitServiceForm({
           const error = errors[typedField];
           return (
             <div key={field} className="space-y-2 md:col-span-2">
-              <NoteTextarea
+              <TiptapNoteEditor
                 id={`permit-${field}`}
                 label={label}
                 value={values[typedField]}
-                onChange={(event) => setField(typedField, event.target.value)}
+                onChange={(value) => setField(typedField, value)}
                 aria-invalid={!!error}
                 aria-describedby={error ? `permit-${field}-error` : undefined}
               />

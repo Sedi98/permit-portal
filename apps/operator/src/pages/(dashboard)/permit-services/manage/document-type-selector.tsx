@@ -147,10 +147,7 @@ export default function DocumentTypeSelector({
     createDocumentType.mutate(
       { name },
       {
-        onSuccess: (response) => {
-          if (!selectedIds.includes(response.data.id)) {
-            onChange([...selectedIds, response.data.id]);
-          }
+        onSuccess: () => {
           setNewName("");
           setIsCreateDialogOpen(false);
           toast.success("Yeni sənəd növü yaradıldı.");
@@ -213,6 +210,7 @@ export default function DocumentTypeSelector({
               className="space-y-4"
               onSubmit={(event) => {
                 event.preventDefault();
+                event.stopPropagation();
                 addDocumentType();
               }}
             >

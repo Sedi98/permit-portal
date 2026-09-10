@@ -4,7 +4,7 @@ type PermissionInfoSectionProps = DetailSectionData & {
   index: number;
 };
 
-export function PermissionInfoSection({ index, title, items }: PermissionInfoSectionProps) {
+export function PermissionInfoSection({ index, title, content }: PermissionInfoSectionProps) {
   return (
     <section className="rounded-2xl border border-[#dfdfdf] bg-white p-6 sm:p-8" aria-labelledby={`permission-section-${index}`}>
       <div className="flex items-center gap-3">
@@ -16,23 +16,10 @@ export function PermissionInfoSection({ index, title, items }: PermissionInfoSec
         </h2>
       </div>
 
-      <ul className="mt-5 flex flex-col gap-4 text-base leading-6 text-[#1f1f1f]">
-        {items.map((item) => (
-          <li key={item.text} className="flex items-start gap-3">
-            <span className="mt-[9px] size-1.5 shrink-0 rounded-full bg-[#286aa6]" aria-hidden="true" />
-            <div className="min-w-0 flex-1">
-              <p className={item.emphasis ? "font-semibold" : undefined}>{item.text}</p>
-              {item.children ? (
-                <ol className={`mt-1 list-inside space-y-1 pl-4 ${item.children.ordered ? "list-decimal" : "list-disc"}`}>
-                  {item.children.items.map((child) => (
-                    <li key={child}>{child}</li>
-                  ))}
-                </ol>
-              ) : null}
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div
+        className="mt-5 text-base leading-6 text-[#1f1f1f] [&_ol]:list-decimal [&_ol]:space-y-1 [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-6 [&_ul]:marker:text-[#286aa6]"
+        dangerouslySetInnerHTML={{ __html: content ?? "" }}
+      />
     </section>
   );
 }

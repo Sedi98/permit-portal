@@ -670,7 +670,7 @@ const ApplyPermissionPage = ({
             permitServiceName={selectedPermitService?.name}
             completedSteps={`${permitServiceId === 1 ? 6 : 5}/6 tamamlandı`}
             onContinue={() => setStep(6)}
-            onDrafts={() => window.location.assign("/applications")}
+            onDrafts={() => window.location.assign("/drafts")}
           />
         )
       ) : null}

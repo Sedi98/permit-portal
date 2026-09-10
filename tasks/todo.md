@@ -1221,3 +1221,41 @@ access to the Google Fonts DM Sans endpoint.
 Səhifə daşması yoxlanıldı, 7 səhifəyə vizual baxış keçirildi, PDF səhifə/font/keçid
 strukturu təsdiqləndi. Mövcud imkanlar, rəsmi faktlar və nümunə API-lər ayrıldı.
 Tətbiq kodu dəyişdirilmədi.
+# Task: Install Tiptap simple-editor in operator app
+
+- [x] Add Tiptap simple-editor only to `apps/operator` with pnpm.
+- [x] Keep `apps/web` unchanged.
+- [x] Verify the operator production build and record lint status.
+
+## Review
+
+The Tiptap CLI installed the simple-editor template and its dependencies into
+`apps/operator` (162 source files). The operator build passes. Operator lint
+currently reports 61 errors from generated Tiptap sources and one existing
+warning; no web files were changed.
+# Task: Replace permit-service notes with Tiptap editor
+
+- [x] Replace the `NoteTextarea` fields in the permit-service manage form with a controlled Tiptap editor.
+- [x] Invalidate the document-type list query after creating a document type.
+- [x] Run focused lint, operator build, and diff verification.
+
+## Review
+
+The permit-service form keeps the service name as the existing `NoteTextarea`
+and uses `TiptapNoteEditor` for legal basis, required documents, and
+suspension/refusal basis. The editor preserves rich formatting by sending
+`editor.getHTML()` to the form state and backend, with formatting, heading,
+list, quote, code-block, rule, undo/redo, and clear-format controls.
+`useCreateDocumentType` now invalidates the shared document-type list key after
+updating the cache, so the selector refreshes from the backend. Focused lint,
+the operator TypeScript/Vite build, and `git diff --check` pass.
+# Task: Review project structure
+
+- [ ] Inspect repository boundaries, packages, and entry points.
+- [ ] Trace routing, layouts, feature modules, and API/data flow.
+- [ ] Review architectural consistency, maintainability, and React performance risks.
+- [ ] Run read-only verification and document prioritized findings.
+
+## Review
+
+Pending.

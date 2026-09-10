@@ -1,4 +1,4 @@
-import { DeleteApi, GetApi, Http } from "@/features/http";
+import { DeleteApi, GetApi, Http, PostApi } from "@/features/http";
 
 import type {
   PermitServiceFormValues,
@@ -67,5 +67,12 @@ export async function updateManagedPermitService(
 export function deactivateManagedPermitService(id: number) {
   return DeleteApi<{ status: string; message: string }>(
     `/admin/permit-services/${id}`,
+  );
+}
+
+export function activateManagedPermitService(id: number) {
+  return PostApi<PermitServiceResponse, undefined>(
+    `/admin/permit-services/${id}/activate`,
+    undefined,
   );
 }

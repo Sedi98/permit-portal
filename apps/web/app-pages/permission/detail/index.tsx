@@ -1,45 +1,32 @@
 import { PermissionIdentity } from "./sections/PermissionIdentity";
 import { PermissionInfoSection } from "./sections/PermissionInfoSection";
 import { PermissionSummary } from "./sections/PermissionSummary";
-import type { DetailItem } from "./sections/types";
 import type { PermitServiceDetail } from "@/features/permit-services/types";
 import { backendAssetUrl } from "@/lib/api";
 
 const fallbackIcon = "/icons/permission-detail/globe.svg";
-
-function toDetailItems(value: string | null): DetailItem[] {
-  if (!value) {
-    return [];
-  }
-
-  const items = value
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => /^•\s*/.test(line))
-    .map((line) => ({ text: line.replace(/^•\s*/, "") }));
-
-  return items.length > 0 ? items : [{ text: value }];
-}
 
 export default function PermissionDetailPage({
   permitService,
 }: {
   permitService: PermitServiceDetail;
 }) {
+  console.log(permitService);
+
   const permitServiceIcon = permitService.icon_url ?? permitService.icon_path;
 
   const sections = [
     {
       title: "Hüquqi əsas",
-      items: toDetailItems(permitService.legal_basis),
+      content: permitService.legal_basis,
     },
     {
       title: "Tələb olunan sənədlər",
-      items: toDetailItems(permitService.required_documents),
+      content: permitService.required_documents,
     },
     {
       title: "Dayandırılma və imtinanın hüquqi əsasları",
-      items: toDetailItems(permitService.suspension_basis),
+      content: permitService.suspension_basis,
     },
   ];
 
@@ -71,8 +58,8 @@ export default function PermissionDetailPage({
           id={permitService.id}
           type={permitService.category_label}
           reviewTime={`${permitService.review_duration_days} iş günü`}
-          fee={`${permitService.state_fee} AZN`}
-          documentCount={`${permitService.document_count} sənəd`}
+          fee={`${permitService.state_fee == `0.00` ? "Pulsuz" : `${permitService.state_fee} AZN`} `}
+          documentCount={`${permitService.document_types?.length ?? 0} sənəd`}
           requirements={["MYGOV hesabı", "Tələb olunan sənədlər"]}
         />
       </div>

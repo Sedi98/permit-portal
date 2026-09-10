@@ -9,6 +9,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import {
+  useActivateManagedPermitService,
   useDeactivateManagedPermitService,
   useManagedPermitServices,
 } from "@/features/permit-services/hooks";
@@ -49,7 +50,9 @@ function PermitServiceCell({ service }: { service: ManagedPermitService }) {
 
 function PermitServiceActions({ service }: { service: ManagedPermitService }) {
   const navigate = useNavigate();
+  const activate = useActivateManagedPermitService();
   const deactivate = useDeactivateManagedPermitService();
+  const isPending = activate.isPending || deactivate.isPending;
 
   return (
     <div className="flex min-w-max items-center gap-2">
@@ -67,7 +70,7 @@ function PermitServiceActions({ service }: { service: ManagedPermitService }) {
           variant="outline"
           size="icon-sm"
           className="text-destructive"
-          disabled={deactivate.isPending}
+          disabled={isPending}
           aria-label="Deaktiv et"
           title="Deaktiv et"
           onClick={() =>
@@ -80,7 +83,25 @@ function PermitServiceActions({ service }: { service: ManagedPermitService }) {
         >
           <Power className="size-4" />
         </Button>
-      ) : null}
+      ) : (
+        <Button
+          variant="outline"
+          size="icon-sm"
+          className="text-primary"
+          disabled={isPending}
+          aria-label="Aktiv et"
+          title="Aktiv et"
+          onClick={() =>
+            activate.mutate(service.id, {
+              onSuccess: () => toast.success("İcazə aktiv edildi"),
+              onError: () =>
+                toast.error("İcazə aktiv edilərkən xəta baş verdi"),
+            })
+          }
+        >
+          <Power className="size-4" />
+        </Button>
+      )}
     </div>
   );
 }

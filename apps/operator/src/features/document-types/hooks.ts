@@ -29,6 +29,7 @@ export function useCreateDocumentType() {
           return { ...current, data: [...current.data, response.data] };
         },
       );
+      void queryClient.invalidateQueries({ queryKey: documentTypesQueryKey });
     },
   });
 }

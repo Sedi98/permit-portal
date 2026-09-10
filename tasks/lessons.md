@@ -36,3 +36,5 @@
 - When permit-service metadata is shared across apply-flow summary screens, audit every terminal branch (including success and saved-draft views) and pass the already-loaded service data through props instead of leaving service-specific constants behind.
 - When an apply-flow error replaces the current step, render its message and recovery action inside the same card shell as the other steps instead of leaving them as uncontained page-level content.
 - When navigation must look like a design-system button, compose the existing `Button` with `asChild` around `Link`; preserve link semantics and use Button variants instead of duplicating button classes on anchors.
+- When creating a document type from the permit-service selector, invalidate and refresh the document-type query only; do not automatically add the newly created type to the permit's selected IDs unless explicitly requested.
+- When a dialog form is rendered inside a page form, stop submit propagation on the inner form so dialog actions cannot submit the parent entity form.

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   createManagedPermitService,
+  activateManagedPermitService,
   deactivateManagedPermitService,
   getManagedPermitService,
   getManagedPermitServices,
@@ -57,6 +58,21 @@ export function useDeactivateManagedPermitService() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deactivateManagedPermitService,
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({
+        queryKey: ["permit-services", "admin", "list"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["permit-services", "admin", "detail", id],
+      });
+    },
+  });
+}
+
+export function useActivateManagedPermitService() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: activateManagedPermitService,
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({
         queryKey: ["permit-services", "admin", "list"],
