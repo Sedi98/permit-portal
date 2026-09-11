@@ -1,5 +1,6 @@
 # Lessons
 
+- When documenting Docker setup, state the exact project-relative env filenames and distinguish container ports from host URLs instead of relying on implicit Compose knowledge.
 - Place page-level skeleton components under the dedicated `components/skeletons` directory so loading placeholders remain organized and reusable.
 - Do not expose a destructive table action unless the backend contract provides a corresponding operation; hiding it after a local-only state change avoids promising persistence the API cannot perform.
 - Before mapping social-network names to icon components, verify the installed icon package's actual exports; Lucide intentionally does not provide common brand icons, so use available semantic icons or project-owned brand assets instead of assuming brand exports exist.
