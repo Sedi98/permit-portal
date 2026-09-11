@@ -28,6 +28,7 @@ import type {
 import ApplicationAssignSection from "@/features/applications/components/ApplicationAssignSection";
 import ConfirmationHistorySection from "@/features/applications/components/ConfirmationHistorySection";
 import ConfirmationSequenceForm from "@/features/applications/components/ConfirmationSequenceForm";
+import TradeDetailSection from "@/features/applications/components/TradeDetailSection";
 
 const APPLICATION_STEPS = [
   { label: "Sahə seçimi" },
@@ -37,6 +38,10 @@ const APPLICATION_STEPS = [
   { label: "Ödəniş" },
   { label: "Müraciətin nəticəsi" },
 ];
+
+const PAYMENT_FREE_APPLICATION_STEPS = APPLICATION_STEPS.filter(
+  (step) => step.label !== "Ödəniş",
+);
 
 const userRoleLabels = {
   super_admin: "Super admin",
@@ -51,9 +56,9 @@ const assignmentRoleLabels = {
   observer: "Nəzarətçi",
 };
 
-function getActiveStep(status: ApplicationStatus) {
-  if (status === "completed") return 5;
-  if (status === "awaiting_signature") return 5;
+function getActiveStep(status: ApplicationStatus, requiresPayment: boolean) {
+  if (status === "completed") return requiresPayment ? 5 : 4;
+  if (status === "awaiting_signature") return requiresPayment ? 5 : 4;
   if (
     status === "payment_confirmation" ||
     status === "awaiting_payment" ||
@@ -117,6 +122,7 @@ export default function ApplicationDetailPage() {
   const detail = applicationQuery.data?.data;
   const me = meQuery.data?.data;
   const isSuperAdmin = me?.role === "super_admin";
+  const requiresPayment = detail?.permit_service.requires_payment !== false;
   const isCurrentAssignee =
     detail?.assignees.some((assignee) => assignee.user_id === me?.id) ?? false;
   const canRoute =
@@ -237,9 +243,18 @@ export default function ApplicationDetailPage() {
     ? null
     : hasRejectedFile
       ? ("deficiency" as const)
-      : hasCompletedReport
-        ? ("payment" as const)
-        : ("report" as const);
+      : !hasCompletedReport
+        ? ("report" as const)
+        : requiresPayment
+          ? ("payment" as const)
+          : null;
+  const tradeDetail = detail.tradeDetail ?? detail.trade_detail;
+  const canSendToSignature =
+    !isReadOnly &&
+    !requiresPayment &&
+    detail.status === "assigned" &&
+    hasCompletedReport &&
+    (isCurrentAssignee || isSuperAdmin);
 
   return (
     <main className="space-y-5 md:space-y-10">
@@ -259,8 +274,10 @@ export default function ApplicationDetailPage() {
         </div>
 
         <Stepper
-          steps={APPLICATION_STEPS}
-          activeStep={getActiveStep(detail.status)}
+          steps={
+            requiresPayment ? APPLICATION_STEPS : PAYMENT_FREE_APPLICATION_STEPS
+          }
+          activeStep={getActiveStep(detail.status, requiresPayment)}
         />
       </div>
 
@@ -271,6 +288,16 @@ export default function ApplicationDetailPage() {
         applicationTitle="Ə R İ Z Ə"
         fields={fields}
       />
+
+      {detail.permit_service_id === 1 && tradeDetail ? (
+        <TableLayout>
+          <TradeDetailSection
+            applicationId={applicationId}
+            tradeDetail={tradeDetail}
+            canEdit={!isReadOnly && detail.status === "payment_review"}
+          />
+        </TableLayout>
+      ) : null}
 
       <TableLayout>
         <ApplicationExecutorsContainer
@@ -348,6 +375,31 @@ export default function ApplicationDetailPage() {
           sequences={confirmationSequences}
           canApproveAny={!isReadOnly && isSuperAdmin}
         />
+
+        {canSendToSignature ? (
+          <section className="mt-8 space-y-4" aria-labelledby="signature-title">
+            <h2 id="signature-title" className="text-xl font-bold text-[#1F1F1F]">
+              İmzaya göndərilmə
+            </h2>
+            <p className="text-sm text-[#797979]">
+              Bu icazə dövlət rüsumu tələb etmir və birbaşa imzaya göndərilə bilər.
+            </p>
+            <div className="flex justify-end">
+              <Button
+                disabled={confirmPayment.isPending}
+                onClick={() =>
+                  confirmPayment.mutate(undefined, {
+                    onSuccess: () => toast.success("Müraciət imzaya göndərildi"),
+                    onError: () =>
+                      toast.error("Müraciət imzaya göndərilərkən xəta baş verdi"),
+                  })
+                }
+              >
+                İmzaya göndər
+              </Button>
+            </div>
+          </section>
+        ) : null}
 
         {!isReadOnly && detail.status === "payment_review" &&
         (isCurrentAssignee || isSuperAdmin) ? (

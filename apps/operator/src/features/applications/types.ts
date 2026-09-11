@@ -20,6 +20,30 @@ export type ApplicationStatus =
 
 export type ApplicantType = "physical" | "legal";
 
+export type TradeOperationType =
+  | "export"
+  | "import"
+  | "re_export"
+  | "re_import"
+  | "transit";
+
+export interface TradeDetail {
+  id: number;
+  permit_application_id: number;
+  operation_type: TradeOperationType;
+  goods_category: string | null;
+  goods_name_volume: string | null;
+  usage_info: string | null;
+  remaining_info: string | null;
+}
+
+export type UpdateTradeDetailPayload = Partial<
+  Pick<
+    TradeDetail,
+    "goods_category" | "goods_name_volume" | "usage_info" | "remaining_info"
+  >
+>;
+
 export interface ApplicationsQueryParams {
   status?: ApplicationStatus | string;
   status_group?: string;
@@ -53,6 +77,7 @@ export interface PermitService {
   slug: string;
   category?: string;
   is_active: boolean;
+  requires_payment: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -244,7 +269,8 @@ export interface ApplicationDetail {
   applicant_full_name: string;
   permit_service: PermitService;
   phones: AppPhone[];
-  trade_detail: Record<string, unknown> | null;
+  tradeDetail?: TradeDetail | null;
+  trade_detail?: TradeDetail | null;
   files: AppFile[];
   documents: AppDocument[];
   status_histories: StatusHistory[];
@@ -295,6 +321,14 @@ export interface StatusChangeResponse {
     assignees?: ApplicationAssignee[];
     documents?: AppDocument[];
     visas?: DocumentVisa[];
+  };
+}
+
+export interface UpdateTradeDetailResponse {
+  status: string;
+  message: string;
+  data: {
+    tradeDetail: Partial<TradeDetail>;
   };
 }
 

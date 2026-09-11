@@ -1425,3 +1425,39 @@ while selecting, removing, and reordering documents; edit mode hydrates it from
 Create and update FormData include matching `document_type_applicant_types[id]`
 entries. Focused ESLint, TypeScript, the operator production build, and targeted
 diff checks pass.
+# Task: Add PS-001 trade-detail editing and document preview
+
+- [x] Model the PS-001 trade-detail response and application API operations.
+- [x] Add the conditional read/edit UI and authenticated PDF preview flow.
+- [x] Refresh an open preview after a successful edit without refetching the detail endpoint.
+- [x] Run operator lint, build, and targeted diff verification.
+
+## Review
+
+PS-001 application details now expose the operation type and only the fields relevant
+to that operation. During `payment_review`, operators can edit the four supported
+text values; only changed values are sent, and the PUT response updates the React
+Query cache directly. The authenticated PDF preview opens in a dialog, cleans up its
+Blob URL, supports retry, and reloads automatically after a successful edit. Focused
+ESLint, TypeScript, the operator production build, and `git diff --check` pass. Full
+lint remains blocked by the existing 62 Tiptap/shared-hook errors and one existing
+TanStack Table warning. The pnpm command wrapper also reports its pre-existing
+`unable to open database file` environment error, so verification used the app's
+installed ESLint, TypeScript, and Vite binaries directly.
+# Task: Support payment-free permit services in the operator flow
+
+- [x] Model the `requires_payment` permit-service flag.
+- [x] Skip payment-sequence creation and show the direct signature action.
+- [x] Remove the payment step from payment-free application progress.
+- [x] Run focused lint, TypeScript, production build, and diff verification.
+
+## Review
+
+Permit-service metadata now models `requires_payment`. A completed report on an
+assigned payment-free application no longer opens the payment confirmation-sequence
+form; eligible executors instead receive an “İmzaya göndər” action backed by the
+existing `confirm-payment-received` mutation. The payment step is omitted from that
+application's progress indicator while paid-service behavior remains unchanged; a
+missing flag safely retains the paid flow. Focused ESLint, TypeScript, the operator
+production build, and `git diff --check` pass. Vite reports only the existing large
+bundle-size advisory.

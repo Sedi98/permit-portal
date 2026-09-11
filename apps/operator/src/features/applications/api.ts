@@ -1,4 +1,4 @@
-import { GetApi, Http, PostApi } from "@/features/http";
+import { GetApi, Http, PostApi, PutApi } from "@/features/http";
 import type {
   ApplicationsQueryParams,
   DepartmentsResponse,
@@ -11,6 +11,8 @@ import type {
   RouteApplicationPayload,
   RoutingCandidatesResponse,
   StatusChangeResponse,
+  UpdateTradeDetailPayload,
+  UpdateTradeDetailResponse,
 } from "./types";
 
 export function getApplications(params?: ApplicationsQueryParams) {
@@ -54,6 +56,24 @@ export function confirmPaymentReceived(id: number) {
     `/admin/permit-applications/${id}/confirm-payment-received`,
     {},
   );
+}
+
+export function updateTradeDetail(
+  id: number,
+  payload: UpdateTradeDetailPayload,
+) {
+  return PutApi<UpdateTradeDetailResponse, UpdateTradeDetailPayload>(
+    `/admin/permit-applications/${id}/trade-detail`,
+    payload,
+  );
+}
+
+export async function getApplicationPreviewBlob(id: number) {
+  const response = await Http.get(
+    `/admin/permit-applications/${id}/preview-document`,
+    { responseType: "blob" },
+  );
+  return response.data as Blob;
 }
 
 export function getAwaitingSignatureApplications() {

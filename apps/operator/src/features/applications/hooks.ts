@@ -10,17 +10,21 @@ import {
   changeStatus,
   getFileBlob,
   getApplicationDocumentBlob,
+  getApplicationPreviewBlob,
   getAwaitingSignatureApplications,
   reviewApplicationFile,
   routeApplication,
   signApplication,
+  updateTradeDetail,
 } from "./api";
 import type {
+  ApplicationDetailResponse,
   ApplicationsQueryParams,
   CreateConfirmationSequencePayload,
   FileReviewPayload,
   RouteApplicationPayload,
   StatusChangePayload,
+  UpdateTradeDetailPayload,
 } from "./types";
 
 export function useApplications(params?: ApplicationsQueryParams) {
@@ -104,6 +108,43 @@ export function useConfirmPaymentReceived(applicationId: number) {
     mutationFn: () => confirmPaymentReceived(applicationId),
     onSuccess: invalidate,
   });
+}
+
+export function useUpdateTradeDetail(applicationId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: UpdateTradeDetailPayload) =>
+      updateTradeDetail(applicationId, payload),
+    onSuccess: (response) => {
+      queryClient.setQueryData<ApplicationDetailResponse>(
+        ["applications", "detail", applicationId],
+        (current) => {
+          if (!current) return current;
+
+          const existing =
+            current.data.tradeDetail ?? current.data.trade_detail;
+          const tradeDetail = existing
+            ? { ...existing, ...response.data.tradeDetail }
+            : (response.data.tradeDetail as NonNullable<
+                ApplicationDetailResponse["data"]["tradeDetail"]
+              >);
+
+          return {
+            ...current,
+            data: { ...current.data, tradeDetail },
+          };
+        },
+      );
+    },
+  });
+}
+
+export function useApplicationPreview() {
+  return useCallback(async (applicationId: number) => {
+    const blob = await getApplicationPreviewBlob(applicationId);
+    return URL.createObjectURL(blob);
+  }, []);
 }
 
 export function useAwaitingSignatureApplications() {
