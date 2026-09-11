@@ -6,6 +6,7 @@ import type { DateRange } from "react-day-picker";
 
 import TableLayout from "@/app/layouts/TableLayout";
 import PageTitle from "@/components/PageTitle";
+import ApplicationListPageSkeleton from "@/components/skeletons/ApplicationListPageSkeleton";
 import { DataTable } from "@/components/ui/data-table";
 import { DatePickerWithRange } from "@/components/ui/range-picker";
 import { PaginationContainer } from "@/components/PaginationContainer";
@@ -179,6 +180,10 @@ export default function ApplicationListPage({
   const totalItems = applicationsData?.data?.total ?? 0;
   const itemsPerPage = applicationsData?.data?.per_page ?? 20;
 
+  if (isLoading) {
+    return <ApplicationListPageSkeleton title={title} showStatus={showStatus} />;
+  }
+
   return (
     <div className="relative space-y-4">
       <h1 className="pl-4 text-base font-medium leading-6 text-stone-900">{title}</h1>
@@ -200,13 +205,7 @@ export default function ApplicationListPage({
           onApplicantTypeChange={(value) => { setApplicantType(value); setPage(1); }}
           showStatus={showStatus}
         />
-        {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="size-10 animate-spin rounded-full border-4 border-[#286aa6] border-t-transparent" />
-          </div>
-        ) : (
-          <DataTable columns={columns} data={items} />
-        )}
+        <DataTable columns={columns} data={items} />
         <PaginationContainer
           currentPage={currentPage}
           totalPages={totalPages}

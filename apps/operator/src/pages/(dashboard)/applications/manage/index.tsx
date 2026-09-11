@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import TableLayout from "@/app/layouts/TableLayout";
 import A4Preview, { type A4PreviewField } from "@/components/A4Preview";
 import ApplicationExecutorsContainer from "@/components/ApplicationExecutorsContainer";
+import ApplicationDetailPageSkeleton from "@/components/skeletons/ApplicationDetailPageSkeleton";
 import NoteTextarea from "@/components/NoteTextarea";
 import RequiredDocumentsSection from "@/components/RequiredDocumentsSection";
 import Stepper from "@/components/Stepper";
@@ -188,11 +189,7 @@ export default function ApplicationDetailPage() {
   };
 
   if (applicationQuery.isLoading || meQuery.isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="size-10 animate-spin rounded-full border-4 border-[#286aa6] border-t-transparent" />
-      </div>
-    );
+    return <ApplicationDetailPageSkeleton />;
   }
 
   if (!applicationId || applicationQuery.isError || !detail) {

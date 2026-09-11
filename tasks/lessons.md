@@ -1,5 +1,6 @@
 # Lessons
 
+- Place page-level skeleton components under the dedicated `components/skeletons` directory so loading placeholders remain organized and reusable.
 - Do not expose a destructive table action unless the backend contract provides a corresponding operation; hiding it after a local-only state change avoids promising persistence the API cannot perform.
 - Before mapping social-network names to icon components, verify the installed icon package's actual exports; Lucide intentionally does not provide common brand icons, so use available semantic icons or project-owned brand assets instead of assuming brand exports exist.
 - When an overflow bug is caused by absolutely positioned editor UI, apply the containing-block position to the exact page-level ancestor requested by the user; a nearer field wrapper may not contain the element that creates the overflow.

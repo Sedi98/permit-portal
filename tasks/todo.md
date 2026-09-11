@@ -1,3 +1,68 @@
+# Task: Add skeletons and lazy loading to all remaining operator pages
+
+- [x] Inventory every remaining static route page and group matching layouts.
+- [x] Add a dedicated named skeleton component for every remaining page.
+- [x] Convert every remaining route module to `React.lazy` with its matching skeleton fallback.
+- [x] Verify focused lint, production build chunks, and changed-file diffs.
+
+## Review
+
+All 20 remaining route-page modules now load through `React.lazy`, with a named,
+page-specific skeleton passed to their local Suspense boundary. The skeletons share
+small layout primitives for table, card-list, form, analytics, dashboard, and login
+shapes while preserving distinct exports and route mappings for every page. Focused
+ESLint, TypeScript/Vite build, and `git diff --check` pass; the build output confirms
+separate chunks for login, home, board, notifications, queues, confirmations,
+reports, users, permit services, ratings, FAQs, contact settings, and manage pages.
+
+# Task: Add ApplicationDetailPage skeleton and lazy routes
+
+- [x] Create a reusable detail-page skeleton under `components/skeletons`.
+- [x] Replace the detail page API spinner with the skeleton.
+- [x] Lazy-load ApplicationDetailPage on every route with the skeleton fallback.
+- [x] Run focused lint, build, and diff verification.
+
+## Review
+
+The detail loading state now mirrors the back/title row, six-step progress indicator,
+A4 application preview, executor and note tables, and required-document cards with
+the shared shadcn Skeleton primitive. Both the initial application/profile queries
+and all 12 detail-route lazy imports use the same reusable fallback. Focused ESLint,
+the TypeScript/Vite production build, and `git diff --check` pass. The build emits
+the detail page as a separate `manage` chunk; full lint retains the previously
+documented unrelated Tiptap/React Compiler failures.
+
+# Task: Add ApplicationListPage skeleton and lazy routes
+
+- [x] Create a shadcn Skeleton primitive and a layout-matched ApplicationListPage skeleton.
+- [x] Use the skeleton for application-list API loading states.
+- [x] Lazy-load every route that renders ApplicationListPage with the skeleton as its Suspense fallback.
+- [x] Run operator lint, build, and diff verification.
+
+## Review
+
+Application list loading now preserves the page title, heading area, date filter,
+search/select controls, eight-column table, alternating rows, and pagination layout
+with shadcn Skeleton elements. The same fallback is shown while every route backed by
+ApplicationListPage downloads its lazy chunk, and it replaces the former API spinner.
+Focused ESLint, TypeScript/Vite production build, and `git diff --check` pass. The
+build output confirms separate chunks for all eight wrapper pages and the shared
+ApplicationListPage module. Full operator lint remains blocked by 61 pre-existing
+Tiptap/React Compiler errors outside the changed files.
+
+# Task: Organize the application-list skeleton
+
+- [x] Move the page skeleton into `components/skeletons`.
+- [x] Update all imports and capture the directory convention.
+- [x] Run focused lint, build, and diff verification.
+
+## Review
+
+The page-level skeleton now lives in the dedicated `components/skeletons`
+directory, while the reusable shadcn primitive remains under `components/ui`.
+Both consumers use the new import path. Focused ESLint and the operator production
+build pass, and lazy route chunks remain intact.
+
 # Task: Block incompatible permit applicant types
 
 - [x] Detect the authenticated user's legal and physical applicant capabilities.
