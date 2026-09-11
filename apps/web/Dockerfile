@@ -15,11 +15,6 @@ RUN pnpm install --frozen-lockfile
 
 COPY apps/web apps/web
 
-ARG NEXT_PUBLIC_API_BASE_URL=https://permit-back.secop.az/api
-ARG NEXT_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
-ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
-
 RUN pnpm --filter @permit-portal/web build
 RUN pnpm --filter @permit-portal/web deploy --prod --legacy /prod/web
 RUN cp -a apps/web/.next /prod/web/.next

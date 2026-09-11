@@ -14,9 +14,6 @@ RUN pnpm install --frozen-lockfile
 
 COPY apps/operator apps/operator
 
-ARG VITE_API_BASE_URL=https://permit-back.secop.az
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
-
 RUN pnpm --filter @permit-portal/operator build
 
 FROM nginx:1.27-alpine AS runtime

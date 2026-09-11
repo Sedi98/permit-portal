@@ -1,3 +1,22 @@
+# Task: Load Docker build variables from each workspace env
+
+- [x] Audit Compose, both Dockerfiles, ignore rules, and application env usage.
+- [x] Wire each image build to its own workspace `.env` without root-level substitution.
+- [x] Verify the rendered Compose model, lint, production builds, and changed-file diffs.
+- [x] Document the result and any verification constraints.
+
+## Review
+
+Compose now assigns `apps/web/.env` and `apps/operator/.env` to their respective
+services instead of interpolating unrelated shell/root values. The Docker context
+selectively includes those two workspace files so Next and Vite load them natively
+during their build stages; the multi-stage runtime images copy only production
+artifacts, not the source env files. `docker compose config --quiet`, both Docker
+image builds, the operator production build, and `git diff --check` pass. Full lint
+continues to report the 61 existing Tiptap/React Compiler errors and one TanStack
+warning. The host web build remains blocked by restricted Google Fonts access, while
+the Docker web build completed successfully and explicitly detected `.env`.
+
 # Task: Add skeletons and lazy loading to all remaining operator pages
 
 - [x] Inventory every remaining static route page and group matching layouts.
