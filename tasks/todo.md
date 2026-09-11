@@ -1461,3 +1461,92 @@ application's progress indicator while paid-service behavior remains unchanged; 
 missing flag safely retains the paid flow. Focused ESLint, TypeScript, the operator
 production build, and `git diff --check` pass. Vite reports only the existing large
 bundle-size advisory.
+# Task: Build ordered confirmation participant editor
+
+- [x] Replace fixed role selects with searchable candidate and role controls.
+- [x] Add an ordered participant table with same-role reordering and removal.
+- [x] Preserve table order exactly in the submitted participants payload.
+- [x] Match the supplied visual layout and verify lint, TypeScript, build, and diff.
+
+## Review
+
+The confirmation form now uses a searchable candidate picker that exposes each
+person's department and translated position, a separate role selector, and an add
+action. Added participants render in a responsive execution table with accessible
+same-role move controls and removal. Role groups remain in Visa → Signature →
+Approval order, while moves preserve the meaningful order inside each role; the POST
+payload maps the table array without reordering. Each required role must still have
+at least one participant. Focused ESLint, TypeScript, the operator production build,
+and `git diff --check` pass. The supplied reference PNG remains an untracked user
+asset and was not modified.
+# Task: Show confirmation approval API errors
+
+- [x] Read approval errors from the Axios response and preserve a fallback message.
+- [x] Apply the behavior to both confirmation approval entry points and verify it.
+
+## Review
+
+Confirmation participant approval errors now extract the backend `message` from an
+Axios response and fall back to the existing generic Azerbaijani error when the
+response is unavailable or malformed. The shared helper is used by both the queue
+card and the application-detail confirmation history. Focused ESLint, TypeScript,
+and `git diff --check` pass.
+# Əlaqə ayarları — operator və web
+
+- [x] Bələdçinin API müqaviləsini və mövcud API/routing/sidebar/UI pattern-lərini yoxla
+- [x] Web üçün ictimai əlaqə ayarları API modulunu əlavə et və footer-i dinamik məlumatlarla göstər
+- [x] Operator üçün əlaqə ayarları types/API/hooks qatını əlavə et
+- [x] Super-admin qorunan “Əlaqə Ayarları” səhifəsini, dinamik sosial şəbəkə sahələrini və validasiyanı hazırla
+- [x] Route, sidebar və breadcrumb inteqrasiyasını tamamla
+- [x] React best-practices yoxlaması, lint və build icra et
+
+## Review
+
+- Public footer `GET /contact-settings` cavabındakı mövcud əlaqə sahələrini və sərbəst
+  sosial platformaları göstərir; tanınan platformalar uyğun ikon xəritəsindən, qalanları
+  ümumi ikon fallback-indən istifadə edir.
+- Operator səhifəsi `GET/PUT /admin/contact-settings` ilə işləyən tək-kart formasıdır.
+  Boş/null ilkin dəyərlər dəstəklənir, sosial sətirlər dinamikdir, dublikat platforma və
+  etibarsız URL-lər saxlanmadan öncə bloklanır, backend mesajı toast-da göstərilir.
+- Səhifə sidebar və route səviyyəsində yalnız `super_admin` üçün açıqdır.
+- Dəyişdirilən faylların focused ESLint və hər iki tətbiqin TypeScript yoxlaması keçir.
+  Operator production build keçir. Tam operator lint yalnız əvvəlcədən mövcud Tiptap
+  qayda xətalarında, web lint mövcud Navbar anchor xətasında, web build isə Google Fonts
+  şəbəkə çıxışında dayanır.
+
+# Əlaqə ayarları section və platforma seçimi
+
+- [x] Operator formasını ayrıca əlaqə və sosial şəbəkə section komponentlərinə ayır
+- [x] Platforma inputunu verilmiş platformalarla Select komponentinə dəyiş
+- [x] Web footer üçün platformalara uyğun brend ikonları əlavə et
+- [x] Focused lint, TypeScript, build və diff yoxlamalarını icra et
+
+## Review
+
+- Əlaqə məlumatları və sosial linklər ayrıca section komponentlərinə çıxarıldı; səhifə
+  yalnız form state-i, validasiya və yadda saxlama əməliyyatını orkestrasiya edir.
+- Platforma sahəsi Facebook, İnstagram, YouTube, WhatsApp, TikTok, Telegram və
+  X (formerly Twitter) seçimli Select-dir. Mövcud legacy açarlar redaktə zamanı itmir.
+- Footer paketdən asılı olmayan lokal SVG brend ikonları ilə həmin açarları göstərir,
+  naməlum açarlar üçün Globe fallback-i saxlanılır.
+- Hər iki tətbiqdə focused ESLint və TypeScript, operator production build və
+  `git diff --check` keçir. Web build yalnız mövcud Google Fonts şəbəkə çıxışında dayanır.
+
+# Sosial link cədvəli və əlavə etmə dialogu
+
+- [x] LinkedIn-i operator platforma seçimlərinə və web ikon xəritəsinə əlavə et
+- [x] Sosial linkləri cədvəl formasında göstər
+- [x] Yeni link üçün platforma və keçid sahəli dialog əlavə et
+- [x] Dialog yadda saxlananda əlaqə kartını yenilə və TanStack Query-ni invalidate et
+- [x] Focused lint, TypeScript və diff yoxlamalarını icra et
+
+## Review
+
+- Sosial linklər platforma, kliklənən URL və silmə əməliyyatı olan cədvəldə göstərilir.
+- Əlavə etmə dialogunda artıq istifadə olunan platformalar deaktivdir; URL və dublikat
+  platforma validasiyasından sonra tək əlaqə kartı PUT sorğusu ilə saxlanır.
+- Uğurlu mutation cavabı cədvəli dərhal yeniləyir və `contactSettingsQueryKey`
+  invalidate edilərək məlumat backend-dən təkrar çəkilir.
+- LinkedIn həm Select seçimində, həm də web footer-in lokal SVG ikon xəritəsindədir.
+- Focused ESLint, hər iki tətbiqin TypeScript yoxlaması, operator production build və
+  `git diff --check` keçir; web build yalnız mövcud Google Fonts şəbəkə çıxışında dayanır.

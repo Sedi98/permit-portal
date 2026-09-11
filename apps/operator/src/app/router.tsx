@@ -31,6 +31,7 @@ import UserManagePage from "@/pages/(dashboard)/users/manage";
 import NotificationsPage from "@/pages/(dashboard)/notifications";
 import FaqsPage from "@/pages/(dashboard)/faqs";
 import ReportsPage from "@/pages/(dashboard)/reports";
+import ContactSettingsPage from "@/pages/(dashboard)/contact-settings";
 
 export default function AppRouter() {
   return (
@@ -123,6 +124,7 @@ export default function AppRouter() {
             <Route path="/permit-services/new" element={<PermitServiceManagePage />} />
             <Route path="/permit-services/:id" element={<PermitServiceManagePage />} />
             <Route path="/faqs" element={<FaqsPage />} />
+            <Route path="/contact-settings" element={<ContactSettingsPage />} />
           </Route>
         </Route>
       </Route>

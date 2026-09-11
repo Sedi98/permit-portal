@@ -1,5 +1,9 @@
 # Lessons
 
+- Do not expose a destructive table action unless the backend contract provides a corresponding operation; hiding it after a local-only state change avoids promising persistence the API cannot perform.
+- Before mapping social-network names to icon components, verify the installed icon package's actual exports; Lucide intentionally does not provide common brand icons, so use available semantic icons or project-owned brand assets instead of assuming brand exports exist.
+- When an overflow bug is caused by absolutely positioned editor UI, apply the containing-block position to the exact page-level ancestor requested by the user; a nearer field wrapper may not contain the element that creates the overflow.
+- When an approval endpoint returns a user-actionable sequencing error, surface the backend `message` in every UI entry point that calls that endpoint and retain a generic fallback for malformed or unavailable responses.
 - Before directly routing a single-type permit, verify that the authenticated profile has the matching applicant capability; block incompatible legal/physical combinations with user-visible feedback.
 - When an application action depends on authenticated profile metadata, handle the unauthenticated state at the initiating control and redirect directly to login before evaluating profile-derived routing.
 - When a confirmation screen repeats permit-service metadata, source its name and review duration from the selected service response instead of embedding values from one example service; start the query at the parent page so later steps render without a loading transition.

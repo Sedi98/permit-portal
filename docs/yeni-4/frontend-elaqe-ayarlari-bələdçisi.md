@@ -11,7 +11,7 @@ Bu, **FAQ kimi, "çoxlu sətirli" bir siyahı DEYİL** — bu, "Profil ayarları
 ```
 GET /api/contact-settings
 ```
-(Auth tələb olunmur.)
+(Auth tələb olunmur..)
 
 ### Cavab
 

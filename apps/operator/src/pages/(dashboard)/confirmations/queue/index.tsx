@@ -7,6 +7,7 @@ import TableLayout from "@/app/layouts/TableLayout";
 import PageTitle from "@/components/PageTitle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getConfirmationErrorMessage } from "@/features/confirmations/errors";
 import {
   useApproveConfirmationParticipant,
   useConfirmationQueue,
@@ -99,7 +100,13 @@ function ConfirmationQueueRow({
               note.trim() ? { note: note.trim() } : {},
               {
                 onSuccess: () => toast.success("Təsdiqləndi"),
-                onError: () => toast.error("Təsdiq zamanı xəta baş verdi"),
+                onError: (error) =>
+                  toast.error(
+                    getConfirmationErrorMessage(
+                      error,
+                      "Təsdiq zamanı xəta baş verdi",
+                    ),
+                  ),
               },
             )
           }

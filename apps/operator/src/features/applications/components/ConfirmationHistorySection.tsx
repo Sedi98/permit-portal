@@ -2,6 +2,7 @@ import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { getConfirmationErrorMessage } from "@/features/confirmations/errors";
 import { useApproveConfirmationParticipant } from "@/features/confirmations/hooks";
 import type {
   ConfirmationParticipant,
@@ -48,7 +49,13 @@ function ParticipantRow({
           onClick={() =>
             approve.mutate({}, {
               onSuccess: () => toast.success("İştirakçı təsdiqi tamamlandı"),
-              onError: () => toast.error("Təsdiq zamanı xəta baş verdi"),
+              onError: (error) =>
+                toast.error(
+                  getConfirmationErrorMessage(
+                    error,
+                    "Təsdiq zamanı xəta baş verdi",
+                  ),
+                ),
             })
           }
         >

@@ -522,7 +522,7 @@ export default function PermitServiceManagePage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="relative space-y-4">
       <div className="flex items-center gap-3 p-4">
         <Button
           variant="ghost"

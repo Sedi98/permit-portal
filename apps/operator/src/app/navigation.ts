@@ -3,6 +3,7 @@ import {
   ChartLine,
   CircleCheckBig,
   CircleHelp,
+  ContactRound,
   CreditCard,
   FileText,
   Home,
@@ -135,6 +136,12 @@ export const sidebarItems: SidebarItem[] = [
     label: "Tez-tez verilən suallar",
     path: "/faqs",
     icon: CircleHelp,
+    roles: ["super_admin"],
+  },
+  {
+    label: "Əlaqə Ayarları",
+    path: "/contact-settings",
+    icon: ContactRound,
     roles: ["super_admin"],
   },
 ];

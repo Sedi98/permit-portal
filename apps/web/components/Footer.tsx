@@ -1,6 +1,8 @@
-import { Globe2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+
+import { getContactSettings } from "@/features/contact-settings/api";
+import SocialBrandIcon from "./SocialBrandIcon";
 
 const navigation = [
   { label: "Xidmətlər", href: "#icazələr" },
@@ -8,14 +10,20 @@ const navigation = [
   { label: "Faq", href: "#faq" },
 ];
 
-const socialLinks = [
-  { label: "Facebook", href: "https://www.facebook.com/" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/" },
-  { label: "YouTube", href: "https://www.youtube.com/" },
-  { label: "Instagram", href: "https://www.instagram.com/" },
-];
+function getSocialLabel(platform: string) {
+  if (platform.toLowerCase() === "x") return "X (formerly Twitter)";
 
-export function Footer() {
+  return platform
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export async function Footer() {
+  const contactSettings = await getContactSettings()
+    .then((response) => response.data)
+    .catch(() => null);
+  const socialLinks = Object.entries(contactSettings?.social_links ?? {});
+
   return (
     <footer className="border-t-[0.8px] border-[#dfdfdf] bg-[#f9fafc] px-6 py-12 text-sm leading-5 md:px-10 lg:px-20">
       <div className="mx-auto max-w-7xl">
@@ -43,24 +51,46 @@ export function Footer() {
           <div className="flex flex-col items-start gap-4">
             <h2 className="font-medium text-[#040b12]">Əlaqə</h2>
             <address className="flex flex-col gap-4 not-italic text-[#286aa6]">
-              <a href="mailto:minenergy@minenergy.gov.az" className="hover:underline">minenergy@minenergy.gov.az</a>
-              <a href="tel:+994125981653" className="hover:underline">(+99412) 598-16-53/54/55</a>
-              <span>Bakı şəhəri, Ü.Hacıbəyli, 84 (Hökumət evi), AZ1000</span>
-            </address>
-            <div className="flex items-center gap-4" aria-label="Sosial şəbəkələr">
-              {socialLinks.map(({ label, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={label}
-                  className="flex size-12 items-center justify-center rounded-lg text-[#286aa6] transition-colors hover:bg-white"
-                >
-                  <Globe2 aria-hidden="true" className="size-5" strokeWidth={2.5} />
+              {contactSettings?.email ? (
+                <a href={`mailto:${contactSettings.email}`} className="hover:underline">
+                  {contactSettings.email}
                 </a>
-              ))}
-            </div>
+              ) : null}
+              {contactSettings?.phone ? (
+                <a
+                  href={`tel:${contactSettings.phone.replace(/[^+\d]/g, "")}`}
+                  className="hover:underline"
+                >
+                  {contactSettings.phone}
+                </a>
+              ) : null}
+              {contactSettings?.address ? <span>{contactSettings.address}</span> : null}
+            </address>
+            {socialLinks.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-4" aria-label="Sosial şəbəkələr">
+                {socialLinks.map(([platform, href]) => {
+                  const label = getSocialLabel(platform);
+
+                  return (
+                    <a
+                      key={platform}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      title={label}
+                      className="flex size-12 items-center justify-center rounded-lg text-[#286aa6] transition-colors hover:bg-white"
+                    >
+                      <SocialBrandIcon
+                        platform={platform}
+                        aria-hidden="true"
+                        className="size-5"
+                      />
+                    </a>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
         </div>
 
