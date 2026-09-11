@@ -59,7 +59,7 @@ export default function PermissionDetailPage({
           allowedApplicantTypes={permitService.allowed_applicant_types}
           type={permitService.category_label}
           reviewTime={`${permitService.review_duration_days} iş günü`}
-          fee={`${permitService.state_fee == `0.00` ? "Pulsuz" : `${permitService.state_fee} AZN`} `}
+          fee={`${permitService.state_fee == `0.00` ? "Ödənişsiz" : `${permitService.state_fee} AZN`} `}
           documentCount={`${permitService.document_types?.length ?? 0} sənəd`}
           requirements={["MYGOV hesabı", "Tələb olunan sənədlər"]}
         />
