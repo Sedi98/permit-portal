@@ -70,15 +70,27 @@ export default function BoardPage() {
     setAppliedDates({});
   }
 
+  function printStatistics() {
+    window.print();
+  }
+
   return (
-    <div className="relative space-y-4">
-      <h1 className="pl-4 text-base font-medium leading-6 text-stone-900">Lövhə</h1>
-      <TableLayout className="space-y-5">
+    <div className="relative space-y-4 print:space-y-0">
+      <h1 className="pl-4 text-base font-medium leading-6 text-stone-900 print:hidden">Lövhə</h1>
+      <TableLayout className="space-y-5 print:p-0">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-base font-bold leading-6 text-[#1f1f1f]">Lisenziya üçün müraciətlərin fəaliyyət sahələri üzrə bölgüsü</h2>
-          <Button variant="outline" className="text-[#286AA6]" disabled title="Excel ixracı hələ mövcud deyil"><Download className="size-6" />Yüklə</Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="text-[#286AA6] print:hidden"
+            onClick={printStatistics}
+            disabled={statisticsQuery.isLoading || !statistics}
+          >
+            <Download className="size-6" />Yüklə
+          </Button>
         </div>
-        <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="flex flex-wrap items-end justify-between gap-6 print:hidden">
           <div className="flex flex-wrap items-center gap-6">
             <div className="flex w-[220px] flex-col gap-1">
               <Label className="text-sm font-medium text-[#797979]">Başlanğıc tarix</Label>
@@ -110,12 +122,12 @@ export default function BoardPage() {
                   <span className="flex items-center gap-[6px]"><i className="size-[9px] rounded-[2px] bg-[#286aa6]" />İcazə</span>
                   <span className="flex items-center gap-[6px]"><i className="size-[9px] rounded-[2px] bg-[#a9c3db]" />Müraciət</span>
                 </div>
-                <Button variant="outline" className="h-auto px-3 py-2 text-base font-semibold text-[#286AA6]" disabled title="Excel ixracı hələ mövcud deyil"><Download className="size-6" />Yüklə</Button>
+                <Button variant="outline" className="h-auto px-3 py-2 text-base font-semibold text-[#286AA6] print:hidden" disabled title="Excel ixracı hələ mövcud deyil"><Download className="size-6" />Yüklə</Button>
               </div>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-[#797979]">Göstərilir:<span className="rounded-[20px] bg-[#eef4fb] px-[14px] py-1 font-bold text-[#286aa6]">{startYear} — {endYear}</span></div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 print:hidden">
                 <Button type="button" size="icon" variant="outline" aria-label="Əvvəlki illər" onClick={() => setEndYear((year) => year - YEAR_RANGE_SIZE)}><ChevronLeft className="size-6 text-[#286aa6]" /></Button>
                 <Button type="button" size="icon" variant="outline" aria-label="Sonrakı illər" disabled={endYear >= currentYear} onClick={() => setEndYear((year) => Math.min(currentYear, year + YEAR_RANGE_SIZE))}><ChevronRight className="size-6 text-[#286aa6]" /></Button>
               </div>

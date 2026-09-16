@@ -134,3 +134,22 @@
     @apply font-sans;
     }
 }
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: white;
+    overflow: visible;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  [data-slot="card"] {
+    break-inside: avoid;
+  }
+}

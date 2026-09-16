@@ -1,3 +1,21 @@
+# Task: Print operator dashboard statistics
+
+- [x] Connect the dashboard download action to the browser print dialog.
+- [x] Exclude dashboard navigation and interactive controls from print output.
+- [x] Keep charts and statistic cards readable across printed/PDF pages.
+- [x] Run operator lint and build verification and review the final diff.
+
+## Review
+
+- The primary dashboard download action now opens the browser print dialog once
+  statistics are available. Print output omits the sidebar, header, page controls,
+  date filters, navigation buttons, and download controls while retaining headings,
+  legends, selected year range, charts, and statistic cards. A4 landscape print
+  styling preserves chart colors and avoids splitting cards where possible.
+- Focused ESLint, the operator TypeScript/Vite production build, and `git diff
+  --check` pass. Full operator lint remains blocked by the existing 61 Tiptap and
+  shared-hook React Compiler errors plus the existing TanStack Table warning.
+
 # Task: Show apply-step validation on fields instead of disabling actions
 
 - [x] Audit every apply step that disables a forward/submit action because required data is missing.
