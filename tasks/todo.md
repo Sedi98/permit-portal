@@ -1,3 +1,129 @@
+# Task: Show apply-step validation on fields instead of disabling actions
+
+- [x] Audit every apply step that disables a forward/submit action because required data is missing.
+- [x] Keep actions clickable for validation while retaining disabled states for loading and unavailable backend state.
+- [x] Mark missing shadcn fields with `data-invalid`/`aria-invalid` and show concise field errors after an attempted action.
+- [x] Mark missing required document cards and the PS-003 capacity field with the same destructive validation treatment.
+- [x] Validate legal-entity selection/address, operation fields, contact fields, documents/capacity, and rating selection consistently.
+- [x] Run focused ESLint, web TypeScript, production build attempt, and diff verification.
+
+## Review
+
+Required-value validation is now revealed on action instead of being hidden behind
+disabled forward buttons. Contact email/phone, legal-entity selection/address,
+trade goods fields, required-document cards, PS-003 installed capacity, and rating
+selection use the shared shadcn `Field`, `FieldError`, `data-invalid`, and
+`aria-invalid` states. Invalid document cards use the same destructive border/ring
+treatment at the requested section level. Validation clears naturally as each value
+is supplied; buttons remain disabled only for in-flight requests or genuinely
+unavailable navigation/application state.
+
+Focused ESLint, web TypeScript, and the web production build pass, and
+`git diff --check` reports only the repository's line-ending conversion warnings.
+Full web lint remains blocked by the pre-existing raw applications anchor in
+`Navbar.tsx` plus the existing unused `idSeries` warning.
+
+# Task: Implement PS-001 / PS-002 / PS-003 application fields
+
+## Scope and confirmed behavior
+
+- [x] Keep service-specific branching based on `permit_service.code` (`PS-001`,
+  `PS-002`, `PS-003`) rather than database IDs.
+- [x] PS-001 web flow: show operation type, category, goods name, quantity, and
+  unit; send the operation enum and the category's Azerbaijani label.
+- [x] PS-002 web flow: show operation type, goods name, quantity, and unit; do
+  not render or submit a category.
+- [x] PS-003 web flow: remove the operation step and require top-level
+  `installed_capacity` directly below the document uploads.
+- [x] Replace the obsolete `goods_name_volume` contract with `goods_name`,
+  `goods_quantity`, and `goods_unit` across both applications.
+- [x] In the operator detail, expose PS-001/PS-002 trade values plus the
+  operator-only `permit_duration` date and `contract_number`; show/edit PS-003
+  `installed_capacity` inside the required-documents section.
+- [x] Gate both `confirm-payment-received` entry points for PS-001/PS-002 until
+  `permit_duration` and `contract_number` are present, while still surfacing the
+  backend's 422 message.
+- [x] Do not add any frontend Customs request, button, state, or error handling;
+  the Customs integration runs in the backend when the permit is signed.
+
+## Web panel plan
+
+- [x] Update `apps/web/features/apply/api.ts` response/payload types for the new
+  trade fields, `operation_type_label`, and top-level `installed_capacity`, and
+  add a typed application update for installed capacity.
+- [x] Refactor `apps/web/app-pages/apply/steps/operations-step.tsx` into a
+  PS-001/PS-002-aware form with the correct always-visible fields and client
+  validation.
+- [x] Update `apps/web/app-pages/apply/index.tsx` hydration, draft-resume
+  completeness checks, transitions, payloads, back navigation, and submit error
+  handling for all three service codes.
+- [x] Extend `apps/web/app-pages/apply/steps/documents-step.tsx` with the PS-003
+  required installed-capacity control and persist it independently from uploads.
+- [x] Update `apps/web/app-pages/apply/steps/checkout-step.tsx` to review the new
+  fields, use `operation_type_label` for display when supplied by the backend,
+  and show installed capacity for PS-003.
+- [x] Supply service-specific step labels/counts to the existing customizable
+  `ProgressStepper` and make child step counters dynamic so PS-003 has no
+  phantom operation step.
+
+## Operator panel plan
+
+- [x] Update `apps/operator/src/features/applications/types.ts` for the current
+  response/update contract, including top-level `installed_capacity`.
+- [x] Rework
+  `apps/operator/src/features/applications/components/TradeDetailSection.tsx`
+  to be service-aware, display the backend operation label, use suitable text
+  controls and the existing date picker, and support the documented edit status
+  rules.
+- [x] Update `apps/operator/src/features/applications/hooks.ts` so successful
+  edits correctly refresh/merge both trade-detail fields and top-level installed
+  capacity.
+- [x] Update
+  `apps/operator/src/pages/(dashboard)/applications/manage/index.tsx` to render
+  PS-001, PS-002, and PS-003 data in their required sections, allow editing in
+  `payment_review` and the documented payment-free `assigned` case, and guard
+  both signature-transition controls.
+- [x] If needed, add a narrowly scoped optional slot/prop to
+  `apps/operator/src/components/RequiredDocumentsSection.tsx` so PS-003 capacity
+  remains structurally inside that section without duplicating the component.
+
+## Verification plan
+
+- [x] Exercise new and resumed/draft web flows for PS-001, PS-002, and PS-003,
+  checking exact request bodies and conditional fields.
+- [x] Exercise operator read/edit behavior in allowed and disallowed statuses,
+  including empty mandatory fields, backend 422 messages, and cache refresh.
+- [x] Compare the relevant views and behavior against both `docs/latest-2`
+  guides, including step counts and field placement.
+- [x] Run focused lint while iterating, then `pnpm lint` and `pnpm build`; record
+  any confirmed pre-existing failures separately from regressions.
+- [x] Run `git diff --check` and review the final diff for unrelated changes.
+
+## Review
+
+PS-001 and PS-002 now share the documented code-based trade flow without relying
+on database IDs: the citizen form sends the exact operation enum, separate goods
+name/quantity/unit fields, and a label-valued category only for PS-001. PS-003 skips
+the operation step, uses a five-step progress sequence, and persists its mandatory
+top-level installed capacity independently from document uploads. Draft and revision
+hydration, review screens, back navigation, and validation messages use the new
+contracts.
+
+The operator detail now renders both trade services, uses the backend operation
+label, edits the five documented operator fields with a date picker for permit
+duration, and shows the editable PS-003 capacity inside the required-documents
+section. Both transitions through `confirm-payment-received` are gated until the
+PS-001/PS-002 Customs fields are complete, and backend error messages remain visible.
+Sparse update responses merge safely into the detail cache, and an open PDF preview
+refreshes after trade edits. No frontend Customs call was added.
+
+Focused ESLint passes for every changed operator file and has no web error (only the
+pre-existing unused `idSeries` warning). Web TypeScript and both production builds
+pass. Full operator lint remains blocked by 61 pre-existing Tiptap/shared-hook errors
+and one TanStack warning; full web lint remains blocked by the existing raw
+applications anchor. `git diff --check` passes with only line-ending conversion
+warnings.
+
 # Task: Load Docker build variables from each workspace env
 
 - [x] Audit Compose, both Dockerfiles, ignore rules, and application env usage.

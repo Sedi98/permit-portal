@@ -116,7 +116,7 @@ export function useUpdateTradeDetail(applicationId: number) {
   return useMutation({
     mutationFn: (payload: UpdateTradeDetailPayload) =>
       updateTradeDetail(applicationId, payload),
-    onSuccess: (response) => {
+    onSuccess: (response, payload) => {
       queryClient.setQueryData<ApplicationDetailResponse>(
         ["applications", "detail", applicationId],
         (current) => {
@@ -124,15 +124,32 @@ export function useUpdateTradeDetail(applicationId: number) {
 
           const existing =
             current.data.tradeDetail ?? current.data.trade_detail;
+          const returnedTradeDetail =
+            response.data.tradeDetail ?? response.data.trade_detail;
+          const tradeChanges = Object.fromEntries(
+            Object.entries(payload).filter(
+              ([field]) => field !== "installed_capacity",
+            ),
+          ) as Partial<NonNullable<ApplicationDetailResponse["data"]["tradeDetail"]>>;
           const tradeDetail = existing
-            ? { ...existing, ...response.data.tradeDetail }
-            : (response.data.tradeDetail as NonNullable<
-                ApplicationDetailResponse["data"]["tradeDetail"]
-              >);
+            ? { ...existing, ...tradeChanges, ...returnedTradeDetail }
+            : returnedTradeDetail
+              ? ({ ...returnedTradeDetail } as NonNullable<
+                  ApplicationDetailResponse["data"]["tradeDetail"]
+                >)
+              : undefined;
+          const installedCapacity =
+            response.data.installed_capacity ?? payload.installed_capacity;
 
           return {
             ...current,
-            data: { ...current.data, tradeDetail },
+            data: {
+              ...current.data,
+              ...(tradeDetail ? { tradeDetail } : {}),
+              ...(installedCapacity !== undefined
+                ? { installed_capacity: installedCapacity }
+                : {}),
+            },
           };
         },
       );

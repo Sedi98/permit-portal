@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { isAxiosError } from "axios";
 import { format } from "date-fns";
 import { ArrowLeft, Download, RefreshCw } from "lucide-react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
@@ -30,6 +31,7 @@ import ApplicationAssignSection from "@/features/applications/components/Applica
 import ConfirmationHistorySection from "@/features/applications/components/ConfirmationHistorySection";
 import ConfirmationSequenceForm from "@/features/applications/components/ConfirmationSequenceForm";
 import TradeDetailSection from "@/features/applications/components/TradeDetailSection";
+import InstalledCapacityField from "@/features/applications/components/InstalledCapacityField";
 
 const APPLICATION_STEPS = [
   { label: "Sahə seçimi" },
@@ -117,8 +119,6 @@ export default function ApplicationDetailPage() {
   const isReadOnly = searchParams.get("readonly") === "1";
   const applicationId = id ? Number(id) : undefined;
   const applicationQuery = useApplicationById(applicationId);
-  console.log(applicationQuery.data);
-
   const meQuery = useMe();
   const detail = applicationQuery.data?.data;
   const me = meQuery.data?.data;
@@ -246,6 +246,17 @@ export default function ApplicationDetailPage() {
           ? ("payment" as const)
           : null;
   const tradeDetail = detail.tradeDetail ?? detail.trade_detail;
+  const serviceCode = detail.permit_service.code;
+  const isTradePermit = serviceCode === "PS-001" || serviceCode === "PS-002";
+  const canEditSpecialFields =
+    !isReadOnly &&
+    (isCurrentAssignee || isSuperAdmin) &&
+    (detail.status === "payment_review" ||
+      (!requiresPayment && detail.status === "assigned"));
+  const hasRequiredSignatureFields =
+    !isTradePermit ||
+    (Boolean(tradeDetail?.permit_duration?.trim()) &&
+      Boolean(tradeDetail?.contract_number?.trim()));
   const canSendToSignature =
     !isReadOnly &&
     !requiresPayment &&
@@ -286,12 +297,13 @@ export default function ApplicationDetailPage() {
         fields={fields}
       />
 
-      {detail.permit_service_id === 1 && tradeDetail ? (
+      {isTradePermit && tradeDetail ? (
         <TableLayout>
           <TradeDetailSection
             applicationId={applicationId}
+            serviceCode={serviceCode}
             tradeDetail={tradeDetail}
-            canEdit={!isReadOnly && detail.status === "payment_review"}
+            canEdit={canEditSpecialFields}
           />
         </TableLayout>
       ) : null}
@@ -383,18 +395,23 @@ export default function ApplicationDetailPage() {
             </p>
             <div className="flex justify-end">
               <Button
-                disabled={confirmPayment.isPending}
+                disabled={confirmPayment.isPending || !hasRequiredSignatureFields}
                 onClick={() =>
                   confirmPayment.mutate(undefined, {
                     onSuccess: () => toast.success("Müraciət imzaya göndərildi"),
-                    onError: () =>
-                      toast.error("Müraciət imzaya göndərilərkən xəta baş verdi"),
+                    onError: (error) =>
+                      toast.error(getApiErrorMessage(error, "Müraciət imzaya göndərilərkən xəta baş verdi")),
                   })
                 }
               >
                 İmzaya göndər
               </Button>
             </div>
+            {!hasRequiredSignatureFields ? (
+              <p className="text-sm text-destructive">
+                İmzaya göndərmək üçün icazənin müddəti və müqavilənin nömrəsi doldurulmalıdır.
+              </p>
+            ) : null}
           </section>
         ) : null}
 
@@ -424,18 +441,23 @@ export default function ApplicationDetailPage() {
             </div>
             <div className="flex justify-end">
               <Button
-                disabled={confirmPayment.isPending}
+                disabled={confirmPayment.isPending || !hasRequiredSignatureFields}
                 onClick={() =>
                   confirmPayment.mutate(undefined, {
                     onSuccess: () => toast.success("Ödəniş təsdiqləndi"),
-                    onError: () =>
-                      toast.error("Ödəniş təsdiqlənərkən xəta baş verdi"),
+                    onError: (error) =>
+                      toast.error(getApiErrorMessage(error, "Ödəniş təsdiqlənərkən xəta baş verdi")),
                   })
                 }
               >
                 Ödənişi təsdiqlə
               </Button>
             </div>
+            {!hasRequiredSignatureFields ? (
+              <p className="text-sm text-destructive">
+                Ödənişi təsdiqləyib imzaya göndərmək üçün icazənin müddəti və müqavilənin nömrəsi doldurulmalıdır.
+              </p>
+            ) : null}
           </section>
         ) : null}
       </TableLayout>
@@ -446,7 +468,15 @@ export default function ApplicationDetailPage() {
           applicationId={detail.id}
           documents={detail.files}
           canReview={canReviewFiles}
-        />
+        >
+          {serviceCode === "PS-003" ? (
+            <InstalledCapacityField
+              applicationId={detail.id}
+              value={detail.installed_capacity}
+              canEdit={canEditSpecialFields}
+            />
+          ) : null}
+        </RequiredDocumentsSection>
       </TableLayout>
 
       {detail.status === "completed" && detail.documents.length > 0 ? (
@@ -485,4 +515,9 @@ export default function ApplicationDetailPage() {
       ) : null}
     </main>
   );
+}
+
+function getApiErrorMessage(error: unknown, fallback: string) {
+  if (!isAxiosError<{ message?: string }>(error)) return fallback;
+  return error.response?.data?.message ?? fallback;
 }

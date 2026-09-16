@@ -21,6 +21,7 @@ import {
   submitApplication,
   submitServiceRating,
   updateApplicationContact,
+  updateApplicationInstalledCapacity,
   updateApplicationLegalEntity,
   updateApplicationTradeDetail,
   uploadApplicationFile,
@@ -84,11 +85,12 @@ function getErrorMessage(error: unknown) {
         data !== null &&
         "errors" in data &&
         typeof data.errors === "object" &&
-        data.errors !== null &&
-        "files" in data.errors &&
-        typeof data.errors.files === "string"
+        data.errors !== null
       ) {
-        return data.errors.files;
+        const validationMessage = Object.values(data.errors).find(
+          (value): value is string => typeof value === "string",
+        );
+        if (validationMessage) return validationMessage;
       }
 
       if (
@@ -169,7 +171,7 @@ function getSelectedApplicationDocuments(
 
 function getFirstIncompleteStep(
   application: ApplicationDetails,
-  permitServiceId: number | undefined,
+  permitServiceCode: string | undefined,
   documentTypes: DocumentType[],
   documents: SelectedApplicationDocument[],
 ): ApplyStep {
@@ -201,10 +203,12 @@ function getFirstIncompleteStep(
   if (!hasContactInformation) return 2;
 
   if (
-    permitServiceId === 1 &&
+    (permitServiceCode === "PS-001" || permitServiceCode === "PS-002") &&
     (!application.trade_detail?.operation_type ||
-      !application.trade_detail.goods_category?.trim() ||
-      !application.trade_detail.goods_name_volume?.trim())
+      (permitServiceCode === "PS-001" && !application.trade_detail.goods_category?.trim()) ||
+      !application.trade_detail.goods_name?.trim() ||
+      !application.trade_detail.goods_quantity?.trim() ||
+      !application.trade_detail.goods_unit?.trim())
   ) {
     return 3;
   }
@@ -219,7 +223,8 @@ function getFirstIncompleteStep(
       return document && document.reviewStatus !== "rejected";
     });
 
-  return hasAllDocuments ? 5 : 4;
+  if (!hasAllDocuments || (permitServiceCode === "PS-003" && !application.installed_capacity?.trim())) return 4;
+  return 5;
 }
 
 const ApplyPermissionPage = ({
@@ -260,6 +265,7 @@ const ApplyPermissionPage = ({
     OperationInformationValues | undefined
   >();
   const [documents, setDocuments] = useState<SelectedApplicationDocument[]>([]);
+  const [installedCapacity, setInstalledCapacity] = useState("");
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>(
     initialPermitService?.documentTypes ?? [],
   );
@@ -330,6 +336,7 @@ const ApplyPermissionPage = ({
         setPermitServiceCode(
           data.permit_service?.code ?? permitService?.code ?? null,
         );
+        setInstalledCapacity(data.installed_capacity ?? "");
         setPersonalInformation({
           fin: data.fin,
           firstName: data.first_name,
@@ -352,14 +359,17 @@ const ApplyPermissionPage = ({
           if (data.trade_detail) {
             setOperationInformation({
               operationType: data.trade_detail.operation_type ?? "import",
-              goodsCategory: data.trade_detail.goods_category ?? "nuclear",
-              goodsNameVolume: data.trade_detail.goods_name_volume ?? "",
+              operationTypeLabel: data.trade_detail.operation_type_label,
+              goodsCategory: data.trade_detail.goods_category ?? "",
+              goodsName: data.trade_detail.goods_name ?? "",
+              goodsQuantity: data.trade_detail.goods_quantity ?? "",
+              goodsUnit: data.trade_detail.goods_unit ?? "",
             });
           }
 
           const initialStep = getFirstIncompleteStep(
             data,
-            resolvedPermitServiceId,
+            data.permit_service?.code ?? permitService?.code,
             configuredDocumentTypes,
             selectedDocuments,
           );
@@ -507,7 +517,7 @@ const ApplyPermissionPage = ({
         phones: values.phones.map((phone) => ({ phone })),
       });
       setContactInformation(values);
-      setStep(permitServiceId === 1 ? 3 : 4);
+      setStep(permitServiceCode === "PS-001" || permitServiceCode === "PS-002" ? 3 : 4);
     } catch (requestError: unknown) {
       setError(getErrorMessage(requestError));
     } finally {
@@ -525,8 +535,10 @@ const ApplyPermissionPage = ({
       await updateApplicationTradeDetail(application.id, {
         trade_detail: {
           operation_type: values.operationType,
-          goods_category: values.goodsCategory,
-          goods_name_volume: values.goodsNameVolume,
+          ...(permitServiceCode === "PS-001" ? { goods_category: values.goodsCategory } : {}),
+          goods_name: values.goodsName,
+          goods_quantity: values.goodsQuantity,
+          goods_unit: values.goodsUnit,
         },
       });
       setOperationInformation(values);
@@ -569,6 +581,30 @@ const ApplyPermissionPage = ({
     } catch (requestError: unknown) {
       setError(getErrorMessage(requestError));
       throw requestError;
+    }
+  };
+
+  const handleDocumentsNext = async (
+    selectedDocuments: SelectedApplicationDocument[],
+    capacity: string,
+  ) => {
+    if (!application) return;
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      if (permitServiceCode === "PS-003") {
+        await updateApplicationInstalledCapacity(application.id, {
+          installed_capacity: capacity,
+        });
+        setInstalledCapacity(capacity);
+      }
+      setDocuments(selectedDocuments);
+      setStep(5);
+    } catch (requestError: unknown) {
+      setError(getErrorMessage(requestError));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -632,6 +668,12 @@ const ApplyPermissionPage = ({
   const legalRepresentativeVoens = (user?.voens ?? []).filter(
     ({ is_legal_representative }) => is_legal_representative === 1,
   );
+  const hasOperationStep = permitServiceCode === "PS-001" || permitServiceCode === "PS-002";
+  const totalFormSteps = hasOperationStep ? 6 : 5;
+  const progressSteps = hasOperationStep
+    ? [effectiveApplicantType === "legal" ? "Hüquqi şəxs" : "Fiziki şəxs", "Əlaqə", "Əməliyyat", "Sənədlər", "Nəzərdən keçir", "Yekun"]
+    : [effectiveApplicantType === "legal" ? "Hüquqi şəxs" : "Fiziki şəxs", "Əlaqə", "Sənədlər", "Nəzərdən keçir", "Yekun"];
+  const visibleStep = !hasOperationStep && typeof step === "number" && step >= 4 ? step - 1 : step;
 
   if (isCreating) {
     return (
@@ -685,7 +727,7 @@ const ApplyPermissionPage = ({
   return (
     <main className="flex w-full flex-col items-center pb-10">
       {typeof step === "number" && step < 7 ? (
-        <ProgressStepper activeStep={step} />
+        <ProgressStepper activeStep={typeof visibleStep === "number" ? visibleStep : 1} steps={progressSteps} />
       ) : null}
 
       {error ? (
@@ -709,12 +751,14 @@ const ApplyPermissionPage = ({
             onBack={() => router.back()}
             onNext={() => void handleLegalInformationNext()}
             isSubmitting={isSubmitting}
+            totalSteps={totalFormSteps}
           />
         ) : (
           <PersonalInformation
             values={personalInformation}
             onNext={() => setStep(2)}
             isNextDisabled={!application}
+            totalSteps={totalFormSteps}
           />
         )
       ) : null}
@@ -726,16 +770,19 @@ const ApplyPermissionPage = ({
           onNext={handleContactNext}
           isSubmitting={isSubmitting}
           isBackDisabled={firstAvailableStep === 2}
+          totalSteps={totalFormSteps}
         />
       ) : null}
 
       {step === 3 ? (
         <OperationStep
+          serviceCode={permitServiceCode === "PS-002" ? "PS-002" : "PS-001"}
           initialValues={operationInformation}
           onBack={() => setStep(2)}
           onNext={handleOperationNext}
           isSubmitting={isSubmitting}
           isBackDisabled={firstAvailableStep === 3}
+          totalSteps={totalFormSteps}
         />
       ) : null}
 
@@ -744,14 +791,16 @@ const ApplyPermissionPage = ({
           documentTypes={documentTypes}
           initialDocuments={documents}
           maxFileSizeMb={maxFileSizeMb}
-          onBack={() => setStep(permitServiceId === 1 ? 3 : 2)}
+          onBack={() => setStep(hasOperationStep ? 3 : 2)}
           onUpload={handleDocumentUpload}
           onReplace={handleDocumentReplace}
           isBackDisabled={firstAvailableStep === 4}
-          onNext={(selectedDocuments) => {
-            setDocuments(selectedDocuments);
-            setStep(5);
-          }}
+          installedCapacity={installedCapacity}
+          requireInstalledCapacity={permitServiceCode === "PS-003"}
+          stepNumber={hasOperationStep ? 4 : 3}
+          totalSteps={totalFormSteps}
+          isSubmitting={isSubmitting}
+          onNext={handleDocumentsNext}
         />
       ) : null}
 
@@ -763,6 +812,9 @@ const ApplyPermissionPage = ({
           legalInformation={legalInformation}
           contactInformation={contactInformation}
           operationInformation={operationInformation}
+          installedCapacity={permitServiceCode === "PS-003" ? installedCapacity : undefined}
+          stepNumber={hasOperationStep ? 5 : 4}
+          totalSteps={totalFormSteps}
           onBack={() => setStep(4)}
           onNext={() => setStep(6)}
           isBackDisabled={firstAvailableStep === 5}
@@ -783,6 +835,8 @@ const ApplyPermissionPage = ({
           submitLabel={
             isRevisionApplication ? "Yenidən göndər" : "Göndər"
           }
+          stepNumber={hasOperationStep ? 6 : 5}
+          totalSteps={totalFormSteps}
         />
       ) : null}
 
@@ -797,7 +851,7 @@ const ApplyPermissionPage = ({
         ) : (
           <ToDraftStep
             permitServiceName={selectedPermitService?.name}
-            completedSteps={`${permitServiceId === 1 ? 6 : 5}/6 tamamlandı`}
+            completedSteps={`${totalFormSteps}/${totalFormSteps} tamamlandı`}
             onContinue={() => setStep(6)}
             onDrafts={() => window.location.assign("/drafts")}
           />

@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 
 import { RadioChoiceCard } from "@/components/radio-choice-card";
 import { Button } from "@/components/ui/button";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { RadioGroup } from "@/components/ui/radio-group";
 import type { Voen } from "@/features/auth/types";
@@ -26,6 +27,7 @@ type LegalEntityInformationProps = {
   onBack?: () => void;
   onNext: () => void;
   isSubmitting?: boolean;
+  totalSteps?: number;
 };
 
 type LockedFieldProps = {
@@ -67,7 +69,9 @@ export default function LegalEntityInformation({
   onBack,
   onNext,
   isSubmitting = false,
+  totalSteps = 6,
 }: LegalEntityInformationProps) {
+  const [showValidation, setShowValidation] = useState(false);
   const canContinue = Boolean(
     values.voen &&
       values.legalEntityName &&
@@ -76,6 +80,15 @@ export default function LegalEntityInformation({
       values.directorLastName &&
       values.directorFatherName,
   );
+  const legalEntityMissing = !values.voen || !values.legalEntityName || !values.directorFirstName || !values.directorLastName || !values.directorFatherName;
+  const addressMissing = !values.legalAddress.trim();
+  const addressInvalid = showValidation && Boolean(values.voen) && addressMissing;
+
+  const handleNext = () => {
+    setShowValidation(true);
+    if (!canContinue) return;
+    onNext();
+  };
 
   return (
     <section className="flex w-full max-w-[770px] flex-col gap-7 rounded-xl border border-[#dfdfdf] p-4 sm:p-8">
@@ -88,7 +101,10 @@ export default function LegalEntityInformation({
         </p>
       </header>
 
-      <div className="flex flex-col gap-4">
+      <div
+        className="flex flex-col gap-4 rounded-xl border border-transparent p-1 data-[invalid=true]:border-destructive data-[invalid=true]:ring-2 data-[invalid=true]:ring-destructive/20"
+        data-invalid={showValidation && legalEntityMissing}
+      >
         <h2 className="text-base font-medium leading-6 text-[#1f1f1f]">
           FİN-inizə əsasən səlahiyyətli olduğunuz hüquqi şəxslər
         </h2>
@@ -99,6 +115,7 @@ export default function LegalEntityInformation({
             onValueChange={onVoenSelect}
             disabled={isSubmitting}
             aria-label="Hüquqi şəxs seçimi"
+            aria-invalid={showValidation && legalEntityMissing}
             className="gap-3"
           >
             {voens.map((item) => (
@@ -138,6 +155,7 @@ export default function LegalEntityInformation({
             </p>
           </div>
         ) : null}
+        {showValidation && legalEntityMissing ? <FieldError>Hüquqi şəxsi seçin və məlumatların yüklənməsini gözləyin.</FieldError> : null}
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -146,7 +164,7 @@ export default function LegalEntityInformation({
           label="Hüquqi şəxsin adı"
           value={values.legalEntityName}
         />
-        <Field>
+        <Field data-invalid={addressInvalid}>
           <FieldLabel htmlFor="legal-address">Hüquqi ünvan</FieldLabel>
           <Input
             id="legal-address"
@@ -154,8 +172,10 @@ export default function LegalEntityInformation({
             onChange={(event) => onLegalAddressChange(event.target.value)}
             placeholder="Daxil edin"
             disabled={!values.voen || isSubmitting}
+            aria-invalid={addressInvalid}
             className="h-12 bg-[#f5f5f5] px-4 py-3 text-base text-[#1f1f1f] placeholder:text-[#797979] disabled:opacity-100"
           />
+          {addressInvalid ? <FieldError>Hüquqi ünvanı daxil edin.</FieldError> : null}
         </Field>
         <LockedField id="legal-entity-voen" label="VÖEN" value={values.voen} />
         <LockedField
@@ -193,13 +213,13 @@ export default function LegalEntityInformation({
         </Button>
 
         <span className="text-sm font-medium leading-5 text-[#797979]">
-          1 / 6
+          1 / {totalSteps}
         </span>
 
         <Button
           type="button"
-          onClick={onNext}
-          disabled={!canContinue || isSubmitting}
+          onClick={handleNext}
+          disabled={isSubmitting}
           className="h-12 w-[100px] gap-2 bg-[#286aa6] px-4 py-3 text-base font-semibold text-white hover:bg-[#286aa6]"
         >
           İrəli

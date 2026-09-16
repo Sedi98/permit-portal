@@ -27,6 +27,7 @@ type PersonalInformationProps = {
   onBack?: () => void;
   onNext?: () => void;
   isNextDisabled?: boolean;
+  totalSteps?: number;
 };
 
 function PersonalInformationField({
@@ -66,6 +67,7 @@ export default function PersonalInformation({
   onBack,
   onNext,
   isNextDisabled = false,
+  totalSteps = 6,
 }: PersonalInformationProps) {
   const idSeries = values?.idSeries ?? "";
   const fin = values?.fin ?? "";
@@ -153,7 +155,7 @@ export default function PersonalInformation({
         </Button>
 
         <span className="text-sm font-medium leading-5 text-[#797979]">
-          1 / 6
+          1 / {totalSteps}
         </span>
 
         <Button

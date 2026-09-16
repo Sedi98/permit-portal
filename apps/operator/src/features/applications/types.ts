@@ -31,8 +31,13 @@ export interface TradeDetail {
   id: number;
   permit_application_id: number;
   operation_type: TradeOperationType;
+  operation_type_label?: string | null;
   goods_category: string | null;
-  goods_name_volume: string | null;
+  goods_name: string | null;
+  goods_quantity: string | null;
+  goods_unit: string | null;
+  permit_duration: string | null;
+  contract_number: string | null;
   usage_info: string | null;
   remaining_info: string | null;
 }
@@ -40,9 +45,13 @@ export interface TradeDetail {
 export type UpdateTradeDetailPayload = Partial<
   Pick<
     TradeDetail,
-    "goods_category" | "goods_name_volume" | "usage_info" | "remaining_info"
+    | "goods_name"
+    | "goods_quantity"
+    | "goods_unit"
+    | "permit_duration"
+    | "contract_number"
   >
->;
+> & { installed_capacity?: string };
 
 export interface ApplicationsQueryParams {
   status?: ApplicationStatus | string;
@@ -226,6 +235,7 @@ export interface ApplicationListItem {
   payment_amount?: number | string | null;
   invoice_no?: string | null;
   paid_at?: string | null;
+  installed_capacity?: string | null;
   created_at: string;
   updated_at: string;
   files_count: number;
@@ -264,6 +274,7 @@ export interface ApplicationDetail {
   payment_amount?: number | string | null;
   invoice_no?: string | null;
   paid_at?: string | null;
+  installed_capacity?: string | null;
   created_at: string;
   updated_at: string;
   applicant_full_name: string;
@@ -328,7 +339,9 @@ export interface UpdateTradeDetailResponse {
   status: string;
   message: string;
   data: {
-    tradeDetail: Partial<TradeDetail>;
+    tradeDetail?: Partial<TradeDetail>;
+    trade_detail?: Partial<TradeDetail>;
+    installed_capacity?: string | null;
   };
 }
 

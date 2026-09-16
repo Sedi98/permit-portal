@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { FieldError } from "@/components/ui/field";
 
 const FILLED_STAR_ICON = "/icons/apply/rating/star-filled.svg";
 const OUTLINE_STAR_ICON = "/icons/apply/rating/star-outline.svg";
@@ -35,8 +36,10 @@ const RatingStep = ({
 }: RatingStepProps) => {
   const [rating, setRating] = useState<RatingValue | null>(initialRating ?? null);
   const [comment, setComment] = useState(initialComment);
+  const [showValidation, setShowValidation] = useState(false);
 
   const handleSubmit = () => {
+    setShowValidation(true);
     if (!rating) return;
 
     void onSubmit?.({ rating, comment: comment.trim() });
@@ -64,7 +67,11 @@ const RatingStep = ({
           </p>
         </header>
 
-        <fieldset className="flex w-full flex-col items-center gap-2.5">
+        <fieldset
+          className="flex w-full flex-col items-center gap-2.5 rounded-lg border border-transparent p-2 data-[invalid=true]:border-destructive data-[invalid=true]:ring-2 data-[invalid=true]:ring-destructive/20"
+          data-invalid={showValidation && !rating}
+          aria-invalid={showValidation && !rating}
+        >
           <legend className="sr-only">Xidmət üçün ulduz reytinqi seçin</legend>
           <div className="flex items-center gap-[13.958px]">
             {RATING_VALUES.map((value) => {
@@ -97,6 +104,7 @@ const RatingStep = ({
           >
             {rating ? `${rating} ulduz seçildi` : "Ulduz seçin"}
           </p>
+          {showValidation && !rating ? <FieldError>Qiymətləndirmək üçün ulduz seçin.</FieldError> : null}
         </fieldset>
 
         <div className="w-full">
@@ -129,7 +137,7 @@ const RatingStep = ({
           <Button
             type="button"
             onClick={handleSubmit}
-            disabled={!rating || isSubmitting}
+            disabled={isSubmitting}
             className="h-12 min-w-0 flex-1 rounded-lg bg-[#286aa6] px-4 py-3 text-base font-semibold text-white hover:bg-[#286aa6] disabled:bg-[#5388b8] disabled:text-[#bcbcbc] disabled:opacity-100"
           >
             Göndər

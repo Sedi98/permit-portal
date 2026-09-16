@@ -24,6 +24,8 @@ type ConfirmationStepProps = {
   isSubmitting?: boolean;
   isBackDisabled?: boolean;
   submitLabel?: string;
+  stepNumber?: number;
+  totalSteps?: number;
 };
 
 const SummaryRow = ({
@@ -52,6 +54,8 @@ const ConfirmationStep = ({
   isSubmitting = false,
   isBackDisabled = false,
   submitLabel = "Göndər",
+  stepNumber = 6,
+  totalSteps = 6,
 }: ConfirmationStepProps) => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4">
@@ -136,7 +140,7 @@ const ConfirmationStep = ({
             Geri
           </Button>
 
-          <span className="text-sm font-medium leading-5 text-[#797979]">6 / 6</span>
+          <span className="text-sm font-medium leading-5 text-[#797979]">{stepNumber} / {totalSteps}</span>
 
           <Button
             type="button"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Check, Download, Eye, LoaderCircle, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -26,6 +26,7 @@ interface RequiredDocumentsSectionProps {
   documents: RequiredDocument[];
   applicationId?: number;
   canReview?: boolean;
+  children?: ReactNode;
 }
 
 function DocumentRow({
@@ -209,9 +210,8 @@ export default function RequiredDocumentsSection({
   documents,
   applicationId,
   canReview = false,
+  children,
 }: RequiredDocumentsSectionProps) {
-  console.log(documents);
-
   return (
     <div className="flex flex-col gap-3 ">
       <p className="text-[#1F1F1F] font-bold text-xl leading-7">{title}</p>
@@ -231,6 +231,7 @@ export default function RequiredDocumentsSection({
           />
         ))}
       </div>
+      {children}
     </div>
   );
 }

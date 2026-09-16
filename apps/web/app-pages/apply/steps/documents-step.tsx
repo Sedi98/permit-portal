@@ -5,6 +5,8 @@ import { useState } from "react";
 
 import { DocumentUploadItem } from "@/components/document-upload-item";
 import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import type { ApplicationFile } from "@/features/apply/api";
 import type { DocumentType } from "@/features/permit-services/types";
 import { cn } from "@/lib/utils";
@@ -29,7 +31,12 @@ type DocumentsStepProps = {
   maxFileSizeMb?: number;
   onBack?: () => void;
   isBackDisabled?: boolean;
-  onNext?: (documents: SelectedApplicationDocument[]) => void;
+  installedCapacity?: string;
+  requireInstalledCapacity?: boolean;
+  stepNumber?: number;
+  totalSteps?: number;
+  isSubmitting?: boolean;
+  onNext?: (documents: SelectedApplicationDocument[], installedCapacity: string) => void;
   onUpload?: (
     documentTypeId: number,
     file: File,
@@ -47,6 +54,7 @@ type RequiredDocumentCardProps = {
   maxFileSizeMb: number;
   onUpload?: (file: File) => ApplicationFile | void | Promise<ApplicationFile | void>;
   onReplace?: (file: File) => void | Promise<void>;
+  invalid?: boolean;
 };
 
 function RequiredDocumentCard({
@@ -56,15 +64,17 @@ function RequiredDocumentCard({
   maxFileSizeMb,
   onUpload,
   onReplace,
+  invalid = false,
 }: RequiredDocumentCardProps) {
   return (
     <article
       className={cn(
-        "flex w-full flex-col items-center gap-2 overflow-hidden rounded-2xl border bg-white px-px pb-5",
+        "flex w-full flex-col items-center gap-2 overflow-hidden rounded-2xl border bg-white px-px pb-5 data-[invalid=true]:border-destructive data-[invalid=true]:ring-2 data-[invalid=true]:ring-destructive/20",
         selectedDocument?.reviewStatus === "rejected"
           ? "border-[#f32020]"
           : "border-[#dfdfdf]",
       )}
+      data-invalid={invalid}
     >
       <header className="flex w-full items-center gap-3 px-5 pb-3 pt-5">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-[#eef4fb] px-3 py-1.5 text-sm font-bold leading-5 text-[#286aa6]">
@@ -124,6 +134,11 @@ const DocumentsStep = ({
   onNext,
   onUpload,
   onReplace,
+  installedCapacity = "",
+  requireInstalledCapacity = false,
+  stepNumber = 4,
+  totalSteps = 6,
+  isSubmitting = false,
 }: DocumentsStepProps) => {
   const [selectedByType, setSelectedByType] = useState<
     Record<number, SelectedApplicationDocument>
@@ -132,6 +147,8 @@ const DocumentsStep = ({
       initialDocuments.map((document) => [document.documentTypeId, document]),
     ),
   );
+  const [capacity, setCapacity] = useState(installedCapacity);
+  const [showValidation, setShowValidation] = useState(false);
 
   const handleUpload = async (documentType: DocumentType, file: File) => {
     const uploadedFile = await onUpload?.(documentType.id, file);
@@ -179,6 +196,13 @@ const DocumentsStep = ({
     documentTypes.length > 0 &&
     selectedDocuments.length === documentTypes.length &&
     selectedDocuments.every((document) => document.reviewStatus !== "rejected");
+  const capacityMissing = requireInstalledCapacity && !capacity.trim();
+
+  const handleNext = () => {
+    setShowValidation(true);
+    if (!allDocumentsUploaded || capacityMissing) return;
+    onNext?.(selectedDocuments, capacity.trim());
+  };
 
   return (
     <section className="flex w-full max-w-[770px] flex-col gap-7 rounded-xl border border-[#dfdfdf] p-4 sm:p-8">
@@ -200,6 +224,7 @@ const DocumentsStep = ({
               selectedDocument={selectedByType[documentType.id]}
               number={index + 1}
               maxFileSizeMb={maxFileSizeMb}
+              invalid={showValidation && (!selectedByType[documentType.id] || selectedByType[documentType.id]?.reviewStatus === "rejected")}
               onUpload={(file) => handleUpload(documentType, file)}
               onReplace={(file) => {
                 const document = selectedByType[documentType.id];
@@ -214,6 +239,13 @@ const DocumentsStep = ({
             Bu icazə üçün tələb olunan sənədlər konfiqurasiya edilməyib.
           </p>
         )}
+        {requireInstalledCapacity ? (
+          <Field data-invalid={showValidation && capacityMissing}>
+            <FieldLabel htmlFor="installed-capacity">Ümumi qoyuluş gücü</FieldLabel>
+            <Input id="installed-capacity" value={capacity} onChange={(event) => setCapacity(event.target.value)} placeholder="Məsələn, 12,5 MVt" aria-invalid={showValidation && capacityMissing} />
+            {showValidation && capacityMissing ? <FieldError>Ümumi qoyuluş gücünü daxil edin.</FieldError> : null}
+          </Field>
+        ) : null}
       </div>
 
       <footer className="flex w-full items-center justify-between border-t border-[#dfdfdf] pt-[21px]">
@@ -228,12 +260,12 @@ const DocumentsStep = ({
           Geri
         </Button>
 
-        <span className="text-sm font-medium leading-5 text-[#797979]">4 / 6</span>
+        <span className="text-sm font-medium leading-5 text-[#797979]">{stepNumber} / {totalSteps}</span>
 
         <Button
           type="button"
-          onClick={() => onNext?.(selectedDocuments)}
-          disabled={!allDocumentsUploaded}
+          onClick={handleNext}
+          disabled={isSubmitting}
           className="h-12 w-[100px] gap-2 bg-[#286aa6] px-4 py-3 text-base font-semibold text-white hover:bg-[#286aa6]"
         >
           İrəli

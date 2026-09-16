@@ -48,6 +48,7 @@
 - When a dialog form is rendered inside a page form, stop submit propagation on the inner form so dialog actions cannot submit the parent entity form.
 - When application history authors arrive under `status_histories[].changed_by`, read their role from that exact object; for executor-specific titles, match the author ID against `assignees[].user_id` and prefer `assignment_role_label`.
 - When an application detail must show both assignees and workflow notes, keep them as two distinct tables: map `assignees` into the upper executor table and `status_histories` into the lower notes table.
+- When a required apply-step value is missing, keep the forward action available and reveal validation on the exact field or document card with shadcn invalid-state attributes; reserve disabled buttons for in-flight or genuinely unavailable actions.
 # Application applicant-type support
 
 - When adding a new applicant type, audit every downstream review and confirmation

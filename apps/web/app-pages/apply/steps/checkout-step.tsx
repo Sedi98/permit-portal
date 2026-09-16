@@ -28,6 +28,9 @@ type CheckoutStepProps = {
   legalInformation?: LegalEntityInformationValues;
   contactInformation?: ContactInformationValues;
   operationInformation?: OperationInformationValues;
+  installedCapacity?: string;
+  stepNumber?: number;
+  totalSteps?: number;
   onBack?: () => void;
   onNext?: () => void;
   isBackDisabled?: boolean;
@@ -91,6 +94,9 @@ const CheckoutStep = ({
   legalInformation,
   contactInformation,
   operationInformation,
+  installedCapacity,
+  stepNumber = 5,
+  totalSteps = 6,
   onBack,
   onNext,
   isBackDisabled = false,
@@ -162,14 +168,18 @@ const CheckoutStep = ({
           </ReviewSection>
 
           {operationInformation ? <ReviewSection title="Əməliyyat və mal məlumatları">
-            <ReviewRow label="Əməliyyatın növü" value={operationInformation.operationType} />
-            <ReviewRow
+            <ReviewRow label="Əməliyyatın növü" value={operationInformation.operationTypeLabel || operationInformation.operationType} />
+            {operationInformation.goodsCategory ? <ReviewRow
               label="Mal kateqoriyası"
               value={operationInformation.goodsCategory}
               valueClassName="max-w-[545px] flex-1"
-            />
-            <ReviewRow label="Malın adı və həcmi" value={operationInformation.goodsNameVolume} />
+            /> : null}
+            <ReviewRow label="Malın adı" value={operationInformation.goodsName} />
+            <ReviewRow label="Miqdar" value={operationInformation.goodsQuantity} />
+            <ReviewRow label="Vahid" value={operationInformation.goodsUnit} />
           </ReviewSection> : null}
+
+          {installedCapacity ? <ReviewSection title="Ümumi qoyuluş gücü"><ReviewRow label="Ümumi qoyuluş gücü" value={installedCapacity} /></ReviewSection> : null}
 
           <ReviewSection title="Sənədlər">
             {documents.map((document, index) => (
@@ -227,7 +237,7 @@ const CheckoutStep = ({
             Geri
           </Button>
 
-          <span className="text-sm font-medium leading-5 text-[#797979]">5 / 6</span>
+          <span className="text-sm font-medium leading-5 text-[#797979]">{stepNumber} / {totalSteps}</span>
 
           <Button
             type="button"

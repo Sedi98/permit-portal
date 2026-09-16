@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 export type ContactInformationValues = {
@@ -18,12 +18,13 @@ type PhoneFieldProps = {
   onChange: (value: string) => void;
   onRemove: (id: number) => void;
   index: number;
+  invalid?: boolean;
 };
 
-function PhoneField({ id, index, value, onChange, onRemove }: PhoneFieldProps) {
+function PhoneField({ id, index, value, onChange, onRemove, invalid = false }: PhoneFieldProps) {
   return (
     <div className="flex w-full items-end gap-3">
-      <Field className="min-w-0 flex-1">
+      <Field className="min-w-0 flex-1" data-invalid={invalid}>
         <FieldLabel htmlFor={`contact-phone-${id}`}>Mobil nömrə</FieldLabel>
         <Input
           id={`contact-phone-${id}`}
@@ -31,7 +32,9 @@ function PhoneField({ id, index, value, onChange, onRemove }: PhoneFieldProps) {
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder="+994 __ ___ __ __"
+          aria-invalid={invalid}
         />
+        {invalid ? <FieldError>Ən azı bir mobil nömrə daxil edin.</FieldError> : null}
       </Field>
       <Button
         type="button"
@@ -58,6 +61,7 @@ type ContactInformationProps = {
   onNext?: (values: ContactInformationValues) => void | Promise<void>;
   isSubmitting?: boolean;
   isBackDisabled?: boolean;
+  totalSteps?: number;
 };
 
 export default function ContactInformation({
@@ -66,6 +70,7 @@ export default function ContactInformation({
   onNext,
   isSubmitting = false,
   isBackDisabled = false,
+  totalSteps = 6,
 }: ContactInformationProps) {
   const [phoneFields, setPhoneFields] = useState(() =>
     (initialValues?.phones?.length ? initialValues.phones : [""]).map(
@@ -73,7 +78,7 @@ export default function ContactInformation({
     ),
   );
   const [email, setEmail] = useState(initialValues?.email ?? "");
-  const [error, setError] = useState<string | null>(null);
+  const [showValidation, setShowValidation] = useState(false);
   const nextPhoneId = useRef(1);
 
   const handleAddPhone = () => {
@@ -96,13 +101,12 @@ export default function ContactInformation({
 
   const handleNext = () => {
     const phones = phoneFields.map((field) => field.value.trim()).filter(Boolean);
+    setShowValidation(true);
 
     if (!email.trim() || phones.length === 0) {
-      setError("E-poçt ünvanı və ən azı bir mobil nömrə daxil edin.");
       return;
     }
 
-    setError(null);
     void onNext?.({ email: email.trim(), phones });
   };
 
@@ -127,6 +131,7 @@ export default function ContactInformation({
               value={field.value}
               onChange={(value) => handlePhoneChange(field.id, value)}
               onRemove={handleRemovePhone}
+              invalid={showValidation && phoneFields.every(({ value }) => !value.trim())}
             />
           ))}
         </div>
@@ -147,7 +152,7 @@ export default function ContactInformation({
           Nömrə əlavə et
         </Button>
 
-        <Field>
+        <Field data-invalid={showValidation && !email.trim()}>
           <FieldLabel htmlFor="contact-email">E-poçt ünvanı</FieldLabel>
           <Input
             id="contact-email"
@@ -155,9 +160,10 @@ export default function ContactInformation({
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="example@email.az"
+            aria-invalid={showValidation && !email.trim()}
           />
+          {showValidation && !email.trim() ? <FieldError>E-poçt ünvanını daxil edin.</FieldError> : null}
         </Field>
-        {error ? <p className="text-sm text-[#d90b0b]" role="alert">{error}</p> : null}
       </div>
 
       <footer className="flex w-full items-center justify-between border-t border-[#dfdfdf] pt-[21px]">
@@ -179,7 +185,7 @@ export default function ContactInformation({
         </Button>
 
         <span className="text-sm font-medium leading-5 text-[#797979]">
-          2 / 6
+          2 / {totalSteps}
         </span>
 
         <Button

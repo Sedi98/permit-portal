@@ -64,9 +64,13 @@ export type ApplicationDetails = PhysicalApplicant & {
   voen?: string | null;
   trade_detail?: {
     operation_type?: TradeDetailPayload["trade_detail"]["operation_type"];
+    operation_type_label?: string;
     goods_category?: string;
-    goods_name_volume?: string;
+    goods_name?: string;
+    goods_quantity?: string;
+    goods_unit?: string;
   } | null;
+  installed_capacity?: string | null;
 };
 
 type ApiResponse<T> = {
@@ -91,10 +95,14 @@ export type ContactInformationPayload = {
 export type TradeDetailPayload = {
   trade_detail: {
     operation_type: "export" | "import" | "re_export" | "re_import" | "transit";
-    goods_category: string;
-    goods_name_volume: string;
+    goods_category?: string;
+    goods_name: string;
+    goods_quantity: string;
+    goods_unit: string;
   };
 };
+
+export type InstalledCapacityPayload = { installed_capacity: string };
 
 export async function createApplication(
   permitServiceId: number,
@@ -139,6 +147,16 @@ export async function updateApplicationTradeDetail(
   payload: TradeDetailPayload,
 ) {
   return PutApi<ApiResponse<unknown>, TradeDetailPayload>(
+    `/permit-applications/${applicationId}`,
+    payload,
+  );
+}
+
+export async function updateApplicationInstalledCapacity(
+  applicationId: number,
+  payload: InstalledCapacityPayload,
+) {
+  return PutApi<ApiResponse<unknown>, InstalledCapacityPayload>(
     `/permit-applications/${applicationId}`,
     payload,
   );
