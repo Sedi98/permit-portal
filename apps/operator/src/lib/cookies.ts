@@ -7,7 +7,11 @@ export function getToken(): string | undefined {
 }
 
 export function setToken(token: string): void {
-  Cookies.set(TOKEN_KEY, token, { path: "/", secure: true, sameSite: "lax" });
+  Cookies.set(TOKEN_KEY, token, {
+    path: "/",
+    secure: window.location.protocol === "https:",
+    sameSite: "lax",
+  });
 }
 
 export function removeToken(): void {
