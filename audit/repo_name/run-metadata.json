@@ -1,0 +1,47 @@
+﻿{
+    "run_id":  "run-1",
+    "repo":  "permit-portal",
+    "target":  "C:/Microsoft Defender/permit-portal",
+    "source_ref":  "6e879399334e882817ff61cf53e65ad75c89e5a5",
+    "worktree_dirty":  false,
+    "profile":  "standard",
+    "scope_paths":  [
+                        "apps/web",
+                        "apps/operator",
+                        "admin-api-senedlesme.yaml",
+                        "package.json",
+                        "pnpm-lock.yaml",
+                        "apps/web/package.json",
+                        "apps/operator/package.json",
+                        "apps/operator/Dockerfile",
+                        "apps/operator/nginx.conf"
+                    ],
+    "budget":  null,
+    "execution_policy":  "sandboxed-source-and-local-only",
+    "selected_companion_files":  [
+                                     "WEB-PROTOCOL-AND-AUTH.md",
+                                     "CLIENT-SIDE.md",
+                                     "SUPPLY-CHAIN-AND-RELEASE.md",
+                                     "CLOUD-AND-DEPLOYMENT.md",
+                                     "DATA-ISOLATION-AND-LIFECYCLE.md",
+                                     "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md"
+                                 ],
+    "prior_run_paths":  [
+
+                        ],
+    "shared_file_owners":  {
+                               "run-metadata.json":  "parent",
+                               "architecture.md":  "parent",
+                               "coverage-ledger.json":  "parent",
+                               "findings.json":  "parent",
+                               "REPORT.md":  "parent",
+                               "FINDINGS-DETAIL.md":  "parent",
+                               "NEEDS-VALIDATION.md":  "parent"
+                           },
+    "sandbox_constraint":  "Required OS-enforced target sandbox and no-network target execution were not available; audit is source-only and runtime claims requiring them remain needs_validation.",
+    "run_status":  "incomplete",
+    "incomplete_reason":  "runtime_validation_unavailable_and_windows_no_follow_validator_blocker",
+    "agents_spent":  15,
+    "sequential_verification":  true,
+    "critic_result":  "Final source verification was completed sequentially within the agent limit. Runtime/deployment validation and Windows no-follow validators remain unavailable."
+}

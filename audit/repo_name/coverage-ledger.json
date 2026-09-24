@@ -1,0 +1,641 @@
+﻿[
+    {
+        "coverage_id":  "apps%2Foperator%2Fsrc%2Fapp%2Frouter.tsx%23dashboard%20routes::apps%2Foperator%2Fsrc%2Fcomponents%2FProtectedRoute.tsx%23ProtectedRoute::apps%2Foperator::Access%20control",
+        "canonical_refs":  {
+                               "surface":  "apps/operator/src/app/router.tsx#dashboard routes",
+                               "boundary":  "apps/operator/src/components/ProtectedRoute.tsx#ProtectedRoute",
+                               "subsystem":  "apps/operator",
+                               "attack_class":  "Access control"
+                           },
+        "surface":  "apps/operator/src/app/router.tsx#dashboard routes",
+        "boundary":  "apps/operator/src/components/ProtectedRoute.tsx#ProtectedRoute",
+        "subsystem":  "apps/operator",
+        "attack_class":  "Access control",
+        "starting_paths":  [
+                               "apps/operator/src/app/router.tsx",
+                               "apps/operator/src/components/ProtectedRoute.tsx",
+                               "apps/operator/src/features/auth/hooks.ts",
+                               "apps/operator/src/features/http.ts"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Access control",
+        "selected_companion_blocks":  [
+                                          "WEB-PROTOCOL-AND-AUTH.md#Browser-session attack classes",
+                                          "CLIENT-SIDE.md#Service-worker and browser-storage attack classes",
+                                          "CLIENT-SIDE.md#UI-redress and navigation attack classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  1,
+        "status":  "candidate",
+        "agent_id":  "hunter-auth",
+        "reviewed_paths":  [
+                               "apps/operator/src/app/router.tsx",
+                               "apps/operator/src/components/ProtectedRoute.tsx",
+                               "apps/operator/src/features/http.ts",
+                               "apps/operator/src/lib/cookies.ts",
+                               "apps/operator/src/features/auth/hooks.ts",
+                               "apps/operator/src/pages/login/index.tsx"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "hunter-auth",
+                                 "reviewed_paths":  [
+                                                        "apps/operator/src/app/router.tsx",
+                                                        "apps/operator/src/components/ProtectedRoute.tsx",
+                                                        "apps/operator/src/features/http.ts",
+                                                        "apps/operator/src/lib/cookies.ts",
+                                                        "apps/operator/src/features/auth/hooks.ts"
+                                                    ],
+                                 "invariant":  "Client route and role guards must not be the only protection for privileged resources and auth identity cache must track token changes.",
+                                 "method":  "source",
+                                 "result":  "ProtectedRoute checks token, /admin/me, and allowedRoles; HTTP 401 clears token. A separate callback token path writes token without explicit auth/me invalidation; backend role enforcement is unavailable.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "operator-stale-auth-me-query-role-guard"
+                                ],
+        "unresolved":  [
+                           "Backend role enforcement and whether stale cached identity can reach protected API data or mutations are not source-visible."
+                       ]
+    },
+    {
+        "coverage_id":  "apps%2Fweb%2Fapp-pages%2Flogin%2Findex.tsx%23MyGov%20callback::apps%2Fweb%2Ffeatures%2Fauth%2Fcookies.ts%23cookieAttributes::apps%2Fweb::Cryptography%20and%20secrets",
+        "canonical_refs":  {
+                               "surface":  "apps/web/app-pages/login/index.tsx#MyGov callback",
+                               "boundary":  "apps/web/features/auth/cookies.ts#cookieAttributes",
+                               "subsystem":  "apps/web",
+                               "attack_class":  "Cryptography and secrets"
+                           },
+        "surface":  "apps/web/app-pages/login/index.tsx#MyGov callback",
+        "boundary":  "apps/web/features/auth/cookies.ts#cookieAttributes",
+        "subsystem":  "apps/web",
+        "attack_class":  "Cryptography and secrets",
+        "starting_paths":  [
+                               "apps/web/app-pages/login/index.tsx",
+                               "apps/web/features/auth/cookies.ts",
+                               "apps/web/features/auth/context.tsx",
+                               "apps/web/features/http.ts"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Cryptography and secrets",
+        "selected_companion_blocks":  [
+                                          "WEB-PROTOCOL-AND-AUTH.md#Federated-identity attack classes",
+                                          "WEB-PROTOCOL-AND-AUTH.md#Browser-session attack classes",
+                                          "CLIENT-SIDE.md#Service-worker and browser-storage attack classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  1,
+        "status":  "candidate",
+        "agent_id":  "hunter-auth",
+        "reviewed_paths":  [
+                               "apps/web/app-pages/login/index.tsx",
+                               "apps/web/features/auth/cookies.ts",
+                               "apps/web/features/auth/api.ts",
+                               "apps/web/features/http.ts",
+                               "apps/web/features/auth/context.tsx",
+                               "apps/web/components/ui/Navbar.tsx"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "hunter-auth",
+                                 "reviewed_paths":  [
+                                                        "apps/web/app-pages/login/index.tsx",
+                                                        "apps/web/features/auth/cookies.ts",
+                                                        "apps/web/features/auth/api.ts",
+                                                        "apps/web/features/http.ts"
+                                                    ],
+                                 "invariant":  "Only a state-bound backend-validated callback may establish a bearer session.",
+                                 "method":  "source",
+                                 "result":  "Non-empty token query parameter is written directly to permit_portal_token and injected as Bearer; callback state, issuer, audience, expiry, and one-time use are not visible.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "web-query-token-session-fixation"
+                                ],
+        "unresolved":  [
+                           "Validate MyGov token issuance, state binding, replay/expiry, and deployment URL leakage."
+                       ]
+    },
+    {
+        "coverage_id":  "apps%2Foperator%2Fsrc%2Ffeatures%2Fapplications%2Fapi.ts%23admin%20mutations::apps%2Foperator%2Fsrc%2Fapp%2Frouter.tsx%23role-gated%20routes::apps%2Foperator::Access%20control",
+        "canonical_refs":  {
+                               "surface":  "apps/operator/src/features/applications/api.ts#admin mutations",
+                               "boundary":  "apps/operator/src/app/router.tsx#role-gated routes",
+                               "subsystem":  "apps/operator",
+                               "attack_class":  "Access control"
+                           },
+        "surface":  "apps/operator/src/features/applications/api.ts#admin mutations",
+        "boundary":  "apps/operator/src/app/router.tsx#role-gated routes",
+        "subsystem":  "apps/operator",
+        "attack_class":  "Access control",
+        "starting_paths":  [
+                               "apps/operator/src/features/applications/api.ts",
+                               "apps/operator/src/features/users/api.ts",
+                               "apps/operator/src/features/confirmations/api.ts",
+                               "apps/operator/src/app/router.tsx"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Access control",
+        "selected_companion_blocks":  [
+                                          "WEB-PROTOCOL-AND-AUTH.md#Browser-session attack classes",
+                                          "DATA-ISOLATION-AND-LIFECYCLE.md#Tenant and object-isolation attack classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  1,
+        "status":  "candidate",
+        "agent_id":  "hunter-access",
+        "reviewed_paths":  [
+                               "apps/operator/src/features/applications/api.ts",
+                               "apps/operator/src/app/router.tsx",
+                               "apps/operator/src/components/ProtectedRoute.tsx",
+                               "apps/operator/src/pages/(dashboard)/applications/manage/index.tsx",
+                               "apps/operator/src/features/users/api.ts",
+                               "apps/operator/src/features/confirmations/api.ts",
+                               "apps/operator/src/features/visa-queue/api.ts",
+                               "apps/operator/src/features/sign-queue/api.ts",
+                               "apps/operator/src/features/awaiting-payment/api.ts"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "hunter-access",
+                                 "reviewed_paths":  [
+                                                        "apps/operator/src/features/applications/api.ts",
+                                                        "apps/operator/src/app/router.tsx",
+                                                        "apps/operator/src/components/ProtectedRoute.tsx",
+                                                        "apps/operator/src/pages/(dashboard)/applications/manage/index.tsx"
+                                                    ],
+                                 "invariant":  "Admin application and privilege mutations must enforce role, department, assignment, workflow, and resource scope at the backend.",
+                                 "method":  "source",
+                                 "result":  "Caller-controlled IDs and payloads reach admin reads/downloads/mutations; frontend guards exist but backend authorization is absent from repository.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "operator-admin-resource-authorization-server-enforcement-unavailable",
+                                    "operator-user-privilege-change-server-enforcement-unavailable"
+                                ],
+        "unresolved":  [
+                           "Backend authorization for admin application/document/workflow and user privilege endpoints is unavailable."
+                       ]
+    },
+    {
+        "coverage_id":  "apps%2Fweb%2Ffeatures%2Fapply%2Fapi.ts%23citizen%20mutations::apps%2Fweb%2Ffeatures%2Fhttp.ts%23bearer%20interceptor::apps%2Fweb::Access%20control",
+        "canonical_refs":  {
+                               "surface":  "apps/web/features/apply/api.ts#citizen mutations",
+                               "boundary":  "apps/web/features/http.ts#bearer interceptor",
+                               "subsystem":  "apps/web",
+                               "attack_class":  "Access control"
+                           },
+        "surface":  "apps/web/features/apply/api.ts#citizen mutations",
+        "boundary":  "apps/web/features/http.ts#bearer interceptor",
+        "subsystem":  "apps/web",
+        "attack_class":  "Access control",
+        "starting_paths":  [
+                               "apps/web/features/apply/api.ts",
+                               "apps/web/features/applications/api.ts",
+                               "apps/web/features/http.ts",
+                               "apps/web/features/auth/context.tsx"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Access control",
+        "selected_companion_blocks":  [
+                                          "WEB-PROTOCOL-AND-AUTH.md#Browser-session attack classes",
+                                          "DATA-ISOLATION-AND-LIFECYCLE.md#Tenant and object-isolation attack classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  1,
+        "status":  "candidate",
+        "agent_id":  "hunter-access",
+        "reviewed_paths":  [
+                               "apps/web/features/apply/api.ts",
+                               "apps/web/features/applications/api.ts",
+                               "apps/web/features/http.ts"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "hunter-access",
+                                 "reviewed_paths":  [
+                                                        "apps/web/features/apply/api.ts",
+                                                        "apps/web/features/applications/api.ts",
+                                                        "apps/web/features/http.ts"
+                                                    ],
+                                 "invariant":  "Citizen bearer principals may access only owned applications/documents.",
+                                 "method":  "source",
+                                 "result":  "Caller-controlled applicationId/documentId values reach citizen reads, mutations, uploads, payment, ratings, and downloads; backend ownership checks are unavailable.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "citizen-application-document-idor-backend-enforcement"
+                                ],
+        "unresolved":  [
+                           "Backend ownership and parent-document checks are unavailable."
+                       ]
+    },
+    {
+        "coverage_id":  "apps%2Foperator%2Fsrc%2Fpages%2F(dashboard)%2Fpermit-services%2Fmanage%2Findex.tsx%23rich%20text%20form::apps%2Fweb%2Fapp-pages%2Fpermission%2Fdetail%2Fsections%2FPermissionInfoSection.tsx%23dangerouslySetInnerHTML::apps::Injection",
+        "canonical_refs":  {
+                               "surface":  "apps/operator/src/pages/(dashboard)/permit-services/manage/index.tsx#rich text form",
+                               "boundary":  "apps/web/app-pages/permission/detail/sections/PermissionInfoSection.tsx#dangerouslySetInnerHTML",
+                               "subsystem":  "apps",
+                               "attack_class":  "Injection"
+                           },
+        "surface":  "apps/operator/src/pages/(dashboard)/permit-services/manage/index.tsx#rich text form",
+        "boundary":  "apps/web/app-pages/permission/detail/sections/PermissionInfoSection.tsx#dangerouslySetInnerHTML",
+        "subsystem":  "apps",
+        "attack_class":  "Injection",
+        "starting_paths":  [
+                               "apps/operator/src/components/tiptap-note-editor.tsx",
+                               "apps/operator/src/features/permit-services/api.ts",
+                               "apps/web/app-pages/permission/detail/sections/PermissionInfoSection.tsx",
+                               "apps/operator/src/lib/tiptap-utils.ts"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Injection",
+        "selected_companion_blocks":  [
+                                          "CLIENT-SIDE.md#DOM and object-state attack classes",
+                                          "CLIENT-SIDE.md#Cross-site information leak classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  1,
+        "status":  "candidate",
+        "agent_id":  "hunter-injection",
+        "reviewed_paths":  [
+                               "apps/operator/src/pages/(dashboard)/permit-services/manage/index.tsx",
+                               "apps/operator/src/components/tiptap-note-editor.tsx",
+                               "apps/operator/src/features/permit-services/api.ts",
+                               "apps/operator/src/app/router.tsx",
+                               "apps/web/app-pages/permission/detail/index.tsx",
+                               "apps/web/app-pages/permission/detail/sections/PermissionInfoSection.tsx"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "hunter-injection",
+                                 "reviewed_paths":  [
+                                                        "apps/operator/src/components/tiptap-note-editor.tsx",
+                                                        "apps/operator/src/features/permit-services/api.ts",
+                                                        "apps/web/app-pages/permission/detail/sections/PermissionInfoSection.tsx"
+                                                    ],
+                                 "invariant":  "Persisted rich text must be sanitized before public HTML rendering and only authorized trusted writers may set it.",
+                                 "method":  "source",
+                                 "result":  "Tiptap HTML reaches multipart persistence and public dangerouslySetInnerHTML; backend sanitization/authorization is not visible.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "stored-rich-text-to-public-dangerouslySetInnerHTML"
+                                ],
+        "unresolved":  [
+                           "Backend sanitization, writer authorization, and browser rendering behavior require validation."
+                       ]
+    },
+    {
+        "coverage_id":  "apps%2Foperator%2Fsrc%2Fpages%2F(dashboard)%2Ffaqs%2Ffaq-form-dialog.tsx%23FAQ%20form::apps%2Fweb%2Fapp-pages%2Fhome%2Fsections%2FFaq.tsx%23JSON-LD%20script::apps::Injection",
+        "canonical_refs":  {
+                               "surface":  "apps/operator/src/pages/(dashboard)/faqs/faq-form-dialog.tsx#FAQ form",
+                               "boundary":  "apps/web/app-pages/home/sections/Faq.tsx#JSON-LD script",
+                               "subsystem":  "apps",
+                               "attack_class":  "Injection"
+                           },
+        "surface":  "apps/operator/src/pages/(dashboard)/faqs/faq-form-dialog.tsx#FAQ form",
+        "boundary":  "apps/web/app-pages/home/sections/Faq.tsx#JSON-LD script",
+        "subsystem":  "apps",
+        "attack_class":  "Injection",
+        "starting_paths":  [
+                               "apps/operator/src/pages/(dashboard)/faqs/faq-form-dialog.tsx",
+                               "apps/web/app-pages/home/sections/Faq.tsx"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Injection",
+        "selected_companion_blocks":  [
+                                          "CLIENT-SIDE.md#DOM and object-state attack classes",
+                                          "CLIENT-SIDE.md#Cross-site information leak classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  1,
+        "status":  "candidate",
+        "agent_id":  "hunter-injection",
+        "reviewed_paths":  [
+                               "apps/operator/src/pages/(dashboard)/faqs/faq-form-dialog.tsx",
+                               "apps/operator/src/features/faqs/api.ts",
+                               "apps/operator/src/app/router.tsx",
+                               "apps/web/app-pages/home/sections/Faq.tsx"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "hunter-injection",
+                                 "reviewed_paths":  [
+                                                        "apps/operator/src/pages/(dashboard)/faqs/faq-form-dialog.tsx",
+                                                        "apps/operator/src/features/faqs/api.ts",
+                                                        "apps/web/app-pages/home/sections/Faq.tsx"
+                                                    ],
+                                 "invariant":  "FAQ data must remain data in a script context and not terminate JSON-LD.",
+                                 "method":  "source",
+                                 "result":  "Persisted FAQ strings are embedded through JSON.stringify inside dangerouslySetInnerHTML; explicit script-terminator escaping and backend filtering are not visible.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "faq-text-to-raw-jsonld-script"
+                                ],
+        "unresolved":  [
+                           "Backend filtering and browser parsing of script-terminator input require validation."
+                       ]
+    },
+    {
+        "coverage_id":  "apps%2Fweb%2Fcomponents%2Fdocument-upload-item.tsx%23file%20input::apps%2Fweb%2Ffeatures%2Fapply%2Fapi.ts%23multipart%20upload::apps::Resource%20and%20file%20handling",
+        "canonical_refs":  {
+                               "surface":  "apps/web/components/document-upload-item.tsx#file input",
+                               "boundary":  "apps/web/features/apply/api.ts#multipart upload",
+                               "subsystem":  "apps",
+                               "attack_class":  "Resource and file handling"
+                           },
+        "surface":  "apps/web/components/document-upload-item.tsx#file input",
+        "boundary":  "apps/web/features/apply/api.ts#multipart upload",
+        "subsystem":  "apps",
+        "attack_class":  "Resource and file handling",
+        "starting_paths":  [
+                               "apps/web/components/document-upload-item.tsx",
+                               "apps/web/features/apply/api.ts",
+                               "apps/operator/src/features/permit-services/api.ts",
+                               "apps/operator/src/pages/(dashboard)/permit-services/manage/index.tsx"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Resource and file handling",
+        "selected_companion_blocks":  [
+                                          "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Resource accumulation attack classes",
+                                          "DATA-ISOLATION-AND-LIFECYCLE.md#Tenant and object-isolation attack classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  1,
+        "status":  "candidate",
+        "agent_id":  "hunter-deploy",
+        "reviewed_paths":  [
+                               "apps/web/components/document-upload-item.tsx",
+                               "apps/web/app-pages/apply/steps/documents-step.tsx",
+                               "apps/web/app-pages/apply/index.tsx",
+                               "apps/web/features/apply/api.ts",
+                               "apps/web/features/http.ts",
+                               "apps/web/features/applications/api.ts",
+                               "apps/operator/src/features/applications/api.ts"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "hunter-deploy",
+                                 "reviewed_paths":  [
+                                                        "apps/web/components/document-upload-item.tsx",
+                                                        "apps/web/features/apply/api.ts",
+                                                        "apps/web/features/applications/api.ts",
+                                                        "apps/operator/src/features/applications/api.ts"
+                                                    ],
+                                 "invariant":  "Server must validate file content, size, quotas, ownership, and parser/resource limits; client metadata checks are not authoritative.",
+                                 "method":  "source",
+                                 "result":  "Browser MIME/name and size checks precede multipart upload; backend validation, quotas, and response limits are outside source. Operator blob URL is not revoked, a self-impact hardening issue.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "upload-client-only-file-validation-and-size-limit"
+                                ],
+        "unresolved":  [
+                           "Backend file validation, limits, quotas, parser behavior, and ownership are unavailable."
+                       ]
+    },
+    {
+        "coverage_id":  "apps%2Foperator%2FDockerfile%23runtime%20image::apps%2Foperator%2Fnginx.conf%23HTTP%20runtime::deployment::Obvious%20things",
+        "canonical_refs":  {
+                               "surface":  "apps/operator/Dockerfile#runtime image",
+                               "boundary":  "apps/operator/nginx.conf#HTTP runtime",
+                               "subsystem":  "deployment",
+                               "attack_class":  "Obvious things"
+                           },
+        "surface":  "apps/operator/Dockerfile#runtime image",
+        "boundary":  "apps/operator/nginx.conf#HTTP runtime",
+        "subsystem":  "deployment",
+        "attack_class":  "Obvious things",
+        "starting_paths":  [
+                               "apps/operator/Dockerfile",
+                               "apps/operator/nginx.conf",
+                               "apps/web/Dockerfile",
+                               "apps/web/next.config.ts",
+                               "docker-compose.yml",
+                               ".gitignore",
+                               ".dockerignore",
+                               "package.json",
+                               "pnpm-lock.yaml"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Obvious things",
+        "selected_companion_blocks":  [
+                                          "CLOUD-AND-DEPLOYMENT.md#Ingress, network, and control-plane attack classes",
+                                          "CLOUD-AND-DEPLOYMENT.md#Container and orchestration attack classes",
+                                          "SUPPLY-CHAIN-AND-RELEASE.md#Dependency and build-input attack classes",
+                                          "SUPPLY-CHAIN-AND-RELEASE.md#Release and update attack classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  1,
+        "status":  "candidate",
+        "agent_id":  "hunter-deploy",
+        "reviewed_paths":  [
+                               "apps/operator/Dockerfile",
+                               "apps/operator/nginx.conf",
+                               "docker-compose.yml",
+                               "apps/web/Dockerfile",
+                               "apps/web/next.config.ts",
+                               ".dockerignore",
+                               ".gitignore",
+                               "package.json",
+                               "pnpm-lock.yaml"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "hunter-deploy",
+                                 "reviewed_paths":  [
+                                                        "apps/operator/Dockerfile",
+                                                        "apps/operator/nginx.conf",
+                                                        "docker-compose.yml",
+                                                        "apps/web/Dockerfile",
+                                                        "apps/web/next.config.ts"
+                                                    ],
+                                 "invariant":  "Deployment must establish transport security and browser security headers at the authoritative boundary.",
+                                 "method":  "source",
+                                 "result":  "Operator runtime listens on HTTP with no source-defined TLS or security headers; external proxy behavior is unknown.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "operator-http-runtime-controls"
+                                ],
+        "unresolved":  [
+                           "External TLS termination, headers, runtime isolation, image provenance, and artifact promotion controls are outside source."
+                       ]
+    },
+    {
+        "coverage_id":  "apps%2Fweb%2Ffeatures%2Fapply%2Fapi.ts%23citizen%20application%20lifecycle::apps%2Fweb%2Ffeatures%2Fapplications%2Fapi.ts%23payment%20and%20submission::apps%2Fweb%2Ffeatures%2Fnotifications%2Fapi.ts%23citizen%20mutations::apps%2Fweb::Business%20logic",
+        "canonical_refs":  {
+                               "surface":  "apps/web/features/apply/api.ts#citizen application lifecycle",
+                               "boundary":  "apps/web/features/applications/api.ts#payment and submission",
+                               "subsystem":  "apps/web/features/notifications/api.ts#citizen mutations",
+                               "attack_class":  "Business logic"
+                           },
+        "surface":  "apps/web/features/apply/api.ts#citizen application lifecycle",
+        "boundary":  "apps/web/features/applications/api.ts#payment and submission",
+        "subsystem":  "apps/web",
+        "attack_class":  "Business logic",
+        "starting_paths":  [
+                               "apps/web/features/apply/api.ts",
+                               "apps/web/features/applications/api.ts",
+                               "apps/web/features/notifications/api.ts",
+                               "apps/web/app-pages/apply/index.tsx"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Business logic",
+        "selected_companion_blocks":  [
+                                          "WEB-PROTOCOL-AND-AUTH.md#Browser-session attack classes",
+                                          "DATA-ISOLATION-AND-LIFECYCLE.md#Deletion, revocation, and lifecycle attack classes",
+                                          "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Failure and recovery attack classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  2,
+        "status":  "candidate",
+        "agent_id":  "hunter-workflow",
+        "reviewed_paths":  [
+                               "apps/web/features/apply/api.ts",
+                               "apps/web/features/applications/api.ts",
+                               "apps/web/features/notifications/api.ts",
+                               "apps/web/app-pages/apply/index.tsx"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "hunter-workflow",
+                                 "reviewed_paths":  [
+                                                        "apps/web/features/apply/api.ts",
+                                                        "apps/web/app-pages/apply/index.tsx"
+                                                    ],
+                                 "invariant":  "Application creation and submission must be state-valid, ownership-scoped, and replay-safe.",
+                                 "method":  "source",
+                                 "result":  "In-memory guards and UI pending states do not provide server idempotency; backend deduplication and transition validation are unavailable.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "citizen-draft-creation-replay-no-idempotency",
+                                    "citizen-payment-submit-resubmit-replay",
+                                    "citizen-rating-ownership-and-replay-server-enforcement-unavailable"
+                                ],
+        "unresolved":  [
+                           "Verify backend draft deduplication, payment/workflow idempotency, application ownership, rating eligibility, duplicate semantics, and notification principal scoping."
+                       ]
+    },
+    {
+        "coverage_id":  "apps%2Fweb%2Fapp-pages%2Fnotifications%2Fsections%2FNotificationDialog.tsx%23direct%20document%20download::apps%2Fweb%2Ffeatures%2Fhttp.ts%23bearer%20interceptor::apps%2Fweb%3A%3Aaccess-control%2Fdata-isolation::Access%20control",
+        "canonical_refs":  {
+                               "surface":  "apps/web/app-pages/notifications/sections/NotificationDialog.tsx#direct document download",
+                               "boundary":  "apps/web/features/http.ts#bearer interceptor",
+                               "subsystem":  "apps/web::access-control/data-isolation",
+                               "attack_class":  "Access control"
+                           },
+        "surface":  "apps/web/app-pages/notifications/sections/NotificationDialog.tsx#direct document download",
+        "boundary":  "apps/web/features/http.ts#bearer interceptor",
+        "subsystem":  "apps/web::access-control/data-isolation",
+        "attack_class":  "Access control",
+        "starting_paths":  [
+                               "apps/web/app-pages/notifications/sections/NotificationDialog.tsx",
+                               "apps/web/app-pages/applications/detail/index.tsx",
+                               "apps/web/features/applications/api.ts",
+                               "apps/web/features/notifications/api.ts",
+                               "apps/web/features/http.ts"
+                           ],
+        "ordinary_attack_class_block":  "ATTACK-CLASSES.md#Access control",
+        "selected_companion_blocks":  [
+                                          "WEB-PROTOCOL-AND-AUTH.md#Browser-session attack classes",
+                                          "DATA-ISOLATION-AND-LIFECYCLE.md#Tenant and object-isolation attack classes",
+                                          "CLIENT-SIDE.md#UI-redress and navigation attack classes"
+                                      ],
+        "excluded_blocks":  [
+
+                            ],
+        "prior_status":  "none",
+        "attempts":  [
+
+                     ],
+        "wave":  2,
+        "status":  "candidate",
+        "agent_id":  "verifier-workflow",
+        "reviewed_paths":  [
+                               "apps/web/app-pages/notifications/sections/NotificationDialog.tsx",
+                               "apps/web/app-pages/applications/detail/index.tsx",
+                               "apps/web/features/applications/api.ts",
+                               "apps/web/features/notifications/api.ts",
+                               "apps/web/features/http.ts"
+                           ],
+        "local_checks":  [
+                             {
+                                 "agent_id":  "verifier-workflow",
+                                 "reviewed_paths":  [
+                                                        "apps/web/features/notifications/api.ts",
+                                                        "apps/web/features/http.ts",
+                                                        "apps/web/app-pages/notifications/sections/NotificationDialog.tsx",
+                                                        "apps/web/features/applications/api.ts"
+                                                    ],
+                                 "invariant":  "Direct document downloads must preserve authentication and resource authorization.",
+                                 "method":  "source",
+                                 "result":  "Direct UI navigation bypasses the Axios bearer interceptor; cookie and backend coverage are deployment-dependent.",
+                                 "artifact":  null
+                             }
+                         ],
+        "result_fingerprints":  [
+                                    "notification-direct-document-download-authorization"
+                                ],
+        "unresolved":  [
+                           "Verify authentication propagation and server-side document ownership authorization for direct navigation downloads."
+                       ]
+    }
+]
